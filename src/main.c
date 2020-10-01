@@ -6,12 +6,36 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         printf("%x ", packet[i]);
     }
     printf("time = %ld\n", header->ts.tv_sec);
+    struct ether_header *eptr;  /* net/ethernet.h */
+
+    /* lets start with the ether header... */
+    eptr = (struct ether_header *) packet;
+
+    fprintf(stdout,"ethernet header source: %s"
+            ,ether_ntoa((const struct ether_addr *)&eptr->ether_shost));
+    fprintf(stdout," destination: %s "
+            ,ether_ntoa((const struct ether_addr *)&eptr->ether_dhost));
+
+    /* check to see if we have an ip packet */
+    if (ntohs (eptr->ether_type) == ETHERTYPE_IP)
+    {
+        fprintf(stdout,"(IP)");
+    }else  if (ntohs (eptr->ether_type) == ETHERTYPE_ARP)
+    {
+        fprintf(stdout,"(ARP)");
+    }else  if (ntohs (eptr->ether_type) == ETHERTYPE_REVARP)
+    {
+        fprintf(stdout,"(RARP)");
+    }else {
+        fprintf(stdout,"(?)");
+        exit(1);
+    }
+    fprintf(stdout,"\n");
 }
 
 int main (int argc, char **argv) {
-    printf("Bonjour Danyl\n");
-    if ((argc-1)%2!=0) {
-        printf("wrong number of arguments %d\n",argc-1);
+    if ((argc - 1) % 2 != 0) {
+        printf("wrong number of arguments %d\n",argc - 1);
         return EXIT_FAILURE;
     }
     char *interface = NULL;
@@ -36,7 +60,7 @@ int main (int argc, char **argv) {
                         return EXIT_FAILURE;
                     }
                     fichier = argv[i+1];
-                    printf("Fichier %s\n",fichier);
+                    printf("Fichier %s\n", fichier);
                 }
                 if (strcmp(argv[i], "-f")==0) {
                     if ((filtre != NULL) || (fichier != NULL)) {
