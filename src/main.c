@@ -45,7 +45,7 @@ int main (int argc, char **argv) {
     int i;
     for(i = 1; i < argc; i += 2) {
         switch (argv[i][0]) {
-              case '-':
+            case '-':
                 if (strcmp(argv[i], "-i") == 0) {
                     if ((interface != NULL)||(fichier != NULL)) {
                         printf("Can't define interface -i\n");
@@ -79,8 +79,9 @@ int main (int argc, char **argv) {
                     printf("level %d\n", level);
                 }
                 break;
-              default:
+            default:
                 printf("Invalid arguments\n");
+                break;
             }
     }
 
@@ -91,14 +92,23 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
     bool exist = false;
-    while (alldevs != NULL) {
-        printf("%s\n", alldevs->name);
-        if (strcmp(alldevs->name, interface) == 0)
+    pcap_if_t *ptr = alldevs;
+
+    while (ptr != NULL) {
+        if (interface != NULL && strcmp(ptr->name, interface) == 0)
             exist = true;
-        alldevs = alldevs->next;
+        ptr = ptr->next;
     }
-    if (!exist) {
-        fprintf(stderr, "%s doens\'t exist\nVoici la liste des interfaces disponibles :\n", interface);
+
+    if (!exist && interface != NULL) {
+        fprintf(stderr, "%s n\'existe pas\nVoici la liste des interfaces disponibles :\n", interface);
+        ptr = alldevs;
+        while (ptr != NULL) {
+            printf("%s\n", ptr->name);
+            if (interface != NULL && strcmp(ptr->name, interface) == 0)
+                exist = true;
+            ptr = ptr->next;
+        }
         return EXIT_FAILURE;
     }
     bpf_u_int32 netp, maskp;
