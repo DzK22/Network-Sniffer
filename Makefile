@@ -13,10 +13,10 @@ $(OBJ_DIR)$(EXEC).o: $(SRC_DIR)$(EXEC).c
 	mkdir -p $(OBJ_DIR)
 	mv $(EXEC).o $(OBJ_DIR)
 
-$(OBJ_DIR)analyseur.o: $(SRC_DIR)analyseur.c
+$(OBJ_DIR)liaison.o: $(SRC_DIR)liaison.c
 	$(CC) -c $< $(CFLAGS)
 	mkdir -p $(OBJ_DIR)
-	mv analyseur.o $(OBJ_DIR)
+	mv liaison.o $(OBJ_DIR)
 
 clean:
 	rm -rf $(OBJ_DIR) $(EXEC) $(DOC_DIR)
