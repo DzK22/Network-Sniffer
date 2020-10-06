@@ -18,6 +18,11 @@ void analyse (const unsigned char * packet, int level) {
             nextInPacket = 0;
             break;
 
+            case ETHERTYPE_ARP:
+                fprintf(stdout, YELLOW"Type = ARP\n"COL_RESET);
+                nextInPacket = 0;
+                break;
+
             default :
             nextInPacket = 0;
             break;

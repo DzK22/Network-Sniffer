@@ -53,14 +53,21 @@ int main (int argc, char **argv) {
         fprintf(stderr, "Vous ne pouvez pas utiliser -i et -o pendant la mm execution\n");
         return EXIT_FAILURE;
     }
-    (void)f;
+
+    if (f && o) {
+        fprintf(stderr, "Vous ne pouvez pas utiliser -f et -o pendant la mm execution\n");
+        return EXIT_FAILURE;
+    }
+
     args[0] = (unsigned char) level;
+
     pcap_if_t *alldevs;
     char errbuff[PCAP_ERRBUF_SIZE];
     if (pcap_findalldevs(&alldevs, errbuff) == -1) {
         fprintf(stderr, "Impossible de capturer les devices\n");
         return EXIT_FAILURE;
     }
+
     bool exist = false;
     pcap_if_t *ptr = alldevs;
 

@@ -9,14 +9,15 @@ int threat_ipv4(const unsigned char *packet, int level, unsigned *next) {
     uint32_t ip_dst = header->daddr;
     unsigned ihl = header->ihl;
     unsigned version = header->version;
+    //header->protocol pour le protocol
     inet_ntop(AF_INET, &ip_src, ip_source, 32);
     inet_ntop(AF_INET, &ip_dst, ip_dest, 32);
 
-    res = snprintf(str_ihl, LEN, "0x%.8x", ihl);
+    res = snprintf(str_ihl, LEN, "%#x", ihl);
     if (res == EXIT_FAILURE)
         return 0;
 
-    snprintf(str_version, LEN, "0x%.4x", version);
+    snprintf(str_version, LEN, "%#x", version);
     if (res == EXIT_FAILURE)
         return 0;
     fprintf(stdout, "source @ = %s\n", ip_source);
