@@ -2,6 +2,6 @@
 #define NETWORK_H
 #include "analyseur.h"
 
-int threat_ipv4(const unsigned char *, int *, int);
+int threat_ipv4(const unsigned char *, int, unsigned *);
 
 #endif
