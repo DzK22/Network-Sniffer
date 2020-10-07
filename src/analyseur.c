@@ -14,8 +14,7 @@ void analyse (const unsigned char * packet, int level) {
 
             case ETHERTYPE_IPV6:
             fprintf(stdout, YELLOW"Type = IPv6\n"COL_RESET);
-            //appeler fonction IPV6
-            nextInPacket = 0;
+            nextInPacket = threat_ipv6(packet + nextLength, level, &nextLength);
             break;
 
             case ETHERTYPE_ARP:

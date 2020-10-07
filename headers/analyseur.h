@@ -17,6 +17,7 @@
 #include "liaison.h"
 #include "network.h"
 #include <time.h>
+#include <netinet/ip6.h>
 
 
 #define V3 3
