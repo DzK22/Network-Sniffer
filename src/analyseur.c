@@ -37,7 +37,18 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     (void)header;
     static unsigned long packetID = 0;
     packetID++;
-    fprintf(stdout, "packet number = %ld\n", packetID);
+    struct tm res;
+    if (localtime_r(&header->ts.tv_sec, &res) == NULL) {
+        fprintf(stderr, "localtime error\n");
+        exit(EXIT_FAILURE);
+    }
+    char str_time[LEN];
+    if (strftime(str_time, LEN, "%X", &res)  == 0) {
+        fprintf(stderr, "strftime error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(stdout, "packet ID = %ld arrived at %s\n", packetID, str_time);
     analyse(packet, args[0]);
 }
 
