@@ -8,17 +8,17 @@ void analyse (const unsigned char * packet, int level) {
         switch(nextInPacket) {
             case ETHERTYPE_IP:
             //appelez fonction IP
-            fprintf(stdout, YELLOW"Type = IPv4\n"COL_RESET);
+            fprintf(stdout, YELLOW"\tType = IPv4\n"COL_RESET);
             nextInPacket = threat_ipv4(packet + nextLength, level, &nextLength);
             break;
 
             case ETHERTYPE_IPV6:
-            fprintf(stdout, YELLOW"Type = IPv6\n"COL_RESET);
+            fprintf(stdout, YELLOW"\tType = IPv6\n"COL_RESET);
             nextInPacket = threat_ipv6(packet + nextLength, level, &nextLength);
             break;
 
             case ETHERTYPE_ARP:
-                fprintf(stdout, YELLOW"Type = ARP\n"COL_RESET);
+                fprintf(stdout, YELLOW"\tType = ARP\n"COL_RESET);
                 nextInPacket = 0;
                 break;
 
