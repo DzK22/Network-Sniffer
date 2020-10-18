@@ -1,6 +1,6 @@
 #include "../headers/application.h"
 
-bool get_app (const unsigned char *packet, int port, int type, int level) {
+bool get_app (const unsigned char *packet, int port, int type, int level, int len) {
     (void)level;
     (void)type;
     (void)packet;
@@ -16,7 +16,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level) {
 
         case HTTPS:
             fprintf(stdout, "\tHTTP\n");
-            threat_http (packet, type);
+            threat_http (packet, type, len);
             break;
 
         case SMTP:
@@ -30,18 +30,23 @@ bool get_app (const unsigned char *packet, int port, int type, int level) {
     }
     return true;
 }
-void threat_app (const unsigned char *packet, int sport, int dport, unsigned *to_add, int level) {
+void threat_app (const unsigned char *packet, int sport, int dport, unsigned *to_add, int level, int len) {
     (void)to_add;
     (void)level;
-    if (!get_app(packet, sport, REQUEST, level) && !get_app(packet, dport, RESPONSE, level))
+    if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
         fprintf(stderr, "THERE IS NO APP MATCHING\n");
 }
 
-void threat_http (const unsigned char *packet, int type) {
+void threat_http (const unsigned char *packet, int type, int len) {
     (void)packet;
     if (type == REQUEST)
         fprintf(stdout, "\t\tREQUEST\n");
     else
         fprintf(stdout, "\t\tRESPONSE\n");
-    //afficher le msg
+    if (len <= 0)
+        return;
+    int i;
+    for (i = 0; i < len; i++) {
+        print(packet[i]);
+    }
 }

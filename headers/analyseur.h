@@ -24,6 +24,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include "application.h"
+#include <ctype.h>
 
 #define POP    110
 #define IMAP   143
@@ -52,7 +53,6 @@
 void callback(unsigned char *, const struct pcap_pkthdr *, const unsigned char *);
 void usage (int);
 int test_snprintf(int, int);
-void print(const unsigned char *, int);
-void analyse (const unsigned char *, int);
+void print(const char);
 
 #endif

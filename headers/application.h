@@ -4,7 +4,7 @@
 #define REQUEST 0x1005
 #define RESPONSE 0x995
 
-bool get_app (const unsigned char *, int, int, int);
-void threat_app (const unsigned char *, int, int, unsigned *, int);
-void threat_http (const unsigned char *, int);
+bool get_app (const unsigned char *, int, int, int, int);
+void threat_app (const unsigned char *, int, int, unsigned *, int, int);
+void threat_http (const unsigned char *, int, int);
 #endif
