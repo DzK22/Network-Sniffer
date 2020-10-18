@@ -16,9 +16,14 @@
 #include <unistd.h>
 #include "liaison.h"
 #include "network.h"
+#include "transport.h"
 #include <time.h>
 #include <netinet/ip6.h>
 #include <stdbool.h>
+#include <netinet/udp.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include "application.h"
 
 #define POP    110
 #define IMAP   143

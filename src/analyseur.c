@@ -1,34 +1,22 @@
 #include "../headers/analyseur.h"
 
 void analyse (const unsigned char * packet, int level) {
-    int nextInPacket;
-    unsigned nextLength;
-    nextInPacket = threat_ethernet(packet, level, &nextLength);
-    while (nextInPacket) {
-        switch(nextInPacket) {
-            case ETHERTYPE_IP:
-            //appelez fonction IP
-            fprintf(stdout, YELLOW"\tType = IPv4\n"COL_RESET);
-            nextInPacket = threat_ipv4(packet + nextLength, level, &nextLength);
-            break;
+    int e_protocol, t_protocol, sport, dport;
+    unsigned previewHeaderLength, to_add;
+    threat_ethernet(packet, &e_protocol, level);
+    previewHeaderLength = sizeof(struct ether_header);
 
-            case ETHERTYPE_IPV6:
-            fprintf(stdout, YELLOW"\tType = IPv6\n"COL_RESET);
-            nextInPacket = threat_ipv6(packet + nextLength, level, &nextLength);
-            break;
+    //Couche réseau
+    threat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level);
+    previewHeaderLength += to_add;
 
-            case ETHERTYPE_ARP:
-                fprintf(stdout, YELLOW"\tType = ARP\n"COL_RESET);
-                nextInPacket = 0;
-                break;
+    //Couche transport
+    threat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
+    previewHeaderLength += to_add;
 
-            default :
-            nextInPacket = 0;
-            break;
-            //sortie de boucle
-        }
-    }
-    fprintf(stdout, COL_RESET"\n");
+    //Couche applicative
+    threat_app(packet + previewHeaderLength, sport, dport, &to_add, level);
+    fprintf(stdout, "\n");
 }
 
 void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {

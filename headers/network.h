@@ -4,7 +4,8 @@
 #define IPV6_LENGTH 40
 
 char* get_protocol(int);
-int threat_ipv4(const unsigned char *, int, unsigned *);
-int threat_ipv6(const unsigned char *, int, unsigned *);
+void threat_network(const unsigned char *, int, int *, unsigned *, int);
+int threat_ipv4(const unsigned char *, int);
+int threat_ipv6(const unsigned char *, int);
 
 #endif
