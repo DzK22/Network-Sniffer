@@ -1,22 +1,22 @@
 #include "../headers/network.h"
 
 char* get_protocol(int id) {
-  char* name;
+  char* protocol_name;
   switch (id) {
-    case 6:
-      name = "TCP";
+    case TCP:
+      protocol_name = "TCP";
       break;
-    case 17:
-      name = "UDP";
+    case UDP:
+      protocol_name = "UDP";
       break;
-    case 1:
-      name = "ICMP";
+    case ICMP:
+      protocol_name = "ICMP";
       break;
     default:
-      name = "Unknown";
+      protocol_name = "Unknown";
       break;
   }
-  return name;
+  return protocol_name;
 }
 
 int threat_ipv4(const unsigned char *packet, int level, unsigned *next) {
