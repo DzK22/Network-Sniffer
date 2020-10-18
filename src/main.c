@@ -88,16 +88,20 @@ int main (int argc, char **argv) {
         }
         return EXIT_FAILURE;
     }
-    
-    pcap_t *packet;
-    if ((packet = pcap_create(interface, errbuff)) == NULL) {
-        fprintf(stderr, "pcap_create error\n");
-        return EXIT_FAILURE;
-    }
 
-    if (pcap_activate(packet) != 0) {
-        fprintf(stderr, "pcap_activate error\n");
-        return EXIT_FAILURE;
+    pcap_t *packet;
+    
+    if (o) {
+        if ((packet = pcap_open_offline(fichier, errbuff)) == NULL) {
+            fprintf(stderr, "pcap_open_offline error\n");
+            return EXIT_FAILURE;
+        }
+    }
+    else {
+        if ((packet = pcap_open_live(interface, BUFSIZ, 1, 0, errbuff)) == NULL) {
+            fprintf(stderr, "pcap_open_live\n");
+            return EXIT_FAILURE;
+        }
     }
 
     /*if (f) {

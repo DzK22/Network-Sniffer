@@ -6,5 +6,5 @@
 
 bool get_app (const unsigned char *, int, int, int, int);
 void threat_app (const unsigned char *, int, int, unsigned *, int, int);
-void threat_http (const unsigned char *, int, int);
+void threat_https (const unsigned char *, int, int);
 #endif

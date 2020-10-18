@@ -15,8 +15,8 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case HTTPS:
-            fprintf(stdout, "\tHTTP\n");
-            threat_http (packet, type, len);
+            fprintf(stdout, "\tHTTPS\n");
+            threat_https(packet, type, len);
             break;
 
         case SMTP:
@@ -37,16 +37,12 @@ void threat_app (const unsigned char *packet, int sport, int dport, unsigned *to
         fprintf(stderr, "THERE IS NO APP MATCHING\n");
 }
 
-void threat_http (const unsigned char *packet, int type, int len) {
-    (void)packet;
+void threat_https (const unsigned char *packet, int type, int len) {
     if (type == REQUEST)
         fprintf(stdout, "\t\tREQUEST\n");
     else
         fprintf(stdout, "\t\tRESPONSE\n");
     if (len <= 0)
         return;
-    int i;
-    for (i = 0; i < len; i++) {
-        print(packet[i]);
-    }
+    print(packet, len);
 }
