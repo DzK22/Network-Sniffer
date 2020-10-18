@@ -58,13 +58,13 @@ void threat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *
     fprintf(stdout, "\tAcknowledgment Num = %d\n", ack_seq);
     fprintf(stdout, "\tDate Offset = %d\n", dataOff);
     fprintf(stdout, "\tFlags : \n");
-    fprintf(stdout, "\t\t - FIN : %d\n", fin);
-    fprintf(stdout, "\t\t - SYN : %d\n", syn);
-    fprintf(stdout, "\t\t - RST : %d\n", reset);
-    fprintf(stdout, "\t\t - PSH : %d\n", push);
-    fprintf(stdout, "\t\t - ACK : %d\n", ack);
-    fprintf(stdout, "\t\t - URG : %d\n", urg);
-    fprintf(stdout, "\t Window = %d\n", window);
-    fprintf(stdout, "\t Checksum = %d\n", checksum);
-    fprintf(stdout, "\t Urgent Pointer = %d\n", urgPointer);
+    fprintf(stdout, "\t\t- FIN : %d\n", fin);
+    fprintf(stdout, "\t\t- SYN : %d\n", syn);
+    fprintf(stdout, "\t\t- RST : %d\n", reset);
+    fprintf(stdout, "\t\t- PSH : %d\n", push);
+    fprintf(stdout, "\t\t- ACK : %d\n", ack);
+    fprintf(stdout, "\t\t- URG : %d\n", urg);
+    fprintf(stdout, "\tWindow = %d\n", window);
+    fprintf(stdout, "\tChecksum = %d\n", checksum);
+    fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
 }

@@ -14,7 +14,9 @@ bool get_app (const unsigned char *packet, int port, int type, int level) {
         case TELNET:
             break;
 
-        case HTTP:
+        case HTTPS:
+            fprintf(stdout, "\tHTTP\n");
+            threat_http (packet, type);
             break;
 
         case SMTP:
@@ -32,5 +34,14 @@ void threat_app (const unsigned char *packet, int sport, int dport, unsigned *to
     (void)to_add;
     (void)level;
     if (!get_app(packet, sport, REQUEST, level) && !get_app(packet, dport, RESPONSE, level))
-        fprintf(stdout, "THERE IS NO APP MATCHING\n");
+        fprintf(stderr, "THERE IS NO APP MATCHING\n");
+}
+
+void threat_http (const unsigned char *packet, int type) {
+    (void)packet;
+    if (type == REQUEST)
+        fprintf(stdout, "\t\tREQUEST\n");
+    else
+        fprintf(stdout, "\t\tRESPONSE\n");
+    //afficher le msg
 }

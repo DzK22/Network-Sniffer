@@ -31,6 +31,7 @@
 #define SMTPS  587
 #define HTTP   80
 #define DNS    53
+#define HTTPS  443
 #define TELNET 23
 #define DHCP   67
 #define FTPD   20
@@ -51,5 +52,7 @@
 void callback(unsigned char *, const struct pcap_pkthdr *, const unsigned char *);
 void usage (int);
 int test_snprintf(int, int);
+void print(const unsigned char *, int);
+void analyse (const unsigned char *, int);
 
 #endif

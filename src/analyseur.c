@@ -1,4 +1,23 @@
 #include "../headers/analyseur.h"
+void print(const unsigned char *packet, int len) {
+    int i;
+    for (i = 0; i < len; i++) {
+        switch (packet[i]) {
+            case '\r':
+            fprintf(stdout, "\\r");
+            break;
+
+            case '\n':
+            fprintf(stdout, "\\n");
+            break;
+
+            default:
+            fprintf(stdout, "%c", packet[i]);
+            break;
+        }
+    }
+    fprintf(stdout, "\n");
+}
 
 void analyse (const unsigned char * packet, int level) {
     int e_protocol, t_protocol, sport, dport;
