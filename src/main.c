@@ -88,11 +88,7 @@ int main (int argc, char **argv) {
         }
         return EXIT_FAILURE;
     }
-    /*bpf_u_int32 netp, maskp;
-    if (pcap_lookupnet((strcmp(interface, "") != 0) ? interface : alldevs[0].name, &netp, &maskp, errbuff) == PCAP_ERROR) {
-        fprintf(stderr, "pcap_lookupnet error\n");
-        return EXIT_FAILURE;
-    }*/
+    
     pcap_t *packet;
     if ((packet = pcap_create(interface, errbuff)) == NULL) {
         fprintf(stderr, "pcap_create error\n");
@@ -103,6 +99,19 @@ int main (int argc, char **argv) {
         fprintf(stderr, "pcap_activate error\n");
         return EXIT_FAILURE;
     }
+
+    /*if (f) {
+        struct bpf_program bfp_f;
+        bpf_u_int32 maskp = 0;
+        if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
+            fprintf(stderr, "Error filter compiling\n");
+            return EXIT_FAILURE;
+        }
+        if (pcap_setfilter(packet, &bfp_f) == PCAP_ERROR) {
+            fprintf(stderr, "Error filter setting\n");
+            return EXIT_FAILURE;
+        }
+    }*/
 
     if (pcap_loop(packet, -1, callback, args) == PCAP_ERROR) {
         fprintf(stderr, "pcap_loop error\n");
