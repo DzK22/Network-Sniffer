@@ -18,6 +18,7 @@
 #include "network.h"
 #include <time.h>
 #include <netinet/ip6.h>
+#include <stdbool.h>
 
 
 #define V3 3
