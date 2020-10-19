@@ -1,16 +1,16 @@
 #include "../headers/transport.h"
 
-void threat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, unsigned *to_add, int level) {
+void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, unsigned *to_add, int level) {
     switch (t_protocol) {
         case UDP:
             //fprintf(stdout, "\tT_PROTOCOL : UDP\n");
-            threat_udp(packet, sport, dport, level);
+            treat_udp(packet, sport, dport, level);
             *to_add = sizeof(struct udphdr);
             break;
 
         case TCP:
             //fprintf(stdout, "\tT_PROTOCOL : TCP\n");
-            threat_tcp(packet, to_add, sport, dport, level);
+            treat_tcp(packet, to_add, sport, dport, level);
             break;
 
         default:
@@ -18,7 +18,7 @@ void threat_transport(const unsigned char *packet, int t_protocol, int *sport, i
     }
 }
 
-void threat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
+void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     (void)level;
     struct udphdr *udp = (struct udphdr *)packet;
     int checksum, dataLength;
@@ -33,7 +33,7 @@ void threat_udp(const unsigned char *packet, int *sport, int *dport, int level) 
     fprintf(stdout, "\tLength = %d\n", dataLength);
 }
 
-void threat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *dport, int level) {
+void treat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *dport, int level) {
     (void)level;
     struct tcphdr *tcp = (struct tcphdr *)packet;
     int fin, syn, reset, push, ack, urg, window, checksum, seq, ack_seq, dataOff, urgPointer;

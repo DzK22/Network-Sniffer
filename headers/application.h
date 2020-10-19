@@ -5,6 +5,6 @@
 #define RESPONSE 0x995
 
 bool get_app (const unsigned char *, int, int, int, int);
-void threat_app (const unsigned char *, int, int, unsigned *, int, int);
-void threat_https (const unsigned char *, int, int);
+void treat_app (const unsigned char *, int, int, unsigned *, int, int);
+void treat_https (const unsigned char *, int, int);
 #endif

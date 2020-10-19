@@ -1,6 +1,6 @@
 #include "../headers/liaison.h"
 
-void threat_ethernet(const unsigned char *packet, int *protocol, int level) {
+void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     const struct ether_header *header = (struct ether_header *) packet;
     const struct ether_addr *mac_src = (struct ether_addr *) header->ether_shost;
     const struct ether_addr *mac_dst = (struct ether_addr *) header->ether_dhost;

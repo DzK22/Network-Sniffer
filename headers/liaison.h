@@ -2,6 +2,6 @@
 #define LIAISON_H
 #include "analyseur.h"
 
-void threat_ethernet(const unsigned char *, int*, int);
+void treat_ethernet(const unsigned char *, int*, int);
 
 #endif

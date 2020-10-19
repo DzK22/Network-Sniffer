@@ -48,19 +48,19 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     unsigned previewHeaderLength, to_add;
     if (level == 3)
         print_packet(packet, len);
-    threat_ethernet(packet, &e_protocol, level);
+    treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
-    threat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level);
+    treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche transport
-    threat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
+    treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche applicative
-    threat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len);
+    treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len);
     fprintf(stdout, "\n");
 }
 

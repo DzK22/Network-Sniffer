@@ -1,18 +1,18 @@
 #include "../headers/network.h"
 
-void threat_network(const unsigned char *packet, int e_protocol, int *t_protocol, unsigned *to_add, int level) {
+void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol, unsigned *to_add, int level) {
     int port = -1;
     switch(e_protocol) {
         case ETHERTYPE_IP:
             //appelez fonction IP
             fprintf(stdout, YELLOW"\tType = IPv4\n"COL_RESET);
-            port = threat_ipv4(packet, level);
+            port = treat_ipv4(packet, level);
             *to_add = sizeof(struct ip);
             break;
 
         case ETHERTYPE_IPV6:
             fprintf(stdout, YELLOW"\tType = IPv6\n"COL_RESET);
-            port = threat_ipv6(packet, level);
+            port = treat_ipv6(packet, level);
             *to_add = sizeof(struct ip6_hdr);
             break;
 
@@ -46,7 +46,7 @@ char* get_protocol(int id) {
   return protocol_name;
 }
 
-int threat_ipv4(const unsigned char *packet, int level) {
+int treat_ipv4(const unsigned char *packet, int level) {
     (void)level;
     char ip_source[LEN], ip_dest[LEN]/*, str_version[LEN], str_ihl[LEN]*/;
     int res;
@@ -85,7 +85,7 @@ int threat_ipv4(const unsigned char *packet, int level) {
     return ip->ip_p;
 }
 
-int threat_ipv6(const unsigned char *packet, int level) {
+int treat_ipv6(const unsigned char *packet, int level) {
     (void)level;
     struct ip6_hdr *ip6 = (struct ip6_hdr *) packet;
     char str_ip_src[LEN], str_ip_dst[LEN];
