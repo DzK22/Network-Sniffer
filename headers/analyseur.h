@@ -55,5 +55,6 @@ void usage (int);
 int test_snprintf(int, int);
 void print(const unsigned char*, int);
 void print_packet (const unsigned char *, int);
+void data_print(const unsigned char* packet);
 
 #endif

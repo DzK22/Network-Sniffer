@@ -12,12 +12,14 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
 
         case ETHERTYPE_IPV6:
             fprintf(stdout, YELLOW"\tType = IPv6\n"COL_RESET);
-            port = treat_ipv6(packet, level);
+            treat_ipv6(packet, level);
             *to_add = sizeof(struct ip6_hdr);
             break;
 
         case ETHERTYPE_ARP:
             fprintf(stdout, YELLOW"\tType = ARP\n"COL_RESET);
+            treat_arp(packet, level);
+            *to_add = sizeof(struct arphdr);
             break;
 
         default :
@@ -86,7 +88,7 @@ int treat_ipv4(const unsigned char *packet, int level) {
     return ip->ip_p;
 }
 
-int treat_ipv6(const unsigned char *packet, int level) {
+void treat_ipv6(const unsigned char *packet, int level) {
     (void)level;
     struct ip6_hdr *ip6 = (struct ip6_hdr *) packet;
     char str_ip_src[LEN], str_ip_dst[LEN];
@@ -94,13 +96,59 @@ int treat_ipv6(const unsigned char *packet, int level) {
     struct in6_addr dst = ip6->ip6_dst;
     if (inet_ntop(AF_INET6, &src, str_ip_src, LEN) == NULL) {
         fprintf(stdout, "inet_ntop error\n");
-        return EXIT_FAILURE;
+        return;
     }
     if (inet_ntop(AF_INET6, &dst, str_ip_dst, LEN) == NULL) {
         fprintf(stdout, "inet_ntop error\n");
-        return EXIT_FAILURE;
+        return;
     }
     fprintf(stdout, "\t@ip src = %s\n", str_ip_src);
     fprintf(stdout, "\t@ip dst = %s\n", str_ip_dst);
-    return 1;
+}
+
+void treat_arp(const unsigned char *packet, int level) {
+    (void)level;
+    struct arphdr *arp = (struct arphdr *)packet;
+    ushort hardware = ntohs(arp->ar_hrd);
+    ushort p_type = ntohs(arp->ar_pro);
+    u_char h_size = arp->ar_hln;
+    u_char protocol = arp->ar_pln;
+    ushort op_code = ntohs(arp->ar_op);
+    (void)op_code;
+    (void)h_size;
+    (void)protocol;
+    fprintf(stdout, "\tHardware Type :\n");
+    switch (hardware) {
+        case ARPHRD_ETHER:
+            fprintf(stdout, "\t\tEthernet\n");
+            break;
+
+        case ARPHRD_EETHER:
+            fprintf(stdout, "\t\tExperimental Ethernet\n");
+            break;
+
+        case ARPHRD_APPLETLK:
+            fprintf(stdout, "\t\tApple Talk\n");
+            break;
+
+        default:
+            fprintf(stdout, "\t\tUnknown Hardware (%d)\n", hardware);
+            break;
+    }
+
+    fprintf(stdout, "\tProtocole Type :\n");
+    switch (p_type) {
+        case ETHERTYPE_IP:
+            fprintf(stdout, "\t\tIPv4\n");
+            break;
+
+        case ETHERTYPE_PUP:
+            fprintf(stdout, "\t\tPUP\n");
+            break;
+
+        default:
+            fprintf(stdout, "\t\tUnknown protocol (%d)\n", p_type);
+            break;
+    }
+    data_print(packet + sizeof(struct arphdr));
 }

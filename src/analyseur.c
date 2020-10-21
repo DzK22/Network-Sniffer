@@ -31,6 +31,19 @@ void print(const unsigned char *packet, int len) {
     fprintf(stdout, "\n");
 }
 
+void data_print(const unsigned char *packet) {
+    unsigned i;
+    fprintf(stdout, "\tDatas: ");
+    for (i = 0; i < 50; i++) {
+        if (packet[i])
+            fprintf(stdout, "%02x", packet[i]);
+        else
+            break;
+    }
+    fprintf(stdout, " ...\n");
+}
+
+
 void print_packet (const unsigned char *packet, int len) {
     int i;
     for (i = 0; i < len; i++)
