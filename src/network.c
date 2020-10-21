@@ -114,41 +114,74 @@ void treat_arp(const unsigned char *packet, int level) {
     u_char h_size = arp->ar_hln;
     u_char protocol = arp->ar_pln;
     ushort op_code = ntohs(arp->ar_op);
-    (void)op_code;
     (void)h_size;
     (void)protocol;
-    fprintf(stdout, "\tHardware Type :\n");
+    fprintf(stdout, "\tHardware Type : ");
     switch (hardware) {
         case ARPHRD_ETHER:
-            fprintf(stdout, "\t\tEthernet\n");
+            fprintf(stdout, "Ethernet\n");
             break;
 
         case ARPHRD_EETHER:
-            fprintf(stdout, "\t\tExperimental Ethernet\n");
+            fprintf(stdout, "Experimental Ethernet\n");
             break;
 
         case ARPHRD_APPLETLK:
-            fprintf(stdout, "\t\tApple Talk\n");
+            fprintf(stdout, "Apple Talk\n");
             break;
 
         default:
-            fprintf(stdout, "\t\tUnknown Hardware (%d)\n", hardware);
+            fprintf(stdout, "Unknown Hardware (%d)\n", hardware);
             break;
     }
+    fprintf(stdout, "\tOpcode : ");
+    put_arp_opcode(op_code);
 
-    fprintf(stdout, "\tProtocole Type :\n");
+    fprintf(stdout, "\tProtocole Type : ");
     switch (p_type) {
         case ETHERTYPE_IP:
-            fprintf(stdout, "\t\tIPv4\n");
+            fprintf(stdout, "IPv4\n");
             break;
 
         case ETHERTYPE_PUP:
-            fprintf(stdout, "\t\tPUP\n");
+            fprintf(stdout, "PUP\n");
             break;
 
         default:
-            fprintf(stdout, "\t\tUnknown protocol (%d)\n", p_type);
+            fprintf(stdout, "Unknown protocol (%d)\n", p_type);
             break;
     }
     data_print(packet + sizeof(struct arphdr));
+}
+
+void put_arp_opcode (int opcode) {
+    switch (opcode) {
+        case ARPOP_REQUEST:
+            fprintf(stdout, "ARP Request\n");
+            break;
+
+        case ARPOP_RREQUEST:
+            fprintf(stdout, "RARP Request\n");
+            break;
+
+        case ARPOP_InREQUEST:
+            fprintf(stdout, "InARP Request\n");
+            break;
+
+        case ARPOP_REPLY:
+            fprintf(stdout, "ARP Reply\n");
+            break;
+
+        case ARPOP_RREPLY:
+            fprintf(stdout, "RARP Reply\n");
+            break;
+
+        case ARPOP_InREPLY:
+            fprintf(stdout, "InARP Reply\n");
+            break;
+
+        default:
+            fprintf(stdout, "\t\tUnknown opcode (%d)\n", opcode);
+            break;
+    }
 }
