@@ -21,6 +21,7 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
             break;
 
         default :
+            fprintf(stdout, "UKNOWN TYPE\n");
             break;
     }
     fprintf(stdout, COL_RESET"\n");
