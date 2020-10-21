@@ -23,7 +23,7 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
             break;
 
         default :
-            fprintf(stdout, "\tUKNOWN TYPE\n");
+            fprintf(stdout, "\tUNKNOWN TYPE\n");
             break;
     }
     fprintf(stdout, COL_RESET"\n");
