@@ -15,7 +15,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case HTTPS:
-            fprintf(stdout, "\tHTTPS\n");
+            fprintf(stdout, "\n\tHTTPS =>");
             treat_https(packet, type, len);
             break;
 
@@ -34,14 +34,14 @@ void treat_app (const unsigned char *packet, int sport, int dport, unsigned *to_
     (void)to_add;
     (void)level;
     if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
-        fprintf(stderr, "THERE IS NO APP MATCHING\n");
+        fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");
 }
 
 void treat_https (const unsigned char *packet, int type, int len) {
     if (type == REQUEST)
-        fprintf(stdout, "\t\tREQUEST\n");
+        fprintf(stdout, " REQUEST\n");
     else
-        fprintf(stdout, "\t\tRESPONSE\n");
+        fprintf(stdout, " RESPONSE\n");
     if (len <= 0)
         return;
     print(packet, len);

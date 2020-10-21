@@ -90,7 +90,7 @@ int main (int argc, char **argv) {
     }
 
     pcap_t *packet;
-    
+
     if (o) {
         if ((packet = pcap_open_offline(fichier, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_offline error\n");
@@ -98,7 +98,7 @@ int main (int argc, char **argv) {
         }
     }
     else {
-        if ((packet = pcap_open_live(interface, BUFSIZ, 1, 0, errbuff)) == NULL) {
+        if ((packet = pcap_open_live(interface, BUFSIZ, 1, 1000, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_live\n");
             return EXIT_FAILURE;
         }

@@ -1,30 +1,40 @@
 #include "../headers/analyseur.h"
 void print(const unsigned char *packet, int len) {
-    int i;
-    bool put_tab = true;
+    int i, cpt = 0;
+    fprintf(stdout, "\t");
     for (i = 0; i < len; i++) {
-        if (!(i%26))
-            fprintf(stdout, "\n");
-        if (put_tab) {
-            fprintf(stdout, "\t");
-            put_tab = false;
-        }
-        if (packet[i] == '\r')
-            fprintf(stdout, "\\r");
-        else if (packet[i] == '\n') {
+        if (packet[i] == '\n') {
             fprintf(stdout, "\\n");
-            fprintf(stdout, "\n");
-            put_tab = true;
+            cpt++;
         }
-        else if (isprint(packet[i]) || isspace(packet[i]))
+        else if (packet[i] == '\r') {
+            fprintf(stdout, "\\r");
+            cpt++;
+        }
+        else if (packet[i] == '\t') {
+            fprintf(stdout, "\\t");
+            cpt++;
+        }
+        else if (isprint(packet[i]) || isspace(packet[i])) {
             fprintf(stdout, "%c", packet[i]);
+            cpt++;
+        }
+        else {
+            fprintf(stdout, ".");
+            cpt++;
+        }
+        if (cpt == 20) {
+            fprintf(stdout, "\n\t");
+            cpt = 0;
+        }
     }
+    fprintf(stdout, "\n");
 }
 
 void print_packet (const unsigned char *packet, int len) {
     int i;
     for (i = 0; i < len; i++)
-        fprintf(stdout, " %02x", packet[i]);
+        fprintf(stdout, "%02x ", packet[i]);
     fprintf(stdout, "\n\n");
 }
 
@@ -47,7 +57,8 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0];
     unsigned previewHeaderLength, to_add;
     if (level == 3)
-        print_packet(packet, len);
+        //Afficher les 10 premiers octets
+        print_packet(packet, 10);
     treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
