@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include "application.h"
 #include <ctype.h>
+#include <net/if_arp.h>
 
 #define POP    110
 #define IMAP   143

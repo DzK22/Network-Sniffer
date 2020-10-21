@@ -3,6 +3,13 @@
 #include "analyseur.h"
 #define IPV6_LENGTH 40
 
+struct c_arphdr {
+    u_char ar_sha[ETH_ALEN];
+    u_char ar_tha[ETH_ALEN];
+    u_char ar_sip[4];
+    u_char ar_tip[4];
+};
+
 char* get_protocol(int);
 void treat_network(const unsigned char *, int, int *, unsigned *, int);
 int treat_ipv4(const unsigned char *, int);

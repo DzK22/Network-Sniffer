@@ -23,7 +23,7 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
             break;
 
         default :
-            fprintf(stdout, "UKNOWN TYPE\n");
+            fprintf(stdout, "\tUKNOWN TYPE\n");
             break;
     }
     fprintf(stdout, COL_RESET"\n");
@@ -109,6 +109,7 @@ void treat_ipv6(const unsigned char *packet, int level) {
 void treat_arp(const unsigned char *packet, int level) {
     (void)level;
     struct arphdr *arp = (struct arphdr *)packet;
+    struct c_arphdr *new_arp = (struct c_arphdr *)(packet + sizeof(struct arphdr));
     ushort hardware = ntohs(arp->ar_hrd);
     ushort p_type = ntohs(arp->ar_pro);
     u_char h_size = arp->ar_hln;
@@ -150,6 +151,17 @@ void treat_arp(const unsigned char *packet, int level) {
         default:
             fprintf(stdout, "Unknown protocol (%d)\n", p_type);
             break;
+    }
+
+    char *mac_src = ether_ntoa((struct ether_addr *)new_arp->ar_sha);
+    char *mac_dst = ether_ntoa((struct ether_addr *)new_arp->ar_tha);
+    char *ip_src = inet_ntoa(*(struct in_addr *)new_arp->ar_sip);
+    char *ip_dst = inet_ntoa(*(struct in_addr *)new_arp->ar_tip);
+    if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
+        fprintf(stdout, "\tSrc @MAC => %s\n", mac_src);
+        fprintf(stdout, "\tDst @MAC => %s\n", mac_dst);
+        fprintf(stdout, "\tSrc @IP => %s\n", ip_src);
+        fprintf(stdout, "\tDst @IP => %s\n", ip_dst);
     }
     data_print(packet + sizeof(struct arphdr));
 }
