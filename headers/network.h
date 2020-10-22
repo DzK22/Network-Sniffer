@@ -4,10 +4,10 @@
 #define IPV6_LENGTH 40
 
 struct c_arphdr {
-    u_char ar_sha[ETH_ALEN];
-    u_char ar_tha[ETH_ALEN];
-    u_char ar_sip[4];
-    u_char ar_tip[4];
+    struct ether_addr ar_sha;
+    struct ether_addr ar_tha;
+    struct in_addr ar_sip;
+    struct in_addr ar_tip;
 };
 
 char* get_protocol(int);

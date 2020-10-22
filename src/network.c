@@ -109,14 +109,11 @@ void treat_ipv6(const unsigned char *packet, int level) {
 void treat_arp(const unsigned char *packet, int level) {
     (void)level;
     struct arphdr *arp = (struct arphdr *)packet;
-    struct c_arphdr *new_arp = (struct c_arphdr *)(packet + sizeof(struct arphdr));
     ushort hardware = ntohs(arp->ar_hrd);
     ushort p_type = ntohs(arp->ar_pro);
     u_char h_size = arp->ar_hln;
     u_char protocol = arp->ar_pln;
     ushort op_code = ntohs(arp->ar_op);
-    (void)h_size;
-    (void)protocol;
     fprintf(stdout, "\tHardware Type : ");
     switch (hardware) {
         case ARPHRD_ETHER:
@@ -152,18 +149,44 @@ void treat_arp(const unsigned char *packet, int level) {
             fprintf(stdout, "Unknown protocol (%d)\n", p_type);
             break;
     }
+    int i, cpt;
+    int arphdr_len = sizeof(struct arphdr);
 
-    char *mac_src = ether_ntoa((struct ether_addr *)new_arp->ar_sha);
-    char *mac_dst = ether_ntoa((struct ether_addr *)new_arp->ar_tha);
-    char *ip_src = inet_ntoa(*(struct in_addr *)new_arp->ar_sip);
-    char *ip_dst = inet_ntoa(*(struct in_addr *)new_arp->ar_tip);
+    fprintf(stdout, "\tHardware size : %d\n", h_size);
+    fprintf(stdout, "\tProtocol size: %d\n", protocol);
     if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
-        fprintf(stdout, "\tSrc @MAC => %s\n", mac_src);
-        fprintf(stdout, "\tDst @MAC => %s\n", mac_dst);
-        fprintf(stdout, "\tSrc @IP => %s\n", ip_src);
-        fprintf(stdout, "\tDst @IP => %s\n", ip_dst);
+        fprintf(stdout, "\tSrc @MAC => ");
+        for (i = 0; i < 6; i++) {
+            printf("%02x", packet[arphdr_len + i]);
+            if (i != 5)
+                printf(":");
+        }
+        printf("\n");
+        fprintf(stdout, "\tSrc @IP => ");
+        for (cpt = 0; cpt < 4; cpt++) {
+            printf("%d", packet[arphdr_len + i + cpt]);
+            if (cpt != 3)
+                printf(".");
+        }
+        printf("\n");
+        i += cpt;
+        fprintf(stdout, "\tDst @MAC => ");
+        for (cpt = 0; cpt < 6; cpt++) {
+            printf("%02x", packet[arphdr_len + i + cpt]);
+            if (cpt != 5)
+                printf(":");
+        }
+        printf("\n");
+        i += cpt;
+        fprintf(stdout, "\tDst @IP => ");
+        for (cpt = 0; cpt < 4; cpt++) {
+            printf("%d", packet[arphdr_len + i + cpt]);
+            if (cpt != 3)
+                printf(".");
+        }
+        printf("\n");
     }
-    data_print(packet + sizeof(struct arphdr));
+    data_print(packet + i);
 }
 
 void put_arp_opcode (int opcode) {

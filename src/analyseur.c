@@ -76,6 +76,11 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
+    /*unsigned i;
+    for (i = sizeof(struct ether_header); i < sizeof(struct ether_header) + sizeof(struct arphdr); i++) {
+        printf("%02x ", packet[i]);
+    }*/
+    printf("\n");
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level);
     previewHeaderLength += to_add;
 
