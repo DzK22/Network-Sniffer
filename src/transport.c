@@ -48,8 +48,8 @@ void treat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *d
     urg = (tcp->th_flags & TH_URG) ? 1 : 0;
     window = ntohs(tcp->th_win);
     checksum = ntohs(tcp->th_sum);
-    seq = ntohs(tcp->th_seq);
-    ack_seq = ntohs(tcp->ack_seq);
+    seq = ntohl(tcp->th_seq);
+    ack_seq = ntohl(tcp->ack_seq);
     dataOff = tcp->th_off;
     urgPointer = ntohs(tcp->th_urp);
     fprintf(stdout, "\tSource Port = %d\n", *sport);

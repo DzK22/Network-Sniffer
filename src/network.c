@@ -83,7 +83,7 @@ int treat_ipv4(const unsigned char *packet, int level) {
     fprintf(stdout, "\tFragment Offset : %d\n", foffset);
     fprintf(stdout, "\tttl : %d \n", ip->ip_ttl);
     fprintf(stdout, "\tProtocol : %s (%d) \n", get_protocol(ip->ip_p), ip->ip_p);
-    fprintf(stdout, "\tChecksum : %d\n", ip->ip_sum);
+    fprintf(stdout, "\tChecksum : %d\n", ntohs(ip->ip_sum));
 
     return ip->ip_p;
 }
@@ -163,7 +163,7 @@ void treat_arp(const unsigned char *packet, int level) {
             else
                 printf("\n");
         }
-        
+
         fprintf(stdout, "\tSrc @IP => ");
         for (cpt = 0; cpt < 4; cpt++) {
             printf("%d", packet[arphdr_len + i + cpt]);
