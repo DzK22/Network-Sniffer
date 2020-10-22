@@ -5,8 +5,10 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     const struct ether_addr *mac_src = (struct ether_addr *) header->ether_shost;
     const struct ether_addr *mac_dst = (struct ether_addr *) header->ether_dhost;
     *protocol = ntohs(header->ether_type);
-    char *mac_source = ether_ntoa(mac_src);
-    char *mac_dest = ether_ntoa(mac_dst);
+    char mac_source[LEN];
+    char mac_dest[LEN];
+    snprintf(mac_source, LEN, "%s", ether_ntoa(mac_src));
+    snprintf(mac_dest, LEN, "%s", ether_ntoa(mac_dst));
 
     switch (level) {
         case V3:

@@ -5,8 +5,8 @@
 
 struct c_arphdr {
     struct ether_addr ar_sha;
-    struct ether_addr ar_tha;
     struct in_addr ar_sip;
+    struct ether_addr ar_tha;
     struct in_addr ar_tip;
 };
 
