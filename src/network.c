@@ -160,31 +160,38 @@ void treat_arp(const unsigned char *packet, int level) {
             printf("%02x", packet[arphdr_len + i]);
             if (i != 5)
                 printf(":");
+            else
+                printf("\n");
         }
-        printf("\n");
+        
         fprintf(stdout, "\tSrc @IP => ");
         for (cpt = 0; cpt < 4; cpt++) {
             printf("%d", packet[arphdr_len + i + cpt]);
             if (cpt != 3)
                 printf(".");
+            else
+                printf("\n");
         }
-        printf("\n");
+
         i += cpt;
         fprintf(stdout, "\tDst @MAC => ");
         for (cpt = 0; cpt < 6; cpt++) {
             printf("%02x", packet[arphdr_len + i + cpt]);
             if (cpt != 5)
                 printf(":");
+            else
+                printf("\n");
         }
-        printf("\n");
+
         i += cpt;
         fprintf(stdout, "\tDst @IP => ");
         for (cpt = 0; cpt < 4; cpt++) {
             printf("%d", packet[arphdr_len + i + cpt]);
             if (cpt != 3)
                 printf(".");
+            else
+                printf("\n");
         }
-        printf("\n");
     }
     data_print(packet + i);
 }

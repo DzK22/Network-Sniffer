@@ -5,10 +5,19 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     const struct ether_addr *mac_src = (struct ether_addr *) header->ether_shost;
     const struct ether_addr *mac_dst = (struct ether_addr *) header->ether_dhost;
     *protocol = ntohs(header->ether_type);
+    int res;
     char mac_source[LEN];
     char mac_dest[LEN];
-    snprintf(mac_source, LEN, "%s", ether_ntoa(mac_src));
-    snprintf(mac_dest, LEN, "%s", ether_ntoa(mac_dst));
+    res = snprintf(mac_source, LEN, "%s", ether_ntoa(mac_src));
+    if (test_snprintf(res, LEN) == EXIT_FAILURE) {
+        fprintf(stderr, "error\n");
+        exit(EXIT_FAILURE);
+    }
+    res = snprintf(mac_dest, LEN, "%s", ether_ntoa(mac_dst));
+    if (test_snprintf(res, LEN) == EXIT_FAILURE) {
+        fprintf(stderr, "error\n");
+        exit(EXIT_FAILURE);
+    }
 
     switch (level) {
         case V3:
