@@ -54,8 +54,8 @@ void treat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *d
     urgPointer = ntohs(tcp->th_urp);
     fprintf(stdout, "\tSource Port = %d\n", *sport);
     fprintf(stdout, "\tDestination Port = %d\n", *dport);
-    fprintf(stdout, "\tSequence Num = %d\n", seq);
-    fprintf(stdout, "\tAcknowledgment Num = %d\n", ack_seq);
+    fprintf(stdout, "\tSequence Num = %02x\n", seq);
+    fprintf(stdout, "\tAcknowledgment Num = %02x\n", ack_seq);
     fprintf(stdout, "\tDate Offset = %d\n", dataOff);
     fprintf(stdout, "\tFlags : \n");
     fprintf(stdout, "\t\t- FIN : %d\n", fin);

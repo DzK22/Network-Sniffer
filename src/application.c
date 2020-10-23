@@ -44,5 +44,7 @@ void treat_https (const unsigned char *packet, int type, int len) {
         fprintf(stdout, " RESPONSE\n");
     if (len <= 0)
         return;
-    print(packet, len);
+    (void)packet;
+    (void)len;
+    //print(packet, len);
 }
