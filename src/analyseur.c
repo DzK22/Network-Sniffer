@@ -1,32 +1,27 @@
 #include "../headers/analyseur.h"
+
+int c_print(char c) {
+    if (c == '\r') {
+        fprintf(stdout, "\\r");
+    }
+    else if (c == '\n') {
+        fprintf(stdout, "\\n");
+        fprintf(stdout, "\n");
+    }
+    else if (isprint(c) || isspace(c))
+        fprintf(stdout, "%c", c);
+    else {
+        fprintf(stdout, ".");
+        return -1;
+    }
+    return c;
+}
 void print(const unsigned char *packet, int len) {
-    int i, cpt = 0;
+    int i;
     fprintf(stdout, "\t");
     for (i = 0; i < len; i++) {
-        if (packet[i] == '\n') {
-            fprintf(stdout, "\\n");
-            cpt++;
-        }
-        else if (packet[i] == '\r') {
-            fprintf(stdout, "\\r");
-            cpt++;
-        }
-        else if (packet[i] == '\t') {
-            fprintf(stdout, "\\t");
-            cpt++;
-        }
-        else if (isprint(packet[i]) || isspace(packet[i])) {
-            fprintf(stdout, "%c", packet[i]);
-            cpt++;
-        }
-        else {
-            fprintf(stdout, ".");
-            cpt++;
-        }
-        if (cpt == 20) {
-            fprintf(stdout, "\n\t");
-            cpt = 0;
-        }
+        if (c_print(packet[i]) == '\n')
+            fprintf(stdout, "\t");
     }
     fprintf(stdout, "\n");
 }
@@ -67,8 +62,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     }
 
     fprintf(stdout, "packet ID = %ld arrived at %s\n", packetID, str_time);
-    int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0];
-    unsigned previewHeaderLength, to_add;
+    int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
     if (level == 3)
         //Afficher les 10 premiers octets
         print_packet(packet, 10);
@@ -76,15 +70,17 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
-    treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level);
+    treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
-
     //Couche transport
     treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche applicative
-    treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len);
+    if (t_protocol == UDP)
+        treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len - dataLen);
+    else if (t_protocol == TCP)
+        treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len - previewHeaderLength);
     fprintf(stdout, "\n");
 }
 

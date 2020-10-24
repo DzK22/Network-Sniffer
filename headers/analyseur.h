@@ -54,6 +54,7 @@
 void callback(unsigned char *, const struct pcap_pkthdr *, const unsigned char *);
 void usage (int);
 int test_snprintf(int, int);
+int c_print(char);
 void print(const unsigned char*, int);
 void print_packet (const unsigned char *, int);
 void data_print(const unsigned char* packet);

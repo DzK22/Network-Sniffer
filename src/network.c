@@ -1,13 +1,12 @@
 #include "../headers/network.h"
 
-void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol, unsigned *to_add, int level) {
+void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol, int *to_add, int level, int *dataLen) {
     int port = -1;
     switch(e_protocol) {
         case ETHERTYPE_IP:
             //appelez fonction IP
             fprintf(stdout, YELLOW"\tType = IPv4\n"COL_RESET);
-            port = treat_ipv4(packet, level);
-            *to_add = sizeof(struct ip);
+            port = treat_ipv4(packet, level, to_add, dataLen);
             break;
 
         case ETHERTYPE_IPV6:
@@ -30,33 +29,14 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
     *t_protocol = port;
 }
 
-char* get_protocol(int id) {
-  char* protocol_name;
-  switch (id) {
-    case TCP:
-      protocol_name = "TCP";
-      break;
-    case UDP:
-      protocol_name = "UDP";
-      break;
-    case ICMP:
-      protocol_name = "ICMP";
-      break;
-    default:
-      protocol_name = "Unknown";
-      break;
-  }
-  return protocol_name;
-}
-
-int treat_ipv4(const unsigned char *packet, int level) {
+int treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen) {
     (void)level;
     char ip_source[LEN], ip_dest[LEN]/*, str_version[LEN], str_ihl[LEN]*/;
     int res;
-    const struct ip *ip;
-    ip = (struct ip *)packet;
+    const struct ip *ip = (struct ip *)packet;
     struct in_addr src, dst;
-    //unsigned ihl = ip->ip_hl;
+    *to_add = ip->ip_hl*4;
+    *dataLen = ntohs(ip->ip_len);
     src = ip->ip_src;
     dst = ip->ip_dst;
     res = snprintf(ip_source, LEN, "%s", inet_ntoa(src));
@@ -226,4 +206,23 @@ void put_arp_opcode (int opcode) {
             fprintf(stdout, "\t\tUnknown opcode (%d)\n", opcode);
             break;
     }
+}
+
+char* get_protocol(int id) {
+  char* protocol_name;
+  switch (id) {
+    case TCP:
+      protocol_name = "TCP";
+      break;
+    case UDP:
+      protocol_name = "UDP";
+      break;
+    case ICMP:
+      protocol_name = "ICMP";
+      break;
+    default:
+      protocol_name = "Unknown";
+      break;
+  }
+  return protocol_name;
 }

@@ -1,6 +1,6 @@
 #include "../headers/transport.h"
 
-void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, unsigned *to_add, int level) {
+void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, int *to_add, int level) {
     switch (t_protocol) {
         case UDP:
             //fprintf(stdout, "\tT_PROTOCOL : UDP\n");
@@ -33,7 +33,7 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     fprintf(stdout, "\tLength = %d\n", dataLength);
 }
 
-void treat_tcp(const unsigned char *packet, unsigned *to_add, int *sport, int *dport, int level) {
+void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport, int level) {
     (void)level;
     struct tcphdr *tcp = (struct tcphdr *)packet;
     int fin, syn, reset, push, ack, urg, window, checksum, seq, ack_seq, dataOff, urgPointer;

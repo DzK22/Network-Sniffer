@@ -19,6 +19,11 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             treat_https(packet, type, len);
             break;
 
+        case HTTP:
+            fprintf(stdout, "\n\tHTTP [%d] =>", port);
+            treat_https(packet, type, len);
+            break;
+
         case SMTP:
             break;
 
@@ -30,7 +35,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
     }
     return true;
 }
-void treat_app (const unsigned char *packet, int sport, int dport, unsigned *to_add, int level, int len) {
+void treat_app (const unsigned char *packet, int sport, int dport, int *to_add, int level, int len) {
     (void)to_add;
     (void)level;
     if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
@@ -44,7 +49,5 @@ void treat_https (const unsigned char *packet, int type, int len) {
         fprintf(stdout, " RESPONSE\n");
     if (len <= 0)
         return;
-    (void)packet;
-    (void)len;
-    //print(packet, len);
+    print(packet, len);
 }
