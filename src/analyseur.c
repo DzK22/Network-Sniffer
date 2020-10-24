@@ -56,7 +56,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         exit(EXIT_FAILURE);
     }
     char str_time[LEN];
-    if (strftime(str_time, LEN, "%X", &res)  == 0) {
+    if (strftime(str_time, LEN, "%a %Y-%m-%d %H:%M:%S %Z", &res)  == 0) {
         fprintf(stderr, "strftime error\n");
         exit(EXIT_FAILURE);
     }

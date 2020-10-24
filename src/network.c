@@ -55,7 +55,8 @@ int treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen
     morefrag = (flags & IP_MF) ? 1 : 0;
     foffset = flags & IP_OFFMASK;
     flags = flags >> 13;
-
+    fprintf(stdout, "\tIHL : %d (%d bytes)\n", *to_add/4, *to_add);
+    fprintf(stdout, "\tToS : 0x%02x\n", ip->ip_tos);
     fprintf(stdout, "\tFlags : 0x%02x\n", flags);
     fprintf(stdout, "\t\t- Reserved bit : %d\n", reserved);
     fprintf(stdout, "\t\t- Don't Fragment : %d\n", dontfrag);
@@ -63,7 +64,7 @@ int treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen
     fprintf(stdout, "\tFragment Offset : %d\n", foffset);
     fprintf(stdout, "\tttl : %d \n", ip->ip_ttl);
     fprintf(stdout, "\tProtocol : %s (%d) \n", get_protocol(ip->ip_p), ip->ip_p);
-    fprintf(stdout, "\tChecksum : %d\n", ntohs(ip->ip_sum));
+    fprintf(stdout, "\tChecksum : 0x%04x\n", ntohs(ip->ip_sum));
 
     return ip->ip_p;
 }
