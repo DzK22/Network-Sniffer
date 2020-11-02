@@ -8,6 +8,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case DNS:
+            fprintf(stdout, "\tDNS [%d]\n", port);
             treat_dns(packet, level);
             break;
 
@@ -15,12 +16,12 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case HTTPS:
-            fprintf(stdout, "\n\tHTTPS [%d] =>", port);
+            fprintf(stdout, "\tHTTPS [%d] =>", port);
             treat_https(packet, type, len, level);
             break;
 
         case HTTP:
-            fprintf(stdout, "\n\tHTTP [%d] =>", port);
+            fprintf(stdout, "\tHTTP [%d] =>", port);
             treat_https(packet, type, len, level);
             break;
 
@@ -56,10 +57,17 @@ void treat_https (const unsigned char *packet, int type, int len, int level) {
 void treat_dns (const unsigned char *packet, int level) {
     (void)level;
     HEADER *dns = (HEADER *)packet;
+    uint16_t tID, nQuestions, nAnswers, nAuth, nAdd;
+    tID = ntohs(dns->id);
+    nQuestions = ntohs(dns->qdcount);
+    nAnswers = ntohs(dns->ancount);
+    nAuth = ntohs(dns->nscount);
+    nAdd = ntohs(dns->arcount);
+    fprintf(stdout, "\tTransaction ID : 0x%04x\n", tID);
     if (dns->qr)
-        fprintf(stdout, "\n\tRESPONSE");
+        fprintf(stdout, "\tRESPONSE");
     else
-        fprintf(stdout, "\n\tREQUEST");
+        fprintf(stdout, "\tREQUEST");
     switch (dns->opcode) {
         case DNSQUERY:
             fprintf(stdout, " Query (%d)\n", dns->opcode);
@@ -79,10 +87,6 @@ void treat_dns (const unsigned char *packet, int level) {
         default:
             fprintf(stdout, " Unknows (%d)\n", dns->opcode);
     }
-    uint16_t nQuestions = ntohs(dns->qdcount);
-    uint16_t nAnswers = ntohs(dns->ancount);
-    uint16_t nAuth = ntohs(dns->nscount);
-    uint16_t nAdd = ntohs(dns->arcount);
     fprintf(stdout, "\tQuestions : %d\n", nQuestions);
     fprintf(stdout, "\tAnswers RRs: %d\n", nAnswers);
     fprintf(stdout, "\tAuthority RRs : %d\n", nAuth);

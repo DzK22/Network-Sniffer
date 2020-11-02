@@ -27,7 +27,7 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
             break;
 
         case V2:
-            fprintf(stdout, GREEN"\t Ethernet:\n"COL_RESET);
+            fprintf(stdout, GREEN"\tEthernet:\n"COL_RESET);
             fprintf(stdout, PINK"\t@mac src : %s\n"COL_RESET, mac_source);
             fprintf(stdout, GREEN"\t@mac dest : %s\n"COL_RESET, mac_dest);
             break;

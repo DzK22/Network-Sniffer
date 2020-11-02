@@ -65,17 +65,21 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
 
     //Couche liaison
+    fprintf(stdout, "[+] Couche Liaison:\n");
     treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
+    fprintf(stdout, "\n[+] Couche Réseau:\n");
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
     //Couche transport
+    fprintf(stdout, "\n[+] Couche Transport:\n");
     treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche applicative
+    fprintf(stdout, "\n[+] Couche Application:\n");
     if (t_protocol == UDP)
         treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len - dataLen);
     else if (t_protocol == TCP)

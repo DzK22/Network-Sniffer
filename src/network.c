@@ -25,7 +25,7 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
             fprintf(stdout, "\tUNKNOWN TYPE\n");
             break;
     }
-    fprintf(stdout, COL_RESET"\n");
+    fprintf(stdout, COL_RESET);
     *t_protocol = port;
 }
 
