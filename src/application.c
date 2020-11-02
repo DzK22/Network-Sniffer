@@ -65,30 +65,100 @@ void treat_dns (const unsigned char *packet, int level) {
     nAdd = ntohs(dns->arcount);
     fprintf(stdout, "\tTransaction ID : 0x%04x\n", tID);
     if (dns->qr)
-        fprintf(stdout, "\tRESPONSE");
+        fprintf(stdout, "\tResponse: Message is a response\n");
     else
-        fprintf(stdout, "\tREQUEST");
-    switch (dns->opcode) {
-        case DNSQUERY:
-            fprintf(stdout, " Query (%d)\n", dns->opcode);
-            break;
-        case DNSIQUERY:
-            fprintf(stdout, " Inverse Query (%d)\n", dns->opcode);
-            break;
-        case DNSSSR:
-            fprintf(stdout, " Server Status Request (%d)\n", dns->opcode);
-            break;
-        case DNSNOTIFY:
-            fprintf(stdout, " Notify (%d)\n", dns->opcode);
-            break;
-        case DNSUPDATE:
-            fprintf(stdout, " Update (%d)\n", dns->opcode);
-            break;
-        default:
-            fprintf(stdout, " Unknows (%d)\n", dns->opcode);
+        fprintf(stdout, "\tResponse: Message is a query\n");
+    put_opcode(dns->opcode);
+    //Answers only in responses
+    if (dns->qr) {
+        if (dns->aa)
+            fprintf(stdout, "\tAuthoritative: Server is an authority for domain\n");
+        else
+            fprintf(stdout, "\tAuthoritative: Server is not an authority for domain\n");
+        if (dns->ra)
+            fprintf(stdout, "\tRecursion available: Server can do recursive queries\n");
+        if (!dns->ad)
+            fprintf(stdout, "\tAnswer authenticated: Answer/authority portion was not authenticated by the server\n");
+        put_rcode(dns->rcode);
     }
+    if (dns->tc)
+        fprintf(stdout, "\tTruncated: Message is truncated\n");
+    else
+        fprintf(stdout, "\tTruncated: Message is not truncated\n");
+    if (dns->rd)
+        fprintf(stdout, "\tRecursion desired: Do query recursively\n");
+    else
+        fprintf(stdout, "\tRecursion desired: Do not query recursively\n");
+    if (dns->cd)
+        fprintf(stdout, "\tNon-authenticated data: Acceptable\n");
+    else
+        fprintf(stdout, "\tNon-authenticated data: Unacceptable\n");
+
     fprintf(stdout, "\tQuestions : %d\n", nQuestions);
     fprintf(stdout, "\tAnswers RRs: %d\n", nAnswers);
     fprintf(stdout, "\tAuthority RRs : %d\n", nAuth);
     fprintf(stdout, "\tAdditionnal RRs : %d\n", nAdd);
+}
+
+void put_opcode(unsigned opcode) {
+    fprintf(stdout, "\tOpcode: ");
+    switch (opcode) {
+        case DNSQUERY:
+            fprintf(stdout, "Query (%d)\n", opcode);
+            break;
+        case DNSIQUERY:
+            fprintf(stdout, "Inverse Query (%d)\n", opcode);
+            break;
+        case DNSSSR:
+            fprintf(stdout, "Server Status Request (%d)\n", opcode);
+            break;
+        case DNSNOTIFY:
+            fprintf(stdout, "Notify (%d)\n", opcode);
+            break;
+        case DNSUPDATE:
+            fprintf(stdout, "Update (%d)\n", opcode);
+            break;
+        default:
+            fprintf(stdout, "Unknows (%d)\n", opcode);
+            break;
+    }
+}
+
+void put_rcode (unsigned rcode) {
+    fprintf(stdout, "\tReply Code: ");
+    switch (rcode) {
+        case DNOERROR:
+            fprintf(stdout, "DNS Query completed successfully (%d)\n", rcode);
+            break;
+        case DFORMERR:
+            fprintf(stdout, "DNS Query Format Error (%d)\n", rcode);
+            break;
+        case DSERVFAIL:
+            fprintf(stdout, "Server failed to complete the DNS request (%d)\n", rcode);
+            break;
+        case DNXDOMAIN:
+            fprintf(stdout, "Domain name does not exist (%d)\n", rcode);
+            break;
+        case DNOTIMP:
+            fprintf(stdout, "Function not implemented (%d)\n", rcode);
+            break;
+        case DREFUSED:
+            fprintf(stdout, "The server refused to answer for the query (%d)\n", rcode);
+            break;
+        case DYXDOMAIN:
+            fprintf(stdout, "Name that should not exist, does exist (%d)\n", rcode);
+            break;
+        case DXRRSET:
+            fprintf(stdout, "RRset that should not exist, does exist (%d)\n", rcode);
+            break;
+        case DNOTAUTH:
+            fprintf(stdout, "Server not authoritative for the zone (%d)\n", rcode);
+            break;
+        case DNOTZONE:
+            fprintf(stdout, "Name not in zone (%d)\n", rcode);
+            break;
+        default:
+            fprintf(stdout, "Unknown reply code (%d)\n", rcode);
+            break;
+    }
 }
