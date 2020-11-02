@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
+#include <arpa/nameser_compat.h>
 #include <net/ethernet.h>
 #include <netinet/ether.h>
 #include <netinet/ip.h>
@@ -19,10 +20,8 @@
 #include "transport.h"
 #include <time.h>
 #include <netinet/ip6.h>
-#include <stdbool.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
-#include <arpa/inet.h>
 #include "application.h"
 #include <ctype.h>
 #include <net/if_arp.h>
