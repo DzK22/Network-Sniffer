@@ -19,10 +19,21 @@
 #define DNOTAUTH 8
 #define DNOTZONE 9
 
+#define PTRMASK 0b11000000
+#define PTRVALUE 192
+#define PTRINDEXMASK 0b0011111111111111
+
 bool get_app (const unsigned char *, int, int, int, int);
 void treat_app (const unsigned char *, int, int, int *, int, int);
 void treat_https (const unsigned char *, int, int, int);
 void treat_dns (const unsigned char *, int);
 void put_opcode (unsigned);
 void put_rcode (unsigned);
+unsigned get_name (const unsigned char *, const unsigned char *);
+
+struct q_datas {
+    u_int16_t type;
+    u_int16_t clss;
+};
+
 #endif

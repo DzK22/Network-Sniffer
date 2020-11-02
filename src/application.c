@@ -98,6 +98,50 @@ void treat_dns (const unsigned char *packet, int level) {
     fprintf(stdout, "\tAnswers RRs: %d\n", nAnswers);
     fprintf(stdout, "\tAuthority RRs : %d\n", nAuth);
     fprintf(stdout, "\tAdditionnal RRs : %d\n", nAdd);
+
+    const unsigned char *datas = packet + sizeof(HEADER);
+    unsigned i;
+    //Questions treatment
+    if (nQuestions) {
+        fprintf(stdout, "\tQuestions:\n");
+        for (i = 0; i < nQuestions; i++) {
+            fprintf(stdout, "\t\t- Name: ");
+            datas = datas + get_name(packet, datas);
+            struct q_datas *q_data = (struct q_datas *)datas;
+            fprintf(stdout, "\n");
+            fprintf(stdout, "\t\t- Type: %d\n", ntohs(q_data->type));
+            fprintf(stdout, "\t\t- Class: %d\n", ntohs(q_data->clss));
+            datas += 4;
+            fprintf(stdout, "\n\n");
+        }
+    }
+    (void)datas;
+}
+
+unsigned get_name (const unsigned char *packet, const unsigned char *rest) {
+    bool ptr;
+    unsigned len = 0;
+    for (;rest[len] != '\0';) {
+        if (((u_int8_t)rest[len] & PTRMASK) == PTRVALUE) {
+            u_int16_t off = rest[len] << 8;
+            off |= rest[len + 1];
+            off &= PTRINDEXMASK;
+            ptr = true;
+            get_name(packet, packet + off);
+            return 2;
+        }
+        else {
+            if (isprint(rest[len + 1]) && rest[len + 1] != '\n')
+                fprintf(stdout, "%c", rest[len + 1]);
+            else
+                fprintf(stdout, ".");
+            len++;
+            ptr = false;
+        }
+    }
+    if (!ptr)
+        len++;
+    return len;
 }
 
 void put_opcode(unsigned opcode) {
