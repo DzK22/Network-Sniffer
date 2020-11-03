@@ -33,7 +33,6 @@ $(OBJ_DIR)application.o: $(SRC_DIR)application.c $(HD_DIR)application.h
 	mkdir -p $(OBJ_DIR)
 	mv application.o $(OBJ_DIR)
 
-
 $(OBJ_DIR)analyseur.o: $(SRC_DIR)analyseur.c $(HD_DIR)analyseur.h
 	$(CC) -c $< $(CFLAGS)
 	mkdir -p $(OBJ_DIR)
