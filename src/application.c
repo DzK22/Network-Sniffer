@@ -104,48 +104,61 @@ void treat_dns (const unsigned char *packet, int level) {
     fprintf(stdout, "\tAdditionnal RRs : %d\n", nAdd);
 
     const unsigned char *datas = packet + sizeof(HEADER);
-    unsigned i, cpt = 0;
+    unsigned i;
     //Questions treatment
     if (nQuestions) {
         fprintf(stdout, "\tQuestions:\n");
         for (i = 0; i < nQuestions; i++) {
             fprintf(stdout, "\t\t- Name: ");
-            datas += get_name(packet, datas);
+            datas += resolve(packet, datas);
             struct q_datas *q_data = (struct q_datas *)datas;
             fprintf(stdout, "\n");
-            fprintf(stdout, "\t\t- Type: %d\n", ntohs(q_data->type));
-            fprintf(stdout, "\t\t- Class: %d\n", ntohs(q_data->clss));
+            char *class = get_class(ntohs(q_data->clss));
+            char *type = get_type(ntohs(q_data->type));
+            fprintf(stdout, "\t\t- Type: %s\n", type);
+            fprintf(stdout, "\t\t- Class: %s\n", class);
             datas += 4;
             fprintf(stdout, "\n\n");
         }
     }
-
     //Answers treatment
-    if (nAnswers) {
-        fprintf(stdout, "\tAnswers:\n");
-        for (i = 0; i < nAnswers; i++) {
-            fprintf(stdout, "\t\t- Name: ");
-            datas += get_name(packet, datas);
-            struct a_datas *a_data = (struct a_datas *)datas;
-            u_int16_t a_len = ntohs(a_data->len);
-            fprintf(stdout, "\n");
-            fprintf(stdout, "\t\t- Type: %d\n", ntohs(a_data->type));
-            fprintf(stdout, "\t\t- Class: %d\n", ntohs(a_data->clss));
-            fprintf(stdout, "\t\t- Ttl: %d\n", ntohs(a_data->ttl));
-            fprintf(stdout, "\t\t- Length: %d\n", ntohs(a_data->len));
-            datas += 10;
-            fprintf(stdout, "\t\t- Datas: ");
-            do {
-                if (isprint(datas[cpt++]))
-                    fprintf(stdout, "%c", datas[cpt - 1]);
-            } while (cpt < a_len);
-            fprintf(stdout, "\n\n");
-            datas += a_len;
-        }
+    if (nAnswers)
+        dns_print("Answers", packet, datas, nAnswers);
+    //Authorities treatment
+    if (nAuth)
+        dns_print("Authorities", packet, datas, nAuth);
+    //Additionnals treatment
+    if (nAdd)
+        dns_print("Additionnals", packet, datas, nAdd);
+}
+
+void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n) {
+    unsigned i, cpt = 0;
+    fprintf(stdout, "\t%s:\n", type);
+    for (i = 0; i < n; i++) {
+        fprintf(stdout, "\t\t- Name:");
+        datas += resolve(packet, datas);
+        struct m_datas *data = (struct m_datas *)datas;
+        u_int16_t len = ntohs(data->len);
+        fprintf(stdout, "\n");
+        char *class = get_class(ntohs(data->clss));
+        char *type = get_type(ntohs(data->type));
+        fprintf(stdout, "\t\t- Type: %s\n", type);
+        fprintf(stdout, "\t\t- Class: %s\n", class);
+        fprintf(stdout, "\t\t- Ttl: %d\n", ntohl(data->ttl));
+        fprintf(stdout, "\t\t- Length: %d\n", ntohs(data->len));
+        datas += 10;
+        fprintf(stdout, "\t\t- Datas: ");
+        do {
+            if (isprint(datas[cpt++]))
+                fprintf(stdout, "%c", datas[cpt - 1]);
+        } while (cpt < len);
+        fprintf(stdout, "\n\n");
+        datas += len;
     }
 }
 
-unsigned get_name (const unsigned char *packet, const unsigned char *rest) {
+unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
     bool ptr;
     unsigned len = 0;
     for (;rest[len] != '\0';) {
@@ -154,7 +167,7 @@ unsigned get_name (const unsigned char *packet, const unsigned char *rest) {
             off |= rest[len + 1];
             off &= PTRINDEXMASK;
             ptr = true;
-            get_name(packet, packet + off);
+            resolve(packet, packet + off);
             return 2;
         }
         else {
@@ -231,5 +244,45 @@ void put_rcode (unsigned rcode) {
         default:
             fprintf(stdout, "Unknown reply code (%d)\n", rcode);
             break;
+    }
+}
+
+char *get_class (u_int16_t class) {
+    switch (class) {
+        case IN:
+            return "IN";
+        case CS:
+            return "CS";
+        case CH:
+            return "CH";
+        case HS:
+            return "HS";
+        default:
+            return "Unknown";
+    }
+}
+
+char *get_type (u_int16_t type) {
+    switch (type) {
+        case SOA:
+            return "SOA";
+        case A:
+            return "A";
+        case AAAA:
+            return "AAAA";
+        case NS:
+            return "NS";
+        case PTR:
+            return "PTR";
+        case MX:
+            return "MX";
+        case CNAME:
+            return "CNAME";
+        case TXT:
+            return "TXT";
+        case HINFO:
+            return "HINFO";
+        default:
+            return "Unknown";
     }
 }
