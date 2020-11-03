@@ -98,6 +98,7 @@ int main (int argc, char **argv) {
         }
     }
     else {
+        fprintf(stdout, "Capture sur l'interface [%s]\n", interface);
         if ((packet = pcap_open_live(interface, BUFSIZ, 1, 1000, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_live\n");
             return EXIT_FAILURE;

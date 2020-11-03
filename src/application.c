@@ -5,6 +5,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
     (void)packet;
     switch (port) {
         case DHCP:
+            fprintf(stdout, "\tDHCP [%d] =>", port);
             break;
 
         case DNS:
@@ -13,6 +14,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case TELNET:
+            fprintf(stdout, "\tTELNET [%d] =>", port);
             break;
 
         case HTTPS:
@@ -26,9 +28,11 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case SMTP:
+            fprintf(stdout, "\tSMTP [%d] =>", port);
             break;
 
         case SMTPS:
+            fprintf(stdout, "\tSMTPS [%d] =>", port);
             break;
 
         default:

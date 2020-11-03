@@ -13,7 +13,11 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
             treat_tcp(packet, to_add, sport, dport, level);
             break;
 
+        case -1:
+            break;
+
         default:
+            fprintf(stdout, "\tUnknown (%d)\n", t_protocol);
             break;
     }
 }
@@ -67,4 +71,62 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     fprintf(stdout, "\tWindow = %d\n", window);
     fprintf(stdout, "\tChecksum = %d\n", checksum);
     fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
+    if (*to_add > 20) {
+        const unsigned char *options = packet + 20;
+        int size = *to_add - 20, i;
+        unsigned char t, l;
+        fprintf(stdout, "\tOptions:\n");
+        for (; size > 0;) {
+            t = options[0];
+            //Signe la fin des options tcp, la suite est du padding
+            if (t == '\0')
+                break;
+            fprintf(stdout, "\t\tT: %d", t);
+            put_tcp_options(t);
+            if (t == NOP) {
+                options++;
+                size--;
+            }
+            else {
+                l = options[1];
+                fprintf(stdout, "\t\tL: %d\n", l);
+                if (l - 2 > 0) {
+                    fprintf(stdout, "\t\tV: ");
+                    for (i = 0; i < l - 2; i++)
+                        fprintf(stdout, "%01x", options[i + 2]);
+                    fprintf(stdout, "\n");
+                }
+                options += l;
+                size -= l;
+            }
+            fprintf(stdout, "\n");
+        }
+    }
+}
+
+/*Type du T-L-V vers String*/
+void put_tcp_options (int option) {
+    switch (option) {
+        case NOP:
+            fprintf(stdout, "\t\tNo Operation (%d)\n", option);
+            break;
+        case MSS:
+            fprintf(stdout, "\t\tMaximum Segment Size (%d)\n", option);
+            break;
+        case WS:
+            fprintf(stdout, "\t\tWindow Scale (%d)\n", option);
+            break;
+        case SACKP:
+            fprintf(stdout, "\t\tSack Permitted (%d)\n", option);
+            break;
+        case SACK:
+            fprintf(stdout, "\t\tSack (%d)\n", option);
+            break;
+        case TS:
+            fprintf(stdout, "\t\tTimestamp (%d)\n", option);
+            break;
+        default:
+            fprintf(stdout, "\t\tUnknown (%d)\n", option);
+            break;
+    }
 }
