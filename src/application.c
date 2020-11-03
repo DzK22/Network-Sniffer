@@ -161,15 +161,20 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
 unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
     bool ptr;
     unsigned len = 0;
+    //On lit le nom tant qu'il n'est pas terminé
     for (;rest[len] != '\0';) {
+        //ON vérifie si le premier octet indique que c'est un pointeur
         if (((u_int8_t)rest[len] & PTRMASK) == PTRVALUE) {
+            //Si le premier octet est un pointeur on récupère l'offset (sur 14 bits)
             u_int16_t off = rest[len] << 8;
             off |= rest[len + 1];
             off &= PTRINDEXMASK;
             ptr = true;
+            //On recherche le nom récursivement à l'offset indiqué
             resolve(packet, packet + off);
             return 2;
         }
+        //Si le premier octet n'est pas un pointeur on affiche le nom
         else {
             if (isprint(rest[len + 1]) && rest[len + 1] != '\n')
                 fprintf(stdout, "%c", rest[len + 1]);
