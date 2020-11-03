@@ -104,13 +104,13 @@ void treat_dns (const unsigned char *packet, int level) {
     fprintf(stdout, "\tAdditionnal RRs : %d\n", nAdd);
 
     const unsigned char *datas = packet + sizeof(HEADER);
-    unsigned i;
+    unsigned i, cpt = 0;
     //Questions treatment
     if (nQuestions) {
         fprintf(stdout, "\tQuestions:\n");
         for (i = 0; i < nQuestions; i++) {
             fprintf(stdout, "\t\t- Name: ");
-            datas = datas + get_name(packet, datas);
+            datas += get_name(packet, datas);
             struct q_datas *q_data = (struct q_datas *)datas;
             fprintf(stdout, "\n");
             fprintf(stdout, "\t\t- Type: %d\n", ntohs(q_data->type));
@@ -119,7 +119,30 @@ void treat_dns (const unsigned char *packet, int level) {
             fprintf(stdout, "\n\n");
         }
     }
-    (void)datas;
+
+    //Answers treatment
+    if (nAnswers) {
+        fprintf(stdout, "\tAnswers:\n");
+        for (i = 0; i < nAnswers; i++) {
+            fprintf(stdout, "\t\t- Name: ");
+            datas += get_name(packet, datas);
+            struct a_datas *a_data = (struct a_datas *)datas;
+            u_int16_t a_len = ntohs(a_data->len);
+            fprintf(stdout, "\n");
+            fprintf(stdout, "\t\t- Type: %d\n", ntohs(a_data->type));
+            fprintf(stdout, "\t\t- Class: %d\n", ntohs(a_data->clss));
+            fprintf(stdout, "\t\t- Ttl: %d\n", ntohs(a_data->ttl));
+            fprintf(stdout, "\t\t- Length: %d\n", ntohs(a_data->len));
+            datas += 10;
+            fprintf(stdout, "\t\t- Datas: ");
+            do {
+                if (isprint(datas[cpt++]))
+                    fprintf(stdout, "%c", datas[cpt - 1]);
+            } while (cpt < a_len);
+            fprintf(stdout, "\n\n");
+            datas += a_len;
+        }
+    }
 }
 
 unsigned get_name (const unsigned char *packet, const unsigned char *rest) {

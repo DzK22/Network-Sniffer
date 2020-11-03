@@ -36,4 +36,11 @@ struct q_datas {
     u_int16_t clss;
 };
 
+struct a_datas   {
+    u_int16_t type;
+    u_int16_t clss;
+    u_int32_t ttl;
+    u_int16_t len;
+};
+
 #endif
