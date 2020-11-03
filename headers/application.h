@@ -55,7 +55,7 @@ struct q_datas {
     u_int16_t clss;
 };
 
-struct m_datas   {
+struct r_datas   {
     u_int16_t type;
     u_int16_t clss;
     u_int32_t ttl;

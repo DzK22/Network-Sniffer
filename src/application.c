@@ -138,7 +138,7 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
     for (i = 0; i < n; i++) {
         fprintf(stdout, "\t\t- Name:");
         datas += resolve(packet, datas);
-        struct m_datas *data = (struct m_datas *)datas;
+        struct r_datas *data = (struct r_datas *)datas;
         u_int16_t len = ntohs(data->len);
         fprintf(stdout, "\n");
         char *class = get_class(ntohs(data->clss));
