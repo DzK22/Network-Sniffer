@@ -4,5 +4,6 @@
 
 void treat_bootp (const unsigned char *, int);
 bool is_dhcp (const unsigned char *);
+void print_dhcp (const unsigned char *, int);
 
 #endif

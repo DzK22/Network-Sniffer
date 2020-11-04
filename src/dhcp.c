@@ -65,7 +65,7 @@ void treat_bootp (const unsigned char *packet, int level) {
     fprintf(stdout, "\n");
     if (dhcp) {
         fprintf(stdout, "\tMagic cookie: DHCP\n");
-        //Traiter DHCP
+        //print_dhcp(bootp->bp_vend + 4, level);
     }
     else
         fprintf(stdout, "\n");
@@ -80,4 +80,15 @@ bool is_dhcp (const unsigned char *cookie) {
             ok = false;
     }
     return ok;
+}
+
+void print_dhcp (const unsigned char *packet, int level) {
+    (void)level;
+    fprintf(stdout, "\tDHCP:\n");
+    unsigned i = 0;
+    do {
+        unsigned len = packet[i + 1], tag = packet[i];
+        (void)len;
+        (void)tag;
+    } while (i < 60); //Le magic cookie a déjà été traité on prend donc les 60 octets suivant de Vendor spec
 }
