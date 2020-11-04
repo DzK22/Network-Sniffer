@@ -85,9 +85,11 @@ bool is_dhcp (const unsigned char *cookie) {
 void print_dhcp (const unsigned char *packet, int level) {
     (void)level;
     fprintf(stdout, "\tDHCP:\n");
-    unsigned i = 0, len, cpt;
+    unsigned i = 0;
+    int cpt, len;
     u_int32_t time;
     int *ip;
+    unsigned char *mac;
     //Le magic cookie a déjà été traité on prend donc les 60 octets suivant de Vendor spec
     do {
         fprintf(stdout, "\t\tOption: ");
@@ -160,8 +162,73 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "\n");
                 break;
 
+            case TAG_REQUESTED_IP:
+                fprintf(stdout, "Requested IP Address: ");
+                len = (int)packet[i + 1];
+                i += 2;
+                ip = get_ip(packet, i);
+                for (cpt = 0; cpt < 4; cpt++) {
+                    if (cpt != 3)
+                        fprintf(stdout, "%d.", ip[cpt]);
+                    else
+                        fprintf(stdout, "%d", ip[cpt]);
+                }
+                free(ip);
+                i += len;
+                fprintf(stdout, "\n");
+                break;
+
+            case TAG_PARM_REQUEST:
+                fprintf(stdout, "Parameter Request List\n");
+                len = (int)packet[i + 1];
+                for (cpt = 0; cpt < len; cpt++) {
+                    fprintf(stdout, "\t\t\t- Parameter Request List Item: ");
+                    int param = packet[i + cpt + 2];
+                    switch (param) {
+                        case TAG_SUBNET_MASK:
+                            fprintf(stdout, "(%d) Subnet Mask\n", param);
+                            break;
+                        case TAG_GATEWAY:
+                            fprintf(stdout, "(%d) Router\n", param);
+                            break;
+                        case TAG_DOMAIN_SERVER:
+                            fprintf(stdout, "(%d) Domain Name Server\n", param);
+                            break;
+                        case TAG_NTP_SERVERS:
+                            fprintf(stdout, "(%d) Network Time Protocol Servers\n", param);
+                            break;
+                        default:
+                            fprintf(stdout, "(%d) Unknown\n", param);
+                            break;
+                    }
+                }
+                i += (int)packet[i];
+                fprintf(stdout, "\n");
+                break;
+
             case TAG_END:
                 fprintf(stdout, "End\n");
+                return;
+
+            case TAG_CLIENT_ID:
+                fprintf(stdout, "Client identifier ");
+                len = (int)packet[i + 1];
+                i += 2;
+                if ((int)packet[i] == 0x01) {
+                    mac = get_mac(packet, i);
+                    for (cpt = 0; cpt < 6; cpt++) {
+                        if (cpt != 5)
+                            fprintf(stdout, "%02x:", mac[cpt]);
+                        else
+                            fprintf(stdout, "%02x", mac[cpt]);
+                    }
+                    free(mac);
+                    fprintf(stdout, "\n");
+                }
+                else
+                    fprintf(stdout, "Unknown\n");
+                i += len;
+                break;
             default:
                 return;
         }
@@ -183,6 +250,21 @@ int *get_ip (const unsigned char *packet, int i) {
     ip[2] = packet[i + 2];
     ip[3] = packet[i + 3];
     return ip;
+}
+
+unsigned char *get_mac (const unsigned char *packet, int i) {
+    unsigned char *mac = malloc(sizeof(unsigned char) * 6);
+    if (mac == NULL) {
+        fprintf(stderr, "malloc error\n");
+        return NULL;
+    }
+    mac[0] = packet[i + 1];
+    mac[1] = packet[i + 2];
+    mac[2] = packet[i + 3];
+    mac[3] = packet[i + 4];
+    mac[4] = packet[i + 5];
+    mac[5] = packet[i + 6];
+    return mac;
 }
 
 void put_dhcp_options (int option) {
