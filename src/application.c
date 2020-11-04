@@ -44,9 +44,8 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
     }
     return true;
 }
-void treat_app (const unsigned char *packet, int sport, int dport, int *to_add, int level, int len) {
-    (void)to_add;
-    (void)level;
+
+void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
     if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
         fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");
 }

@@ -22,6 +22,6 @@
 #define RESPONSE 0x995
 
 bool get_app (const unsigned char *, int, int, int, int);
-void treat_app (const unsigned char *, int, int, int *, int, int);
+void treat_app (const unsigned char *, int, int, int, int);
 
 #endif

@@ -82,9 +82,9 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     //Couche applicative
     fprintf(stdout, "\n[+7] Couche Application:\n");
     if (t_protocol == UDP)
-        treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len - dataLen);
+        treat_app(packet + previewHeaderLength, sport, dport, level, len - dataLen);
     else if (t_protocol == TCP)
-        treat_app(packet + previewHeaderLength, sport, dport, &to_add, level, len - previewHeaderLength);
+        treat_app(packet + previewHeaderLength, sport, dport, level, len - previewHeaderLength);
     fprintf(stdout, "\n");
 }
 
