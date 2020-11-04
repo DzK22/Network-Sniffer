@@ -4,8 +4,28 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
     (void)level;
     (void)packet;
     switch (port) {
-        case DHCP:
-            fprintf(stdout, "\tDHCP [%d] =>", port);
+        case HTTPS:
+            treat_transfer(packet, type, len, level, HTTPS);
+            break;
+
+        case HTTP:
+            treat_transfer(packet, type, len, level, HTTP);
+            break;
+
+        case FTPC:
+            treat_transfer(packet, type, len, level, FTPC);
+            break;
+
+        case FTPD:
+            treat_transfer(packet, type, len, level, FTPD);
+            break;
+
+        case SMTP:
+            treat_transfer(packet, type, len, level, SMTP);
+            break;
+
+        case SMTPS:
+            treat_transfer(packet, type, len, level, SMTPS);
             break;
 
         case DNS:
@@ -13,26 +33,8 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             treat_dns(packet, level);
             break;
 
-        case TELNET:
-            fprintf(stdout, "\tTELNET [%d] =>", port);
-            break;
-
-        case HTTPS:
-            fprintf(stdout, "\tHTTPS [%d] =>", port);
-            treat_https(packet, type, len, level);
-            break;
-
-        case HTTP:
-            fprintf(stdout, "\tHTTP [%d] =>", port);
-            treat_https(packet, type, len, level);
-            break;
-
-        case SMTP:
-            fprintf(stdout, "\tSMTP [%d] =>", port);
-            break;
-
-        case SMTPS:
-            fprintf(stdout, "\tSMTPS [%d] =>", port);
+        case DHCP:
+            fprintf(stdout, "\tDHCP [%d] =>", port);
             break;
 
         default:
