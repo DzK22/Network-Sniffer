@@ -1,8 +1,6 @@
 #include "../headers/application.h"
 
 bool get_app (const unsigned char *packet, int port, int type, int level, int len) {
-    (void)level;
-    (void)packet;
     switch (port) {
         case HTTPS:
             treat_transfer(packet, type, len, level, HTTPS);
