@@ -61,6 +61,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         exit(EXIT_FAILURE);
     }
 
+    fprintf(stdout, "<----------------------------------------------------------------------------------------------------->\n");
     fprintf(stdout, "packet ID = %ld arrived at %s\n", packetID, str_time);
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
 

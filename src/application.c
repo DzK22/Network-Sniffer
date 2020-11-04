@@ -37,6 +37,10 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             fprintf(stdout, "\tDHCP [%d] =>", port);
             break;
 
+        case MDNS:
+            fprintf(stdout, "\tMDNS [%d]\n", port);
+            break;
+
         default:
             return false;
     }

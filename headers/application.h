@@ -14,6 +14,7 @@
 #define DHCP   67
 #define FTPD   20
 #define FTPC   21
+#define MDNS 5353
 #define TCP 6
 #define UDP 17
 #define ICMP 1
