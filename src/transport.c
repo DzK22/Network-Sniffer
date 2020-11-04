@@ -33,7 +33,7 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
 
     fprintf(stdout, "\tSource port = %d\n", *sport);
     fprintf(stdout, "\tDestination port = %d\n", *dport);
-    fprintf(stdout, "\tChecksum = %d\n", checksum);
+    fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
     fprintf(stdout, "\tLength = %d\n", dataLength);
 }
 
@@ -69,7 +69,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     fprintf(stdout, "\t\t- ACK : %d\n", ack);
     fprintf(stdout, "\t\t- URG : %d\n", urg);
     fprintf(stdout, "\tWindow = %d\n", window);
-    fprintf(stdout, "\tChecksum = %d\n", checksum);
+    fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
     fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
     if (*to_add > 20) {
         const unsigned char *options = packet + 20;

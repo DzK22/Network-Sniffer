@@ -17,8 +17,8 @@
 
 char* get_protocol(int);
 void treat_network(const unsigned char *, int, int *, int *, int, int *);
-int treat_ipv4(const unsigned char *, int, int *, int *);
-void treat_ipv6(const unsigned char *, int);
+uint8_t treat_ipv4(const unsigned char *, int, int *, int *);
+uint8_t treat_ipv6(const unsigned char *, int);
 void treat_arp(const unsigned char *, int);
 void put_arp_opcode (int);
 
