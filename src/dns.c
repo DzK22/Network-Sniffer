@@ -78,7 +78,7 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
     unsigned i, cpt = 0;
     fprintf(stdout, "\t%s:\n", type);
     for (i = 0; i < n; i++) {
-        fprintf(stdout, "\t\t- Name:");
+        fprintf(stdout, "\t\t- Name: ");
         datas += resolve(packet, datas);
         struct r_datas *data = (struct r_datas *)datas;
         u_int16_t len = ntohs(data->len);
