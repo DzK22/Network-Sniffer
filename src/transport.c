@@ -72,61 +72,70 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
     fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
     if (*to_add > 20) {
-        const unsigned char *options = packet + 20;
-        int size = *to_add - 20, i;
-        unsigned char t, l;
+        int i = sizeof(struct tcphdr), value, len;
         fprintf(stdout, "\tOptions:\n");
-        for (; size > 0;) {
-            t = options[0];
-            //Signe la fin des options tcp, la suite est du padding
-            if (t == '\0')
-                break;
-            fprintf(stdout, "\t\tT: %d", t);
-            put_tcp_options(t);
-            if (t == NOP) {
-                options++;
-                size--;
-            }
-            else {
-                l = options[1];
-                fprintf(stdout, "\t\tL: %d\n", l);
-                if (l - 2 > 0) {
-                    fprintf(stdout, "\t\tV: ");
-                    for (i = 0; i < l - 2; i++)
-                        fprintf(stdout, "%01x", options[i + 2]);
+        do {
+            fprintf(stdout, "\t\tTCP Option - ");
+            switch (packet[i]) {
+                case NOP:
+                    fprintf(stdout, "\tNo Operation (NOP)\n");
+                    i++;
+                    break;
+                case MSS:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tMaximum Segment Size (%d)\n", packet[i]);
+                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                    value = packet[i + 2] << 8 | packet[i + 3];
+                    fprintf(stdout, "\t\t\t\tMSS Value: %d bytes\n", value);
+                    i += len;
+                    break;
+                case WS:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tWindow Scale (%d)\n", packet[i]);
+                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                    fprintf(stdout, "\t\t\t\tShift count: %d\n", packet[i + 2]);
+                    i += len;
+                    break;
+                case SACKP:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tSack Permitted (%d)\n", packet[i]);
+                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                    i += len;
+                    break;
+                case SACK:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tSack\n");
+                    i += len;
+                    break;
+                case TS:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tTimestamp (%d)\n", packet[i]);
+                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                    value = get_timestamp(packet, i);
+                    fprintf(stdout, "\t\t\t\tTimestamp value: %d secs\n", value);
+                    value = get_timestamp(packet, i + 4);
+                    fprintf(stdout, "\t\t\t\tTimestamp echo reply: %d secs\n", value);
+                    i += len;
+                    break;
+                default:
+                    len = (int)packet[i + 1];
+                    fprintf(stdout, "\tUnknown \n");
+                    fprintf(stdout, "\t\t\tLength: %d\n", len);
+                    int cpt;
+                    if (len > 2) {
+                        fprintf(stdout, "\t\t\tValue: 0x");
+                        for (cpt = 2; cpt < len; cpt++)
+                            fprintf(stdout, "%02x", packet[i + cpt]);
+                    }
                     fprintf(stdout, "\n");
-                }
-                options += l;
-                size -= l;
+                    i += len;
+                    break;
             }
             fprintf(stdout, "\n");
-        }
+        } while (i < *to_add);
     }
 }
 
-/*Type du T-L-V vers String*/
-void put_tcp_options (int option) {
-    switch (option) {
-        case NOP:
-            fprintf(stdout, "\t\tNo Operation (%d)\n", option);
-            break;
-        case MSS:
-            fprintf(stdout, "\t\tMaximum Segment Size (%d)\n", option);
-            break;
-        case WS:
-            fprintf(stdout, "\t\tWindow Scale (%d)\n", option);
-            break;
-        case SACKP:
-            fprintf(stdout, "\t\tSack Permitted (%d)\n", option);
-            break;
-        case SACK:
-            fprintf(stdout, "\t\tSack (%d)\n", option);
-            break;
-        case TS:
-            fprintf(stdout, "\t\tTimestamp (%d)\n", option);
-            break;
-        default:
-            fprintf(stdout, "\t\tUnknown (%d)\n", option);
-            break;
-    }
+u_int32_t get_timestamp (const unsigned char *packet, int i) {
+    return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
 }
