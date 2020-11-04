@@ -3,6 +3,8 @@
 #include "analyseur.h"
 #include "dns.h"
 #include "transfer.h"
+#include "dhcp.h"
+#include "bootp.h"
 #define POP    110
 #define IMAP   143
 #define SMTP   25

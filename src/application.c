@@ -32,7 +32,8 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case DHCP:
-            fprintf(stdout, "\tDHCP [%d] =>", port);
+            fprintf(stdout, "\tDHCP [%d]\n", port);
+            treat_bootp(packet, level);
             break;
 
         case MDNS:
