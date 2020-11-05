@@ -1,5 +1,18 @@
 #include "../headers/analyseur.h"
 
+pcap_t *packet;
+
+void sigint_handler(int signum) {
+    (void)signum;
+    struct pcap_stat stats;
+    if (pcap_stats(packet, &stats) >= 0) {
+        fprintf(stdout, SUPPR"%d packets received\n", stats.ps_recv);
+        fprintf(stdout, "%d packets dropped\n\n", stats.ps_drop);
+    }
+    pcap_close(packet);
+    exit(EXIT_SUCCESS);
+}
+
 int main (int argc, char **argv) {
     usage(argc);
     char interface[LEN] = "any";
@@ -9,6 +22,16 @@ int main (int argc, char **argv) {
     char arg;
     unsigned char args[1];
     bool o = false, f = false, v = false, i = false;
+    struct sigaction sig_int;
+    sig_int.sa_handler = sigint_handler;
+    if (sigemptyset(&sig_int.sa_mask) == -1) {
+        fprintf(stderr, "sigemptyset error\n");
+        return EXIT_FAILURE;
+    }
+    if (sigaction(SIGINT, &sig_int, NULL) == -1) {
+        fprintf(stderr, "sigaction error\n");
+        return EXIT_FAILURE;
+    }
     while ((arg = getopt(argc, argv, "v:o:i:f:")) != -1) {
         switch (arg) {
             case 'i':
@@ -89,8 +112,6 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    pcap_t *packet;
-
     if (o) {
         if ((packet = pcap_open_offline(fichier, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_offline error\n");
@@ -125,6 +146,5 @@ int main (int argc, char **argv) {
     free(ptr);
     free(alldevs);
     pcap_close(packet);
-    fprintf(stdout, "%d paquets ont été capturés\n", args[1] + 1);
     return EXIT_SUCCESS;
 }

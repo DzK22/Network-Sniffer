@@ -1,4 +1,5 @@
 #include "../headers/analyseur.h"
+static unsigned long packetID = 0;
 
 int c_print(char c) {
     if (c == '\r') {
@@ -47,8 +48,7 @@ void print_packet (const unsigned char *packet, int len) {
 }
 
 void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
-    static unsigned long packetID = 0;
-    args[1] = packetID++;
+    packetID++;
     struct tm res;
     if (localtime_r(&header->ts.tv_sec, &res) == NULL) {
         fprintf(stderr, "localtime error\n");

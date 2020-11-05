@@ -24,6 +24,7 @@
 #include <netinet/tcp.h>
 #include "application.h"
 #include <ctype.h>
+#include <signal.h>
 #include <net/if_arp.h>
 
 #define V3 3
@@ -34,7 +35,9 @@
 #define PINK "\e[38;2;250;20;160m"
 #define YELLOW "\e[38;2;255;250;0m"
 #define LEN 512
+#define SUPPR "\e[D\e[D\e[K"
 
+void sigint_handler (int);
 void callback(unsigned char *, const struct pcap_pkthdr *, const unsigned char *);
 void usage (int);
 int test_snprintf(int, int);
