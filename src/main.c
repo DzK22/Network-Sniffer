@@ -145,6 +145,7 @@ int main (int argc, char **argv) {
     }
     free(ptr);
     free(alldevs);
+    fprintf(stdout, "%d packets analyzed\n", args[1] + 1);
     pcap_close(packet);
     return EXIT_SUCCESS;
 }
