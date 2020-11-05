@@ -8,6 +8,7 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     int res;
     char mac_source[LEN];
     char mac_dest[LEN];
+    char *type = NULL;
     res = snprintf(mac_source, LEN, "%s", ether_ntoa(mac_src));
     if (test_snprintf(res, LEN) == EXIT_FAILURE) {
         fprintf(stderr, "error\n");
@@ -22,14 +23,31 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     switch (level) {
         case V3:
             fprintf(stdout, GREEN"Ethernet:\n"COL_RESET);
-            fprintf(stdout, PINK"\t@mac src : %s\n"COL_RESET, mac_source);
-            fprintf(stdout, GREEN"\t@mac dest : %s\n"COL_RESET, mac_dest);
+            fprintf(stdout, GREEN"\t@mac dest: %s\n"COL_RESET, mac_dest);
+            fprintf(stdout, PINK"\t@mac src: %s\n"COL_RESET, mac_source);
+            switch (*protocol) {
+                case ETHERTYPE_IP:
+                    type = "IPv4";
+                    break;
+                case ETHERTYPE_IPV6:
+                    type = "IPv6";
+                    break;
+                case ETHERTYPE_ARP:
+                    type = "ARP";
+                    break;
+                default:
+                    break;
+            }
+            if (*type)
+                fprintf(stdout, "\tType: %s (0x%04x)\n", type,  *protocol);
+            else
+                fprintf(stdout, "\tType: Unknown 0x%04x\n", *protocol);
             break;
 
         case V2:
             fprintf(stdout, GREEN"\tEthernet:\n"COL_RESET);
-            fprintf(stdout, PINK"\t@mac src : %s\n"COL_RESET, mac_source);
-            fprintf(stdout, GREEN"\t@mac dest : %s\n"COL_RESET, mac_dest);
+            fprintf(stdout, GREEN"\t@mac dest: %s\n"COL_RESET, mac_dest);
+            fprintf(stdout, PINK"\t@mac src: %s\n"COL_RESET, mac_source);
             break;
 
         case V1:
