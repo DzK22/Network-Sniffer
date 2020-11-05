@@ -1,16 +1,13 @@
 #include "../headers/analyseur.h"
-
+extern unsigned long packetID;
 pcap_t *packet;
+
+volatile sig_atomic_t interrupt = 0;
 
 void sigint_handler(int signum) {
     (void)signum;
-    struct pcap_stat stats;
-    if (pcap_stats(packet, &stats) >= 0) {
-        fprintf(stdout, SUPPR"%d packets received\n", stats.ps_recv);
-        fprintf(stdout, "%d packets dropped\n\n", stats.ps_drop);
-    }
-    pcap_close(packet);
-    exit(EXIT_SUCCESS);
+    interrupt = 1;
+    pcap_breakloop(packet);
 }
 
 int main (int argc, char **argv) {
@@ -20,7 +17,7 @@ int main (int argc, char **argv) {
     char filtre[LEN];
     int level = V2, res;
     char arg;
-    unsigned char args[1];
+    unsigned char args[3];
     bool o = false, f = false, v = false, i = false;
     struct sigaction sig_int;
     sig_int.sa_handler = sigint_handler;
@@ -138,14 +135,17 @@ int main (int argc, char **argv) {
             return EXIT_FAILURE;
         }
     }*/
-
+    args[1] = (int)0;
     if (pcap_loop(packet, -1, callback, args) == PCAP_ERROR) {
         fprintf(stderr, "pcap_loop error\n");
         return EXIT_FAILURE;
     }
     free(ptr);
     free(alldevs);
-    fprintf(stdout, "%d packets analyzed\n", args[1] + 1);
+    if (interrupt)
+        fprintf(stdout, SUPPR"%ld packets captured\n", packetID);
+    else
+        fprintf(stdout, "%ld packets captured\n", packetID);
     pcap_close(packet);
     return EXIT_SUCCESS;
 }
