@@ -214,6 +214,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "Client identifier ");
                 len = (int)packet[i + 1];
                 i += 2;
+                //Si le type est ethernet alors c'est une @MAC
                 if ((int)packet[i] == 0x01) {
                     mac = get_mac(packet, i);
                     for (cpt = 0; cpt < 6; cpt++) {

@@ -122,7 +122,9 @@ int main (int argc, char **argv) {
         fprintf(stderr, "pcap_loop error\n");
         return EXIT_FAILURE;
     }
-
+    free(ptr);
+    free(alldevs);
     pcap_close(packet);
+    fprintf(stdout, "%d paquets ont été capturés\n", args[1] + 1);
     return EXIT_SUCCESS;
 }

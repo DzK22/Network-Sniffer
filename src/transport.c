@@ -71,7 +71,8 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     fprintf(stdout, "\tWindow = %d\n", window);
     fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
     fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
-    if (*to_add > 20) {
+    //Si la taille de l'entete tcp est supérieure à 20 octets alors il y a des options tcp et on les affiche uniquement si le niveau de détails est au plus haut
+    if (*to_add > 20 && level == V3) {
         int i = sizeof(struct tcphdr), value, len;
         fprintf(stdout, "\tOptions:\n");
         do {
