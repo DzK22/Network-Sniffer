@@ -31,10 +31,22 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     checksum = ntohs(udp->uh_sum);
     dataLength = ntohs(udp->uh_ulen);
 
-    fprintf(stdout, "\tSource port = %d\n", *sport);
-    fprintf(stdout, "\tDestination port = %d\n", *dport);
-    fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
-    fprintf(stdout, "\tLength = %d\n", dataLength);
+    switch (level) {
+        case V2:
+            fprintf(stdout, "\tSource port = %d\n", *sport);
+            fprintf(stdout, "\tDestination port = %d\n", *dport);
+            break;
+
+        case V3:
+            fprintf(stdout, "\tSource port = %d\n", *sport);
+            fprintf(stdout, "\tDestination port = %d\n", *dport);
+            fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
+            fprintf(stdout, "\tLength = %d\n", dataLength);
+            break;
+
+        default:
+            return;
+    }
 }
 
 void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport, int level) {

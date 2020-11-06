@@ -89,6 +89,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         fprintf(stderr, "fflush error\n");
         exit(EXIT_FAILURE);
     }
+    
     fprintf(stdout, "\n");
 }
 

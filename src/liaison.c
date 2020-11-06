@@ -38,7 +38,7 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
                 default:
                     break;
             }
-            if (*type)
+            if (type != NULL)
                 fprintf(stdout, "\tType: %s (0x%04x)\n", type,  *protocol);
             else
                 fprintf(stdout, "\tType: Unknown 0x%04x\n", *protocol);
