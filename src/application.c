@@ -28,11 +28,15 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
 
         case DNS:
             fprintf(stdout, "\tDNS [%d]\n", port);
+            if (level == V1)
+                break;
             treat_dns(packet, level);
             break;
 
         case DHCP:
             fprintf(stdout, "\tBOOTP [%d]\n", port);
+            if (level == V1)
+                break;
             treat_bootp(packet, level);
             break;
 
