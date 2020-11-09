@@ -12,9 +12,10 @@ void sigint_handler(int signum) {
 
 int main (int argc, char **argv) {
     usage(argc);
-    char interface[LEN] = "any";
+    char interface[LEN];
     char fichier[LEN];
     char filtre[LEN];
+    char errbuff[PCAP_ERRBUF_SIZE];
     int level = V2, res;
     char arg;
     unsigned char args[3];
@@ -79,36 +80,6 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    args[0] = (unsigned char) level;
-
-    pcap_if_t *alldevs;
-    char errbuff[PCAP_ERRBUF_SIZE];
-    if (pcap_findalldevs(&alldevs, errbuff) == -1) {
-        fprintf(stderr, "Impossible de capturer les devices\n");
-        return EXIT_FAILURE;
-    }
-
-    bool exist = false;
-    pcap_if_t *ptr = alldevs;
-
-    while (ptr != NULL) {
-        if ((strcmp(interface, "any") != 0) && strcmp(ptr->name, interface) == 0)
-            exist = true;
-        ptr = ptr->next;
-    }
-
-    if (!exist && (strcmp(interface, "any") != 0)) {
-        fprintf(stderr, "%s n\'existe pas\nVoici la liste des interfaces disponibles :\n", interface);
-        ptr = alldevs;
-        while (ptr != NULL) {
-            printf("%s\n", ptr->name);
-            if (interface != NULL && strcmp(ptr->name, interface) == 0)
-                exist = true;
-            ptr = ptr->next;
-        }
-        return EXIT_FAILURE;
-    }
-
     if (o) {
         if ((packet = pcap_open_offline(fichier, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_offline error\n");
@@ -116,32 +87,64 @@ int main (int argc, char **argv) {
         }
     }
     else {
+        pcap_if_t *alldevs;
+        if (pcap_findalldevs(&alldevs, errbuff) == -1) {
+            fprintf(stderr, "Impossible de capturer les devices\n");
+            return EXIT_FAILURE;
+        }
+
+        bool exist = false;
+        pcap_if_t *ptr = alldevs;
+        if (!i) {
+            res = snprintf(interface, LEN, "%s", alldevs[0].name);
+            if (test_snprintf(res, LEN) == EXIT_FAILURE)
+                return EXIT_FAILURE;
+        }
+        else {
+            while (ptr != NULL) {
+                if (strcmp(ptr->name, interface) == 0)
+                exist = true;
+                ptr = ptr->next;
+            }
+
+            if (!exist) {
+                fprintf(stderr, "%s n\'existe pas\nVoici la liste des interfaces disponibles :\n", interface);
+                ptr = alldevs;
+                while (ptr != NULL) {
+                    printf("%s\n", ptr->name);
+                    if (interface != NULL && strcmp(ptr->name, interface) == 0)
+                    exist = true;
+                    ptr = ptr->next;
+                }
+                return EXIT_FAILURE;
+            }
+        }
         fprintf(stdout, "Capture sur l'interface [%s]\n", interface);
         if ((packet = pcap_open_live(interface, BUFSIZ, 1, 1000, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_live\n");
             return EXIT_FAILURE;
         }
+        /*if (f) {
+            struct bpf_program bfp_f;
+            bpf_u_int32 maskp = 0;
+            if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
+                fprintf(stderr, "Error filter compiling\n");
+                return EXIT_FAILURE;
+            }
+            if (pcap_setfilter(packet, &bfp_f) == PCAP_ERROR) {
+                fprintf(stderr, "Error filter setting\n");
+                return EXIT_FAILURE;
+            }
+        }*/
     }
 
-    /*if (f) {
-        struct bpf_program bfp_f;
-        bpf_u_int32 maskp = 0;
-        if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
-            fprintf(stderr, "Error filter compiling\n");
-            return EXIT_FAILURE;
-        }
-        if (pcap_setfilter(packet, &bfp_f) == PCAP_ERROR) {
-            fprintf(stderr, "Error filter setting\n");
-            return EXIT_FAILURE;
-        }
-    }*/
+    args[0] = (unsigned char) level;
     args[1] = (int)0;
+
     if (pcap_loop(packet, -1, callback, args) == PCAP_ERROR) {
         fprintf(stderr, "pcap_loop error\n");
         return EXIT_FAILURE;
     }
-    free(ptr);
-    free(alldevs);
     if (interrupt)
         fprintf(stdout, SUPPR"%ld packets captured\n", packetID);
     else

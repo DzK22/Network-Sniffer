@@ -27,6 +27,7 @@
 #include <signal.h>
 #include <net/if_arp.h>
 
+#define NO_INTERFACE "NULL"
 #define V3 3
 #define V2 2
 #define V1 1
