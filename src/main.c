@@ -124,6 +124,7 @@ int main (int argc, char **argv) {
             fprintf(stderr, "pcap_open_live\n");
             return EXIT_FAILURE;
         }
+        pcap_freealldevs(alldevs);
         /*if (f) {
             struct bpf_program bfp_f;
             bpf_u_int32 maskp = 0;
@@ -140,7 +141,6 @@ int main (int argc, char **argv) {
 
     args[0] = (unsigned char) level;
     args[1] = (int)0;
-
     if (pcap_loop(packet, -1, callback, args) == PCAP_ERROR) {
         fprintf(stderr, "pcap_loop error\n");
         return EXIT_FAILURE;

@@ -124,9 +124,9 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                     len = (int)packet[i + 1];
                     fprintf(stdout, "\tTimestamp (%d)\n", packet[i]);
                     fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                    value = get_timestamp(packet, i);
+                    value = get_timestamp_v(packet, i);
                     fprintf(stdout, "\t\t\t\tTimestamp value: %d secs\n", value);
-                    value = get_timestamp(packet, i + 4);
+                    value = get_timestamp_er(packet, i + 4);
                     fprintf(stdout, "\t\t\t\tTimestamp echo reply: %d secs\n", value);
                     i += len;
                     break;
@@ -149,6 +149,10 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     }
 }
 
-u_int32_t get_timestamp (const unsigned char *packet, int i) {
+u_int32_t get_timestamp_v (const unsigned char *packet, int i) {
     return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
+}
+
+u_int32_t get_timestamp_er (const unsigned char *packet, int i) {
+    return packet[i + 6] << 24 | packet[i + 7] << 16 | packet[i + 8] << 8 | packet[i + 9];
 }

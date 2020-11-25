@@ -94,6 +94,8 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         do {
             if (isprint(datas[cpt++]))
                 fprintf(stdout, "%c", datas[cpt - 1]);
+            else
+                fprintf(stdout, ".");
         } while (cpt < len);
         fprintf(stdout, "\n\n");
         datas += len;
