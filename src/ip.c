@@ -73,6 +73,9 @@ char* get_protocol(int id) {
     case UDP:
       protocol_name = "UDP";
       break;
+     case OSPF:
+        protocol_name = "OSPF";
+        break;
     case ICMP:
       protocol_name = "ICMP";
       break;

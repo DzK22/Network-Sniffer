@@ -17,8 +17,6 @@
 #define FTPD   20
 #define FTPC   21
 #define MDNS 5353
-#define TCP 6
-#define UDP 17
 #define ICMP 1
 #define REQUEST 0x1005
 #define RESPONSE 0x995
