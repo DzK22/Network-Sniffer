@@ -6,7 +6,7 @@ OBJ_DIR = obj/
 HD_DIR = headers/
 
 $(EXEC): $(OBJ_DIR)$(EXEC).o $(OBJ_DIR)liaison.o $(OBJ_DIR)analyseur.o $(OBJ_DIR)network.o $(OBJ_DIR)ip.o $(OBJ_DIR)arp.o $(OBJ_DIR)transport.o $(OBJ_DIR)ospf.o $(OBJ_DIR)application.o $(OBJ_DIR)dns.o $(OBJ_DIR)transfer.o $(OBJ_DIR)dhcp.o
-	$(CC) -o frame_tracker $^ $(CFLAGS)
+	$(CC) -o nSniffer $^ $(CFLAGS)
 
 $(OBJ_DIR)$(EXEC).o: $(SRC_DIR)$(EXEC).c $(HD_DIR)analyseur.h
 	$(CC) -c $< $(CFLAGS)
@@ -70,4 +70,4 @@ $(OBJ_DIR)analyseur.o: $(SRC_DIR)analyseur.c $(HD_DIR)analyseur.h
 
 
 clean:
-	rm -rf $(OBJ_DIR) frame_tracker $(DOC_DIR)
+	rm -rf $(OBJ_DIR) nSniffer $(DOC_DIR)
