@@ -79,6 +79,13 @@ struct ospfhdr {
     } ospf_union;
 };
 
+#define	ospf_hello	ospf_union.hello_packet
+#define	ospf_db		ospf_union.db_packet
+#define	ospf_lsr	ospf_union.lsr_packet
+#define	ospf_lsu	ospf_union.lsu_packet
+#define	ospf_lsa	ospf_union.lsa_packet
+
+
 char *get_ptype (int);
 
 #endif

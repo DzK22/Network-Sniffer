@@ -173,4 +173,7 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
     fprintf(stdout, "\tSource OSPF Router: %s\n", inet_ntoa(ospf->rid));
     fprintf(stdout, "\tArea ID: %s\n", inet_ntoa(ospf->aid));
     fprintf(stdout, "\tChecksum: 0x%4x\n", checksum);
+    if (ospf->type == HELLO) {
+        fprintf(stdout, "\tNetwork Mask: %s\n", inet_ntoa(ospf->ospf_hello.nmask));
+    }
 }
