@@ -8,6 +8,14 @@
 #define LSR 3
 #define LSU 4
 #define LSA 5
+#define OPT_DN 0x80
+#define OPT_O 0x40
+#define OPT_DC 0x20
+#define OPT_L 0x10
+#define OPT_N 0x08
+#define OPT_MC 0x04
+#define OPT_E 0x02
+#define OPT_MT 0x01
 
 struct lsahdr {
     uint16_t age;
@@ -85,7 +93,8 @@ struct ospfhdr {
 #define	ospf_lsu	ospf_union.lsu_packet
 #define	ospf_lsa	ospf_union.lsa_packet
 
-
+void treat_ospf(const unsigned char *, int *, int);
+void print_hopt (int *, int);
 char *get_ptype (int);
 
 #endif

@@ -1,6 +1,10 @@
 #include "../headers/analyseur.h"
 unsigned long packetID = 0;
 
+static inline bool supported_ep (int e_protocol) {
+    return (e_protocol == ETHERTYPE_IP) || (e_protocol == ETHERTYPE_IPV6) || (e_protocol == ETHERTYPE_ARP);
+}
+
 int c_print(char c) {
     if (c == '\r') {
         fprintf(stdout, "\\r");
@@ -73,13 +77,21 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     fprintf(stdout, "\n[+3] Couche Réseau:\n");
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
+
     //Couche transport
-    fprintf(stdout, "\n[+4] Couche Transport:\n");
+    if (t_protocol != OSPF && supported_ep(e_protocol))
+        fprintf(stdout, "\n[+4] Couche Transport:\n");
+    else
+        fprintf(stdout, "\n");
     treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche applicative
-    fprintf(stdout, "\n[+7] Couche Application:\n");
+    if (t_protocol != OSPF && supported_ep(e_protocol))
+        fprintf(stdout, "\n[+7] Couche Application:\n");
+    else
+        fprintf(stdout, "\n");
+        
     if (t_protocol == UDP)
         treat_app(packet + previewHeaderLength, sport, dport, level, len - dataLen);
     else if (t_protocol == TCP)
@@ -89,7 +101,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         fprintf(stderr, "fflush error\n");
         exit(EXIT_FAILURE);
     }
-    
+
     fprintf(stdout, "\n");
 }
 

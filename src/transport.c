@@ -160,20 +160,3 @@ u_int32_t get_timestamp_v (const unsigned char *packet, int i) {
 u_int32_t get_timestamp_er (const unsigned char *packet, int i) {
     return packet[i + 6] << 24 | packet[i + 7] << 16 | packet[i + 8] << 8 | packet[i + 9];
 }
-
-void treat_ospf(const unsigned char *packet, int *to_add, int level) {
-    (void)level;
-    struct ospfhdr *ospf = (struct ospfhdr *)packet;
-    *to_add = sizeof(struct ospfhdr);
-    u_int16_t len = ntohs(ospf->len);
-    u_int16_t checksum = ntohs(ospf->checksum);
-    fprintf(stdout, "\tVersion: %d\n", ospf->version);
-    fprintf(stdout, "\tMessage Type: %s (%d)\n", get_ptype(ospf->type), ospf->type);
-    fprintf(stdout, "\tPacket Length: %d\n", len);
-    fprintf(stdout, "\tSource OSPF Router: %s\n", inet_ntoa(ospf->rid));
-    fprintf(stdout, "\tArea ID: %s\n", inet_ntoa(ospf->aid));
-    fprintf(stdout, "\tChecksum: 0x%4x\n", checksum);
-    if (ospf->type == HELLO) {
-        fprintf(stdout, "\tNetwork Mask: %s\n", inet_ntoa(ospf->ospf_hello.nmask));
-    }
-}

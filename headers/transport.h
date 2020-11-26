@@ -16,7 +16,6 @@
 void treat_transport(const unsigned char *, int, int *, int *, int *, int);
 void treat_udp(const unsigned char *, int *, int *, int);
 void treat_tcp(const unsigned char *, int *, int *, int *, int);
-void treat_ospf(const unsigned char *, int *, int);
 void treat_icmp();
 u_int32_t get_timestamp_v (const unsigned char *, int);
 u_int32_t get_timestamp_er (const unsigned char *, int);
