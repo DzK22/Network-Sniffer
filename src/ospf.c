@@ -12,7 +12,7 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
     fprintf(stdout, "\tSource OSPF Router: %s\n", inet_ntoa(ospf->rid));
     fprintf(stdout, "\tArea ID: %s\n", inet_ntoa(ospf->aid));
     fprintf(stdout, "\tChecksum: 0x%4x\n", checksum);
-    if (ospf->type == HELLO) {
+    if (ospf->type == HELLO && ospf->version == 2) {
         int opts[8];
         u_int8_t opt = ospf->ospf_hello.options;
         opts[0] = (opt & OPT_DN) ? 1 : 0;
@@ -24,8 +24,11 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
         opts[6] = (opt & OPT_E) ? 1 : 0;
         opts[7] = (opt & OPT_MT) ? 1 : 0;
         u_int16_t h_int = ntohs(ospf->ospf_hello.interval);
+        u_int32_t deadint = ntohl(ospf->ospf_hello.dead_interval);
         fprintf(stdout, "\tNetwork Mask: %s\n", inet_ntoa(ospf->ospf_hello.nmask));
         fprintf(stdout, "\tHello Interval [sec]: %d\n", h_int);
+        fprintf(stdout, "\tRouter Priority: %d\n", ospf->ospf_hello.priority);
+        fprintf(stdout, "\tRouter Dead Interval: %d\n", deadint);
         fprintf(stdout, "\tOptions: 0x%2x\n", opt);
         print_hopt(opts, 8);
         fprintf(stdout, "\tDesignated Router: %s\n", inet_ntoa(ospf->ospf_hello.dr));
