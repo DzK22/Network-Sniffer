@@ -1,5 +1,6 @@
 #include "../headers/application.h"
 
+//Fonction qui invoque la fonction nécessaire selon le protocole applicatif
 bool get_app (const unsigned char *packet, int port, int type, int level, int len) {
     switch (port) {
         case HTTPS:
@@ -50,6 +51,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
     return true;
 }
 
+//Fonction qui vérifie si un des ports sources et destinations match avec un port applicatif
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
     if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
         fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");

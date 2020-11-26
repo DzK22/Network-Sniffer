@@ -1,5 +1,6 @@
 #include "../headers/dhcp.h"
 
+//Fonction qui gère bootp
 void treat_bootp (const unsigned char *packet, int level) {
     (void)level;
     struct bootp *bootp = (struct bootp *)packet;
@@ -71,6 +72,7 @@ void treat_bootp (const unsigned char *packet, int level) {
         fprintf(stdout, "\n");
 }
 
+//Fonction qui check si bootp utilise l'option dhcp (à l'aide du magic cookie)
 bool is_dhcp (const unsigned char *cookie) {
     bool ok = true;
     unsigned magic_cookie[4] = VM_RFC1048;

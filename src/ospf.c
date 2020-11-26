@@ -1,5 +1,6 @@
 #include "../headers/ospf.h"
 
+//Traite OSPv2 (Seulement IPv4 et non la version 3 pour certains champs tels que les options de hello packet)
 void treat_ospf(const unsigned char *packet, int *to_add, int level) {
     (void)level;
     struct ospfhdr *ospf = (struct ospfhdr *)packet;
@@ -37,6 +38,7 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
     }
 }
 
+//Transforme le type d'un message OSPF en string pour l'affichage
 char *get_ptype (int type) {
     char *str_type = NULL;
     switch (type) {
@@ -62,6 +64,7 @@ char *get_ptype (int type) {
     return str_type;
 }
 
+//Affiche les options OSPFv2
 void print_hopt (int *list, int n) {
     int i;
     for (i = 0; i < n; i++) {

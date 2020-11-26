@@ -1,5 +1,6 @@
 #include "../headers/ip.h"
 
+//Fonction qui gère une en-tête ipv4
 uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen) {
     (void)level;
     char ip_source[LEN], ip_dest[LEN]/*, str_version[LEN], str_ihl[LEN]*/;
@@ -41,6 +42,7 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
     return protocol;
 }
 
+//Fonction qui gère une en-tête ipv6
 uint8_t treat_ipv6(const unsigned char *packet, int level) {
     (void)level;
     struct ip6_hdr *ip6 = (struct ip6_hdr *) packet;
@@ -64,6 +66,7 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
     return next_header;
 }
 
+//Fonction qui convertion le numéro de port en string pour l'affichage du nom du protocol correspondant à ce protocole
 char* get_protocol(int id) {
   char* protocol_name;
   switch (id) {

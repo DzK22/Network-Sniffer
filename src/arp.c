@@ -1,5 +1,6 @@
 #include "../headers/arp.h"
 
+//Fonction qui gère le protocole ARP
 void treat_arp(const unsigned char *packet, int level) {
     (void)level;
     struct arphdr *arp = (struct arphdr *)packet;
@@ -48,6 +49,7 @@ void treat_arp(const unsigned char *packet, int level) {
 
     fprintf(stdout, "\tHardware size : %d\n", h_size);
     fprintf(stdout, "\tProtocol size: %d\n", protocol);
+    //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
     if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
         fprintf(stdout, "\tSrc @MAC => ");
         for (i = 0; i < 6; i++) {
@@ -90,6 +92,7 @@ void treat_arp(const unsigned char *packet, int level) {
     data_print(packet + i);
 }
 
+//Converti l'opcode ARP en string pour l'affichage
 void put_arp_opcode (int opcode) {
     switch (opcode) {
         case ARPOP_REQUEST:

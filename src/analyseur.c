@@ -1,6 +1,7 @@
 #include "../headers/analyseur.h"
 unsigned long packetID = 0;
 
+//Fonction qui check si le protocole ethernet est supporté par l'analyseur (Utile pour balayer certains affichages)
 static inline bool supported_ep (int e_protocol) {
     return (e_protocol == ETHERTYPE_IP) || (e_protocol == ETHERTYPE_IPV6) || (e_protocol == ETHERTYPE_ARP);
 }
@@ -21,6 +22,7 @@ int c_print(char c) {
     }
     return c;
 }
+
 void print(const unsigned char *packet, int len) {
     int i;
     fprintf(stdout, "\t");
@@ -42,7 +44,6 @@ void data_print(const unsigned char *packet) {
     }
     fprintf(stdout, " ...\n");
 }
-
 
 void print_packet (const unsigned char *packet, int len) {
     int i;
@@ -91,7 +92,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         fprintf(stdout, "\n[+7] Couche Application:\n");
     else
         fprintf(stdout, "\n");
-        
+
     if (t_protocol == UDP)
         treat_app(packet + previewHeaderLength, sport, dport, level, len - dataLen);
     else if (t_protocol == TCP)

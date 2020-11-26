@@ -53,6 +53,7 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     }
 }
 
+//Fonction qui traite l'en-tête TCP
 void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport, int level) {
     (void)level;
     struct tcphdr *tcp = (struct tcphdr *)packet;
@@ -153,10 +154,12 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     }
 }
 
+//Récupère la valeur du timestamp
 u_int32_t get_timestamp_v (const unsigned char *packet, int i) {
     return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
 }
 
+//Récupère la valeur du timestamp echo-reply qui évalue le temps d'un rtt
 u_int32_t get_timestamp_er (const unsigned char *packet, int i) {
     return packet[i + 6] << 24 | packet[i + 7] << 16 | packet[i + 8] << 8 | packet[i + 9];
 }

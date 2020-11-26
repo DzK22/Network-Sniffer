@@ -1,5 +1,6 @@
 #include "../headers/liaison.h"
 
+//Fonction qui gère la couche liaison dans sa globalité
 void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     const struct ether_header *header = (struct ether_header *) packet;
     const struct ether_addr *mac_src = (struct ether_addr *) header->ether_shost;
