@@ -30,6 +30,7 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
         print_hopt(opts, 8);
         fprintf(stdout, "\tDesignated Router: %s\n", inet_ntoa(ospf->ospf_hello.dr));
         fprintf(stdout, "\tBackup Designated Router: %s\n", inet_ntoa(ospf->ospf_hello.bdr));
+        fprintf(stdout, "\tActive Neighbor: %s\n", inet_ntoa(*ospf->ospf_hello.neighbor));
     }
 }
 
