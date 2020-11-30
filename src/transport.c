@@ -17,17 +17,14 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
             treat_ospf(packet, to_add, level);
             break;
 
-        case -1:
-            break;
-
         default:
-            fprintf(stdout, "\tUnknown (%d)\n", t_protocol);
+            if (level != V1)
+                fprintf(stdout, "\tUnknown (%d)\n", t_protocol);
             break;
     }
 }
 
 void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
-    (void)level;
     struct udphdr *udp = (struct udphdr *)packet;
     int checksum, dataLength;
     *sport = ntohs(udp->uh_sport);
@@ -36,6 +33,9 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     dataLength = ntohs(udp->uh_ulen);
 
     switch (level) {
+        case V1:
+            fprintf(stdout, "|| UDP\t");
+            break;
         case V2:
             fprintf(stdout, "\tSource port = %d\n", *sport);
             fprintf(stdout, "\tDestination port = %d\n", *dport);
@@ -47,9 +47,6 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
             fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
             fprintf(stdout, "\tLength = %d\n", dataLength);
             break;
-
-        default:
-            return;
     }
 }
 
@@ -73,93 +70,109 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     ack_seq = ntohl(tcp->ack_seq);
     dataOff = tcp->th_off;
     urgPointer = ntohs(tcp->th_urp);
-    fprintf(stdout, "\tSource Port = %d\n", *sport);
-    fprintf(stdout, "\tDestination Port = %d\n", *dport);
-    fprintf(stdout, "\tSequence Num = %02x\n", seq);
-    fprintf(stdout, "\tAcknowledgment Num = %02x\n", ack_seq);
-    fprintf(stdout, "\tDate Offset = %d\n", dataOff);
-    fprintf(stdout, "\tFlags : \n");
-    fprintf(stdout, "\t\t- FIN : %d\n", fin);
-    fprintf(stdout, "\t\t- SYN : %d\n", syn);
-    fprintf(stdout, "\t\t- RST : %d\n", reset);
-    fprintf(stdout, "\t\t- PSH : %d\n", push);
-    fprintf(stdout, "\t\t- ACK : %d\n", ack);
-    fprintf(stdout, "\t\t- URG : %d\n", urg);
-    fprintf(stdout, "\tWindow = %d\n", window);
-    fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
-    fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
-    //Si la taille de l'entete tcp est supérieure à 20 octets alors il y a des options tcp et on les affiche uniquement si le niveau de détails est au plus haut
-    if (*to_add > 20 && level == V3) {
-        int i = sizeof(struct tcphdr), value, len;
-        fprintf(stdout, "\tOptions:\n");
-        do {
-            fprintf(stdout, "\t\tTCP Option - ");
-            switch (packet[i]) {
-                case NOP:
-                    fprintf(stdout, "\tNo Operation (NOP)\n");
-                    i++;
-                    break;
-                case MSS:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tMaximum Segment Size (%d)\n", packet[i]);
-                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                    value = packet[i + 2] << 8 | packet[i + 3];
-                    fprintf(stdout, "\t\t\t\tMSS Value: %d bytes\n", value);
-                    i += len;
-                    break;
-                case WS:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tWindow Scale (%d)\n", packet[i]);
-                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                    fprintf(stdout, "\t\t\t\tShift count: %d\n", packet[i + 2]);
-                    i += len;
-                    break;
-                case SACKP:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tSack Permitted (%d)\n", packet[i]);
-                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                    i += len;
-                    break;
-                case SACK:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tSack\n");
-                    i += len;
-                    break;
-                case TS:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tTimestamp (%d)\n", packet[i]);
-                    fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                    value = get_timestamp_v(packet, i);
-                    fprintf(stdout, "\t\t\t\tTimestamp value: %d secs\n", value);
-                    value = get_timestamp_er(packet, i + 4);
-                    fprintf(stdout, "\t\t\t\tTimestamp echo reply: %d secs\n", value);
-                    i += len;
-                    break;
-                default:
-                    len = (int)packet[i + 1];
-                    fprintf(stdout, "\tUnknown \n");
-                    fprintf(stdout, "\t\t\tLength: %d\n", len);
-                    int cpt;
-                    if (len > 2) {
-                        fprintf(stdout, "\t\t\tValue: 0x");
-                        for (cpt = 2; cpt < len; cpt++)
+    switch (level) {
+        case V1:
+            fprintf(stdout, "|| [TCP] ");
+            fprintf(stdout, "{ ");
+            if (fin)
+                fprintf(stdout, "FIN ");
+            if (syn)
+                fprintf(stdout, "SYN ");
+            if (reset)
+                fprintf(stdout, "RST ");
+            if (push)
+                fprintf(stdout, "PSH ");
+            if (ack)
+                fprintf(stdout, "ACK ");
+            if (urg)
+                fprintf(stdout, "URG ");
+            fprintf(stdout, "}\t");
+            break;
+        default:
+            fprintf(stdout, "\tSource Port = %d\n", *sport);
+            fprintf(stdout, "\tDestination Port = %d\n", *dport);
+            fprintf(stdout, "\tSequence Num = %02x\n", seq);
+            fprintf(stdout, "\tAcknowledgment Num = %02x\n", ack_seq);
+            fprintf(stdout, "\tDate Offset = %d\n", dataOff);
+            fprintf(stdout, "\tFlags : \n");
+            fprintf(stdout, "\t\t- FIN : %d\n", fin);
+            fprintf(stdout, "\t\t- SYN : %d\n", syn);
+            fprintf(stdout, "\t\t- RST : %d\n", reset);
+            fprintf(stdout, "\t\t- PSH : %d\n", push);
+            fprintf(stdout, "\t\t- ACK : %d\n", ack);
+            fprintf(stdout, "\t\t- URG : %d\n", urg);
+            fprintf(stdout, "\tWindow = %d\n", window);
+            fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
+            fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
+            //Si la taille de l'entete tcp est supérieure à 20 octets alors il y a des options tcp et on les affiche uniquement si le niveau de détails est au plus haut
+            if (*to_add > 20 && level == V3) {
+                int i = sizeof(struct tcphdr), value, len;
+                fprintf(stdout, "\tOptions:\n");
+                do {
+                    fprintf(stdout, "\t\tTCP Option - ");
+                    switch (packet[i]) {
+                        case NOP:
+                        fprintf(stdout, "\tNo Operation (NOP)\n");
+                        i++;
+                        break;
+                        case MSS:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tMaximum Segment Size (%d)\n", packet[i]);
+                        fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                        value = packet[i + 2] << 8 | packet[i + 3];
+                        fprintf(stdout, "\t\t\t\tMSS Value: %d bytes\n", value);
+                        i += len;
+                        break;
+                        case WS:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tWindow Scale (%d)\n", packet[i]);
+                        fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                        fprintf(stdout, "\t\t\t\tShift count: %d\n", packet[i + 2]);
+                        i += len;
+                        break;
+                        case SACKP:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tSack Permitted (%d)\n", packet[i]);
+                        fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                        i += len;
+                        break;
+                        case SACK:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tSack\n");
+                        i += len;
+                        break;
+                        case TS:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tTimestamp (%d)\n", packet[i]);
+                        fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                        value = get_timestamp(packet, i);
+                        fprintf(stdout, "\t\t\t\tTimestamp value: %d secs\n", value);
+                        value = get_timestamp(packet, i + 4);
+                        fprintf(stdout, "\t\t\t\tTimestamp echo reply: %d secs\n", value);
+                        i += len;
+                        break;
+                        default:
+                        len = (int)packet[i + 1];
+                        fprintf(stdout, "\tUnknown \n");
+                        fprintf(stdout, "\t\t\tLength: %d\n", len);
+                        int cpt;
+                        if (len > 2) {
+                            fprintf(stdout, "\t\t\tValue: 0x");
+                            for (cpt = 2; cpt < len; cpt++)
                             fprintf(stdout, "%02x", packet[i + cpt]);
+                        }
+                        fprintf(stdout, "\n");
+                        i += len;
+                        break;
                     }
                     fprintf(stdout, "\n");
-                    i += len;
-                    break;
+                } while (i < *to_add);
             }
-            fprintf(stdout, "\n");
-        } while (i < *to_add);
+            break;
     }
 }
 
 //Récupère la valeur du timestamp
-u_int32_t get_timestamp_v (const unsigned char *packet, int i) {
+u_int32_t get_timestamp (const unsigned char *packet, int i) {
     return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
-}
-
-//Récupère la valeur du timestamp echo-reply qui évalue le temps d'un rtt
-u_int32_t get_timestamp_er (const unsigned char *packet, int i) {
-    return packet[i + 6] << 24 | packet[i + 7] << 16 | packet[i + 8] << 8 | packet[i + 9];
 }

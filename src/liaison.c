@@ -22,6 +22,10 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     }
 
     switch (level) {
+        case V1:
+            fprintf(stdout, "[Ethernet] %s => %s\t", mac_source, mac_dest);
+            break;
+            
         case V3:
             fprintf(stdout, GREEN"Ethernet:\n"COL_RESET);
             fprintf(stdout, GREEN"\t@mac dest: %s\n"COL_RESET, mac_dest);
@@ -49,10 +53,6 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
             fprintf(stdout, GREEN"\tEthernet:\n"COL_RESET);
             fprintf(stdout, GREEN"\t@mac dest: %s\n"COL_RESET, mac_dest);
             fprintf(stdout, PINK"\t@mac src: %s\n"COL_RESET, mac_source);
-            break;
-
-        case V1:
-            fprintf(stdout, "[Ethernet] %s => %s\n", mac_source, mac_dest);
             break;
     }
 }

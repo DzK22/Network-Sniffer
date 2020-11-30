@@ -24,52 +24,59 @@ void treat_bootp (const unsigned char *packet, int level) {
     char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
     //Utile pour inet_ntop plus tard
     //char str_cip[LEN], str_yip[LEN], str_sip[LEN], str_gip[LEN];
-    if (opcode == BOOTREPLY)
-        fprintf(stdout, "\tMessage type: Reply (%d)\n", opcode);
-    else
-        fprintf(stdout, "\tMessage type: Request (%d)\n", opcode);
-    switch (htype) {
-        case 1:
-            fprintf(stdout, "\tHardware type: Ethernet (0x%02x)\n", htype);
-            break;
-        case 2:
-            fprintf(stdout, "\tHardware type: Experimental Ethernet (0x%02x)\n", htype);
+    switch (level) {
+        case V1:
+            fprintf(stdout, "|| BOOTP\t");
             break;
         default:
-            fprintf(stdout, "\tHardware type: Unknown (0x%02x)\n", htype);
+            if (opcode == BOOTREPLY)
+            fprintf(stdout, "\tMessage type: Reply (%d)\n", opcode);
+            else
+            fprintf(stdout, "\tMessage type: Request (%d)\n", opcode);
+            switch (htype) {
+                case 1:
+                fprintf(stdout, "\tHardware type: Ethernet (0x%02x)\n", htype);
+                break;
+                case 2:
+                fprintf(stdout, "\tHardware type: Experimental Ethernet (0x%02x)\n", htype);
+                break;
+                default:
+                fprintf(stdout, "\tHardware type: Unknown (0x%02x)\n", htype);
+                break;
+            }
+            fprintf(stdout, "\tHardware address length: %d\n", hlen);
+            fprintf(stdout, "\tHops: %d\n", hops);
+            fprintf(stdout, "\tTransaction ID: 0x%08x\n", xID);
+            fprintf(stdout, "\tSeconds elapsed: %d\n", secs);
+            fprintf(stdout, "\tBootp flags: 0x%04x\n", flags);
+            fprintf(stdout, "\tClient IP address: %s\n", inet_ntoa(cip));
+            fprintf(stdout, "\tYour (client) IP address: %s\n", inet_ntoa(yip));
+            fprintf(stdout, "\tNext server IP address: %s\n", inet_ntoa(sip));
+            fprintf(stdout, "\tRelay agent IP address: %s\n", inet_ntoa(gip));
+            fprintf(stdout, "\tClient MAC address: %s\n", chaddr);
+            if (strcmp(sname, "None") == 0)
+            fprintf(stdout, "\tServer host name not given\n");
+            else
+            fprintf(stdout, "\tServer host name: %s\n", sname);
+            if (strcmp(file, "None") == 0)
+            fprintf(stdout, "\tBoot file name not given\n");
+            else
+            fprintf(stdout, "\tBoot file name: %s\n", file);
+            bool dhcp = is_dhcp(bootp->bp_vend);
+            (void)dhcp;
+            fprintf(stdout, "\tVendor Spec: ");
+            unsigned i;
+            for (i = 0; i < 4; i++)
+            fprintf(stdout, "%d ", bootp->bp_vend[i]);
+            fprintf(stdout, "\n");
+            if (dhcp) {
+                fprintf(stdout, "\tMagic cookie: DHCP\n");
+                print_dhcp(bootp->bp_vend + 4, level);
+            }
+            else
+            fprintf(stdout, "\n");
             break;
     }
-    fprintf(stdout, "\tHardware address length: %d\n", hlen);
-    fprintf(stdout, "\tHops: %d\n", hops);
-    fprintf(stdout, "\tTransaction ID: 0x%08x\n", xID);
-    fprintf(stdout, "\tSeconds elapsed: %d\n", secs);
-    fprintf(stdout, "\tBootp flags: 0x%04x\n", flags);
-    fprintf(stdout, "\tClient IP address: %s\n", inet_ntoa(cip));
-    fprintf(stdout, "\tYour (client) IP address: %s\n", inet_ntoa(yip));
-    fprintf(stdout, "\tNext server IP address: %s\n", inet_ntoa(sip));
-    fprintf(stdout, "\tRelay agent IP address: %s\n", inet_ntoa(gip));
-    fprintf(stdout, "\tClient MAC address: %s\n", chaddr);
-    if (strcmp(sname, "None") == 0)
-        fprintf(stdout, "\tServer host name not given\n");
-    else
-        fprintf(stdout, "\tServer host name: %s\n", sname);
-    if (strcmp(file, "None") == 0)
-        fprintf(stdout, "\tBoot file name not given\n");
-    else
-        fprintf(stdout, "\tBoot file name: %s\n", file);
-    bool dhcp = is_dhcp(bootp->bp_vend);
-    (void)dhcp;
-    fprintf(stdout, "\tVendor Spec: ");
-    unsigned i;
-    for (i = 0; i < 4; i++)
-        fprintf(stdout, "%d ", bootp->bp_vend[i]);
-    fprintf(stdout, "\n");
-    if (dhcp) {
-        fprintf(stdout, "\tMagic cookie: DHCP\n");
-        print_dhcp(bootp->bp_vend + 4, level);
-    }
-    else
-        fprintf(stdout, "\n");
 }
 
 //Fonction qui check si bootp utilise l'option dhcp (à l'aide du magic cookie)

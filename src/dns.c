@@ -1,7 +1,7 @@
 #include "../headers/dns.h"
 
+//Appelée que si Verbose = 2 ou 3
 void treat_dns (const unsigned char *packet, int level) {
-    (void)level;
     HEADER *dns = (HEADER *)packet;
     uint16_t tID, nQuestions, nAnswers, nAuth, nAdd;
     tID = ntohs(dns->id);
@@ -48,6 +48,8 @@ void treat_dns (const unsigned char *packet, int level) {
     const unsigned char *datas = packet + sizeof(HEADER);
     unsigned i;
     //Questions treatment
+    if (level == V2)
+        return;
     if (nQuestions) {
         fprintf(stdout, "\tQuestions:\n");
         for (i = 0; i < nQuestions; i++) {

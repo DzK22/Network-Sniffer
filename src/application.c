@@ -28,21 +28,28 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case DNS:
-            fprintf(stdout, "\tDNS [%d]\n", port);
             if (level == V1)
-                break;
-            treat_dns(packet, level);
+                fprintf(stdout, "|| DNS\n");
+            else {
+                fprintf(stdout, "\tDNS [%d]\n", port);
+                treat_dns(packet, level);
+            }
             break;
 
         case DHCP:
-            fprintf(stdout, "\tBOOTP [%d]\n", port);
             if (level == V1)
-                break;
-            treat_bootp(packet, level);
+                fprintf(stdout, "|| BOOTP\n");
+            else {
+                fprintf(stdout, "\tBOOTP [%d]\n", port);
+                treat_bootp(packet, level);
+            }
             break;
 
         case MDNS:
-            fprintf(stdout, "\tMDNS [%d]\n", port);
+            if (level == V1)
+                fprintf(stdout, "|| MDNS\n");
+            else
+                fprintf(stdout, "\tMDNS [%d]\n", port);
             break;
 
         default:
@@ -53,6 +60,10 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
 
 //Fonction qui vérifie si un des ports sources et destinations match avec un port applicatif
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
-    if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len))
-        fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");
+    if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len)) {
+        if (level == V1)
+            fprintf(stdout, "|| No App\n");
+        else
+            fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");
+    }
 }
