@@ -80,11 +80,11 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
     if (!get_app(packet, sport, true, level, len) && !get_app(packet, dport, false, level, len)) {
         switch (level) {
             case V1:
-                fprintf(stdout, "|| No App\n");
+                fprintf(stdout, "|| No App");
                 break;
 
             case V2:
-                fprintf(stdout, "$> No App matching\n");
+                fprintf(stdout, "$> No App matching");
                 break;
 
             case V3:
