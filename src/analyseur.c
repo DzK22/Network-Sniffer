@@ -17,9 +17,9 @@ static inline bool supported_app (int app) {
 }
 
 int c_print(char c) {
-    if (c == '\r') {
+    if (c == '\r')
         fprintf(stdout, "\\r");
-    }
+
     else if (c == '\n') {
         fprintf(stdout, "\\n");
         fprintf(stdout, "\n");
@@ -92,7 +92,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     //Couche liaison
     if (level == V3)
         fprintf(stdout, "[+2] Couche Liaison:\n");
-        
+
     treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
