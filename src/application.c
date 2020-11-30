@@ -1,38 +1,38 @@
 #include "../headers/application.h"
 
 //Fonction qui invoque la fonction nécessaire selon le protocole applicatif
-bool get_app (const unsigned char *packet, int port, int type, int level, int len) {
+bool get_app (const unsigned char *packet, int port, bool resp, int level, int len) {
     switch (port) {
         case HTTPS:
-            treat_transfer(packet, type, len, level, HTTPS);
+            treat_transfer(packet, resp, len, level, HTTPS);
             break;
 
         case HTTP:
-            treat_transfer(packet, type, len, level, HTTP);
+            treat_transfer(packet, resp, len, level, HTTP);
             break;
 
         case FTPC:
-            treat_transfer(packet, type, len, level, FTPC);
+            treat_transfer(packet, resp, len, level, FTPC);
             break;
 
         case FTPD:
-            treat_transfer(packet, type, len, level, FTPD);
+            treat_transfer(packet, resp, len, level, FTPD);
             break;
 
         case SMTP:
-            treat_transfer(packet, type, len, level, SMTP);
+            treat_transfer(packet, resp, len, level, SMTP);
             break;
 
         case SMTPS:
-            treat_transfer(packet, type, len, level, SMTPS);
+            treat_transfer(packet, resp, len, level, SMTPS);
             break;
 
         case POP:
-            treat_transfer(packet, type, len, level, POP);
+            treat_transfer(packet, resp, len, level, POP);
             break;
 
         case IMAP:
-            treat_transfer(packet, type, len, level, IMAP);
+            treat_transfer(packet, resp, len, level, IMAP);
             break;
 
         case DNS:
@@ -71,7 +71,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
 
 //Fonction qui vérifie si un des ports sources et destinations match avec un port applicatif
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
-    if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len)) {
+    if (!get_app(packet, sport, true, level, len) && !get_app(packet, dport, false, level, len)) {
         switch (level) {
             case V1:
                 fprintf(stdout, "|| No App\n");

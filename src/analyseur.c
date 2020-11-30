@@ -98,7 +98,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength += to_add;
 
     //Couche transport
-    if (t_protocol != OSPF && supported_ep(e_protocol) && level == V3)
+    if (t_protocol != -1 && t_protocol != OSPF && supported_ep(e_protocol) && level == V3)
         fprintf(stdout, "\n[+4] Couche Transport:\n");
     else if (level == V3)
         fprintf(stdout, "\n");

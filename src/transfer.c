@@ -1,7 +1,7 @@
 #include "../headers/transfer.h"
 
 //Fonction qui invoque la fonction correpondant au protocole (de "transfert") applicatif du port passé en paramètre
-void treat_transfer (const unsigned char *packet, int response, int len, int level, int port) {
+void treat_transfer (const unsigned char *packet, bool resp, int len, int level, int port) {
     switch (port) {
         case HTTP:
             switch (level) {
@@ -135,7 +135,7 @@ void treat_transfer (const unsigned char *packet, int response, int len, int lev
             return;
     }
 
-    if (!response)
+    if (!resp)
         fprintf(stdout, " REQUEST\n");
     else
         fprintf(stdout, " RESPONSE\n");
