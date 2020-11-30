@@ -56,7 +56,7 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
         case MDNS:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| MDNS\n");
+                    fprintf(stdout, "|| MDNS");
                     break;
 
                 case V2:
