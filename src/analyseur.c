@@ -8,7 +8,8 @@ static inline bool supported_ep (int e_protocol) {
 
 static inline bool supported_app (int app) {
     return (app == HTTP) || (app == HTTPS) || (app == FTPC) || (app == FTPD) || \
-    (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || (app == MDNS);
+    (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || (app == MDNS) || \
+    (app == TELNET) || (app == POP) || (app == IMAP);
 }
 
 int c_print(char c) {
@@ -106,7 +107,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength += to_add;
 
     //Couche applicative
-    if (t_protocol != OSPF && supported_ep(e_protocol && (supported_app(sport) || supported_app(dport))) && level != V1)
+    if (t_protocol != OSPF && supported_ep(e_protocol) && (supported_app(sport) || supported_app(dport)) && level != V1)
         fprintf(stdout, "\n[+7] Couche Application:\n");
     else if (level == V3)
         fprintf(stdout, "\n");
