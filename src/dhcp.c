@@ -76,7 +76,6 @@ void treat_bootp (const unsigned char *packet, int level) {
 
         //Si Verbose 1 et 2 on affiche uniquement les options DHCP si DHCP présent
         default:
-            fprintf(stdout, "|| BOOTP\t");
             if (is_dhcp(bootp->bp_vend))
                 print_dhcp(bootp->bp_vend + 4, level);
             break;
@@ -97,11 +96,20 @@ bool is_dhcp (const unsigned char *cookie) {
 }
 
 void print_dhcp (const unsigned char *packet, int level) {
-    (void)level;
-    if (level == V3)
-        fprintf(stdout, "\tDHCP:\n");
-    else
-        fprintf(stdout, "$> DHCP: ");
+    switch (level) {
+        case V1:
+            fprintf(stdout, "|| DHCP\n");
+            return;
+
+        case V2:
+            fprintf(stdout, "$> DHCP: ");
+            break;
+
+        case V3:
+            fprintf(stdout, "\tDHCP:\n");
+            break;
+    }
+
     unsigned i = 0;
     int cpt, len;
     u_int32_t time;
@@ -120,7 +128,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -133,7 +141,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -146,7 +154,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -159,7 +167,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -178,7 +186,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -197,7 +205,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
@@ -216,13 +224,15 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if ((int)packet[i] != TAG_END)
                     fprintf(stdout, ", ");
                 break;
 
             case TAG_PARM_REQUEST:
                 if (level == V3)
                     fprintf(stdout, "Parameter Request List\n");
+                if (level == V2)
+                    fprintf(stdout, "Parameter Request List Item: { ");
                 len = (int)packet[i + 1];
                 for (cpt = 0; cpt < len; cpt++) {
                     if (level == V3)
@@ -230,31 +240,46 @@ void print_dhcp (const unsigned char *packet, int level) {
                     int param = packet[i + cpt + 2];
                     switch (param) {
                         case TAG_SUBNET_MASK:
-                            fprintf(stdout, "(%d) Subnet Mask\n", param);
+                            fprintf(stdout, "(%d) Subnet Mask", param);
+                            if (level == V3)
+                                fprintf(stdout, "\n");
                             break;
                         case TAG_GATEWAY:
-                            fprintf(stdout, "(%d) Router\n", param);
+                            fprintf(stdout, "(%d) Router", param);
+                            if (level == V3)
+                                fprintf(stdout, "\n");
                             break;
                         case TAG_DOMAIN_SERVER:
-                            fprintf(stdout, "(%d) Domain Name Server\n", param);
+                            fprintf(stdout, "(%d) Domain Name Server", param);
+                            if (level == V3)
+                                fprintf(stdout, "\n");
                             break;
                         case TAG_NTP_SERVERS:
-                            fprintf(stdout, "(%d) Network Time Protocol Servers\n", param);
+                            fprintf(stdout, "(%d) Network Time Protocol Servers", param);
+                            if (level == V3)
+                                fprintf(stdout, "\n");
                             break;
                         default:
-                            fprintf(stdout, "(%d) Unknown\n", param);
+                            if (level == V3)
+                                fprintf(stdout, "(%d) Unknown", param);
                             break;
                     }
+                    if (cpt != len - 1)
+                        fprintf(stdout, ", ");
                 }
+                if (level == V2)
+                    fprintf(stdout, " }");
                 i += (int)packet[i];
                 if (level == V3)
                     fprintf(stdout, "\n");
-                else
+                else if (i < 60)
                     fprintf(stdout, ", ");
                 break;
 
             case TAG_END:
-                fprintf(stdout, "End\n");
+                if (level == V3)
+                    fprintf(stdout, "End");
+                fprintf(stdout, "\n");
                 return;
 
             case TAG_CLIENT_ID:
@@ -271,14 +296,14 @@ void print_dhcp (const unsigned char *packet, int level) {
                             fprintf(stdout, "%02x", mac[cpt]);
                     }
                     free(mac);
-                    if (level == V3)
-                        fprintf(stdout, "\n");
-                    else
-                        fprintf(stdout, ", ");
                 }
                 else
                     fprintf(stdout, "Unknown\n");
                 i += len;
+                if (level == V3)
+                    fprintf(stdout, "\n");
+                else if ((int)packet[i] != TAG_END)
+                    fprintf(stdout, ", ");
                 break;
             default:
                 return;

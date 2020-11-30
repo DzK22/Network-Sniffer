@@ -51,7 +51,6 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
 
 //Fonction qui traite l'en-tête TCP
 void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport, int level) {
-    (void)level;
     struct tcphdr *tcp = (struct tcphdr *)packet;
     int fin, syn, reset, push, ack, urg, window, checksum, seq, ack_seq, dataOff, urgPointer;
     *to_add = tcp->th_off * 4;
@@ -105,6 +104,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                 fprintf(stdout, "URG ");
             fprintf(stdout, "}\n");
             break;
+
         case V3:
             fprintf(stdout, "\tSource Port = %d\n", *sport);
             fprintf(stdout, "\tDestination Port = %d\n", *dport);
