@@ -18,6 +18,7 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
             break;
 
         case -1:
+            //Pourrait être dans le default mais c'est pour éviter l'affichage de "couche transport"
             break;
 
         default:

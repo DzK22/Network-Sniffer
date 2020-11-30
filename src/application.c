@@ -47,6 +47,12 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             treat_bootp(packet, level);
             break;
 
+        case TELNET:
+            if (level == V3)
+                fprintf(stdout, "\tTELNET [%d]\n", port);
+            treat_telnet(packet, len, level);
+            break;
+
         case MDNS:
             switch (level) {
                 case V1:

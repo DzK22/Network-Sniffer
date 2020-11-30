@@ -5,6 +5,7 @@
 #include "transfer.h"
 #include "dhcp.h"
 #include "bootp.h"
+#include "telnet.h"
 #define POP    110
 #define IMAP   143
 #define SMTP   25
