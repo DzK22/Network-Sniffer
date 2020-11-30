@@ -28,28 +28,31 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             break;
 
         case DNS:
-            if (level == V1)
-                fprintf(stdout, "|| DNS\n");
-            else {
+            if (level == V3)
                 fprintf(stdout, "\tDNS [%d]\n", port);
-                treat_dns(packet, level);
-            }
+            treat_dns(packet, level);
             break;
 
         case DHCP:
-            if (level == V1)
-                fprintf(stdout, "|| BOOTP\n");
-            else {
+            if (level == V3)
                 fprintf(stdout, "\tBOOTP [%d]\n", port);
-                treat_bootp(packet, level);
-            }
+            treat_bootp(packet, level);
             break;
 
         case MDNS:
-            if (level == V1)
-                fprintf(stdout, "|| MDNS\n");
-            else
-                fprintf(stdout, "\tMDNS [%d]\n", port);
+            switch (level) {
+                case V1:
+                    fprintf(stdout, "|| MDNS\n");
+                    break;
+
+                case V2:
+                    fprintf(stdout, "MDNS: port: %d\n", port);
+                    break;
+
+                case V3:
+                    fprintf(stdout, "\tMDNS [%d]\n", port);
+                    break;
+            }
             break;
 
         default:
@@ -61,9 +64,18 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
 //Fonction qui vérifie si un des ports sources et destinations match avec un port applicatif
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
     if (!get_app(packet, sport, REQUEST, level, len) && !get_app(packet, dport, RESPONSE, level, len)) {
-        if (level == V1)
-            fprintf(stdout, "|| No App\n");
-        else
-            fprintf(stderr, "\n\tTHERE IS NO APP MATCHING\n");
+        switch (level) {
+            case V1:
+                fprintf(stdout, "|| No App\n");
+                break;
+
+            case V2:
+                fprintf(stdout, "No App matching\n");
+                break;
+
+            case V3:
+                fprintf(stderr, "\n\tThere is no app matching with ports number %d && %d\n", sport, dport);
+                break;
+        }
     }
 }

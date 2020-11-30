@@ -72,27 +72,35 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
 
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
     fprintf(stdout, "<----------------------------------------------------------------------------------------------------->\n");
-    if (level == V1)
-        fprintf(stdout, "[%ld]: ", packetID);
-    else
-        fprintf(stdout, "packet ID = %ld arrived at %s with Length : %d bytes\n", packetID, str_time, header->len);
+    switch (level) {
+        case V1:
+            fprintf(stdout, "[%ld]: ", packetID);
+            break;
 
+        case V2:
+            fprintf(stdout, "Packet ID = %ld\n", packetID);
+            break;
+
+        case V3:
+            fprintf(stdout, "Packet ID = %ld arrived at %s with Length : %d bytes\n", packetID, str_time, header->len);
+            break;
+    }
     //Couche liaison
-    if (level != V1)
+    if (level == V3)
         fprintf(stdout, "[+2] Couche Liaison:\n");
     treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
-    if (level != V1)
+    if (level == V3)
         fprintf(stdout, "\n[+3] Couche Réseau:\n");
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
 
     //Couche transport
-    if (t_protocol != OSPF && supported_ep(e_protocol) && level != V1)
+    if (t_protocol != OSPF && supported_ep(e_protocol) && level == V3)
         fprintf(stdout, "\n[+4] Couche Transport:\n");
-    else if (level != V1)
+    else if (level == V3)
         fprintf(stdout, "\n");
     treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
@@ -100,7 +108,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     //Couche applicative
     if (t_protocol != OSPF && supported_ep(e_protocol && (supported_app(sport) || supported_app(dport))) && level != V1)
         fprintf(stdout, "\n[+7] Couche Application:\n");
-    else if (level != V1)
+    else if (level == V3)
         fprintf(stdout, "\n");
 
     if (t_protocol == UDP)

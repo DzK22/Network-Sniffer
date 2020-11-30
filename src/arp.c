@@ -9,11 +9,57 @@ void treat_arp(const unsigned char *packet, int level) {
     u_char h_size = arp->ar_hln;
     u_char protocol = arp->ar_pln;
     ushort op_code = ntohs(arp->ar_op);
+    int i, cpt;
+    int arphdr_len = sizeof(struct arphdr);
     switch (level) {
         case V1:
             fprintf(stdout, "|| [ARP]\t");
             break;
-        default:
+
+        case V2:
+            fprintf(stdout, "ARP: ");
+            //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
+            if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
+                fprintf(stdout, "@mac src: ");
+                for (i = 0; i < 6; i++) {
+                    printf("%02x", packet[arphdr_len + i]);
+                    if (i != 5)
+                        printf(":");
+                    else
+                        printf(", ");
+                }
+
+                fprintf(stdout, "@ip src: ");
+                for (cpt = 0; cpt < 4; cpt++) {
+                    printf("%d", packet[arphdr_len + i + cpt]);
+                    if (cpt != 3)
+                        printf(".");
+                    else
+                        printf(", ");
+                }
+
+                i += cpt;
+                fprintf(stdout, "@mac dst: ");
+                for (cpt = 0; cpt < 6; cpt++) {
+                    printf("%02x", packet[arphdr_len + i + cpt]);
+                    if (cpt != 5)
+                        printf(":");
+                    else
+                        printf(", ");
+                }
+
+                i += cpt;
+                fprintf(stdout, "@ip dst: ");
+                for (cpt = 0; cpt < 4; cpt++) {
+                    printf("%d", packet[arphdr_len + i + cpt]);
+                    if (cpt != 3)
+                        printf(".");
+                }
+            }
+            fprintf(stdout, "\n");
+            break;
+
+        case V3:
             fprintf(stdout, "\tHardware Type : ");
             switch (hardware) {
                 case ARPHRD_ETHER:
@@ -49,8 +95,6 @@ void treat_arp(const unsigned char *packet, int level) {
                     fprintf(stdout, "Unknown protocol (%d)\n", p_type);
                     break;
             }
-            int i, cpt;
-            int arphdr_len = sizeof(struct arphdr);
 
             fprintf(stdout, "\tHardware size : %d\n", h_size);
             fprintf(stdout, "\tProtocol size: %d\n", protocol);
@@ -60,9 +104,9 @@ void treat_arp(const unsigned char *packet, int level) {
                 for (i = 0; i < 6; i++) {
                     printf("%02x", packet[arphdr_len + i]);
                     if (i != 5)
-                    printf(":");
+                        printf(":");
                     else
-                    printf("\n");
+                        printf("\n");
                 }
 
                 fprintf(stdout, "\tSrc @IP => ");

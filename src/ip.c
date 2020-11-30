@@ -21,7 +21,12 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
         case V1:
             fprintf(stdout, "|| [IPv4] %s => %s\t", ip_source, ip_dest);
             break;
-        default:
+
+        case V2:
+            fprintf(stdout, "IPv4: @ip src: %s, @ip dst: %s\n", ip_source, ip_dest);
+            break;
+
+        case V3:
             fprintf(stdout, PINK"\t@ip src : %s\n"COL_RESET, ip_source);
             fprintf(stdout, GREEN"\t@ip dest : %s\n"COL_RESET, ip_dest);
             int reserved, dontfrag, morefrag, foffset;
@@ -65,7 +70,12 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
         case V1:
             fprintf(stdout, "|| [IPv6] %s => %s\t", str_ip_src, str_ip_dst);
             break;
-        default:
+
+        case V2:
+            fprintf(stdout, "IPv6: @ip src: %s, @ip dst: %s\n", str_ip_src, str_ip_dst);
+            break;
+
+        case V3:
             fprintf(stdout, "\tPayload Length: %d\n", ntohs(ip6->ip6_plen));
             fprintf(stdout, "\tNext Header: %s (%d)\n", get_protocol(next_header), next_header);
             fprintf(stdout, "\tHop Limit: %d\n", ip6->ip6_hlim);
