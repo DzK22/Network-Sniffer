@@ -18,8 +18,8 @@
 #define FTPC   21
 #define MDNS 5353
 #define ICMP 1
-#define REQUEST 0x1005
-#define RESPONSE 0x995
+#define REQUEST 1
+#define RESPONSE 0
 
 bool get_app (const unsigned char *, int, int, int, int);
 void treat_app (const unsigned char *, int, int, int, int);
