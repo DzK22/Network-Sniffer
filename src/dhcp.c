@@ -101,7 +101,7 @@ void print_dhcp (const unsigned char *packet, int level) {
     if (level == V3)
         fprintf(stdout, "\tDHCP:\n");
     else
-        fprintf(stdout, "DHCP: ");
+        fprintf(stdout, "$> DHCP: ");
     unsigned i = 0;
     int cpt, len;
     u_int32_t time;

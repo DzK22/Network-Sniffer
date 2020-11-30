@@ -27,6 +27,14 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
             treat_transfer(packet, type, len, level, SMTPS);
             break;
 
+        case POP:
+            treat_transfer(packet, type, len, level, POP);
+            break;
+
+        case IMAP:
+            treat_transfer(packet, type, len, level, IMAP);
+            break;
+
         case DNS:
             if (level == V3)
                 fprintf(stdout, "\tDNS [%d]\n", port);
@@ -46,7 +54,7 @@ bool get_app (const unsigned char *packet, int port, int type, int level, int le
                     break;
 
                 case V2:
-                    fprintf(stdout, "MDNS: port: %d\n", port);
+                    fprintf(stdout, "$> MDNS: port: %d\n", port);
                     break;
 
                 case V3:
@@ -70,7 +78,7 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
                 break;
 
             case V2:
-                fprintf(stdout, "No App matching\n");
+                fprintf(stdout, "$> No App matching\n");
                 break;
 
             case V3:

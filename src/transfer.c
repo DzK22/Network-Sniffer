@@ -10,7 +10,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
-                    fprintf(stdout, "HTTP:");
+                    fprintf(stdout, "$> HTTP:");
                     break;
 
                 case V3:
@@ -26,7 +26,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
-                    fprintf(stdout, "HTTPS:");
+                    fprintf(stdout, "$> HTTPS:");
                     break;
 
                 case V3:
@@ -42,6 +42,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
+                    fprintf(stdout, "$> FTP Data:");
                     break;
 
                 case V3:
@@ -57,7 +58,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
-                    fprintf(stdout, "FTP Control:");
+                    fprintf(stdout, "$> FTP Control:");
                     break;
 
                 case V3:
@@ -73,7 +74,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
-                    fprintf(stdout, "SMTP:");
+                    fprintf(stdout, "$> SMTP:");
                     break;
 
                 case V3:
@@ -89,7 +90,7 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
                     return;
 
                 case V2:
-                    fprintf(stdout, "SMTPS:");
+                    fprintf(stdout, "$> SMTPS:");
                     break;
 
                 case V3:
@@ -98,10 +99,42 @@ void treat_transfer (const unsigned char *packet, int type, int len, int level, 
             }
             break;
 
+        case POP:
+            switch (level) {
+                case V1:
+                    fprintf(stdout, "|| POP\n");
+                    return;
+
+                case V2:
+                    fprintf(stdout, "$> POP:");
+                    break;
+
+                case V3:
+                    fprintf(stdout, "\tPOP [%d] =>", port);
+                    break;
+            }
+            break;
+
+        case IMAP:
+            switch (level) {
+                case V1:
+                    fprintf(stdout, "|| IMAP\n");
+                    return;
+
+                case V2:
+                    fprintf(stdout, "$> IMAP:");
+                    break;
+
+                case V3:
+                    fprintf(stdout, "\tIMAP [%d] =>", port);
+                    break;
+            }
+            break;
+
         default:
             return;
     }
-    
+
     if (type == REQUEST)
         fprintf(stdout, " REQUEST\n");
     else

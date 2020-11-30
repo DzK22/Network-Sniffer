@@ -12,7 +12,7 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "OSPF: version: %d, msg type: %s (%d)\n", ospf->version, get_ptype(ospf->type), ospf->type);
+            fprintf(stdout, "$> OSPF: version: %d, msg type: %s (%d)\n", ospf->version, get_ptype(ospf->type), ospf->type);
             break;
 
         case V3:

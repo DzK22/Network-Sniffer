@@ -16,7 +16,7 @@ void treat_dns (const unsigned char *packet, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "DNS: Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", nQuestions, nAnswers, nAuth, nAdd);
+            fprintf(stdout, "$> DNS: Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", nQuestions, nAnswers, nAuth, nAdd);
             break;
 
         case V3:

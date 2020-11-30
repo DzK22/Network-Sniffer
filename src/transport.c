@@ -37,7 +37,7 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
             fprintf(stdout, "|| UDP\t");
             break;
         case V2:
-            fprintf(stdout, "UDP: sport: %d, dport: %d\n", *sport, *dport);
+            fprintf(stdout, "$> UDP: sport: %d, dport: %d\n", *sport, *dport);
             break;
 
         case V3:
@@ -89,7 +89,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             break;
 
         case V2:
-            fprintf(stdout, "TCP: sport: %d, dport: %d ", *sport, *dport);
+            fprintf(stdout, "$> TCP: sport: %d, dport: %d ", *sport, *dport);
             fprintf(stdout, "{ ");
             if (fin)
                 fprintf(stdout, "FIN ");

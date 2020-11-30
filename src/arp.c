@@ -2,7 +2,6 @@
 
 //Fonction qui gère le protocole ARP
 void treat_arp(const unsigned char *packet, int level) {
-    (void)level;
     struct arphdr *arp = (struct arphdr *)packet;
     ushort hardware = ntohs(arp->ar_hrd);
     ushort p_type = ntohs(arp->ar_pro);
@@ -17,7 +16,7 @@ void treat_arp(const unsigned char *packet, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "ARP: ");
+            fprintf(stdout, "$> ARP: ");
             //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
             if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
                 fprintf(stdout, "@mac src: ");

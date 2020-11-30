@@ -23,7 +23,7 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
             break;
 
         case V2:
-            fprintf(stdout, "IPv4: @ip src: %s, @ip dst: %s\n", ip_source, ip_dest);
+            fprintf(stdout, "$> IPv4: @ip src: %s, @ip dst: %s\n", ip_source, ip_dest);
             break;
 
         case V3:
@@ -72,7 +72,7 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "IPv6: @ip src: %s, @ip dst: %s\n", str_ip_src, str_ip_dst);
+            fprintf(stdout, "$> IPv6: @ip src: %s, @ip dst: %s\n", str_ip_src, str_ip_dst);
             break;
 
         case V3:
