@@ -6,6 +6,10 @@ static inline bool supported_ep (int e_protocol) {
     return (e_protocol == ETHERTYPE_IP) || (e_protocol == ETHERTYPE_IPV6) || (e_protocol == ETHERTYPE_ARP);
 }
 
+static inline bool supported_tr (int t_protocol) {
+    return (t_protocol == UDP) || (t_protocol == TCP);
+}
+
 static inline bool supported_app (int app) {
     return (app == HTTP) || (app == HTTPS) || (app == FTPC) || (app == FTPD) || \
     (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || (app == MDNS) || \
@@ -66,11 +70,6 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         exit(EXIT_FAILURE);
     }
     char str_time[LEN];
-    if (strftime(str_time, LEN, "%a %Y-%m-%d %H:%M:%S %Z", &res)  == 0) {
-        fprintf(stderr, "strftime error\n");
-        exit(EXIT_FAILURE);
-    }
-
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
     fprintf(stdout, "<----------------------------------------------------------------------------------------------------->\n");
     switch (level) {
@@ -83,6 +82,10 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
             break;
 
         case V3:
+            if (strftime(str_time, LEN, "%a %Y-%m-%d %H:%M:%S %Z", &res)  == 0) {
+                fprintf(stderr, "strftime error\n");
+                exit(EXIT_FAILURE);
+            }
             fprintf(stdout, "Packet ID = %ld arrived at %s with Length : %d bytes\n", packetID, str_time, header->len);
             break;
     }
@@ -99,7 +102,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength += to_add;
 
     //Couche transport
-    if (t_protocol != -1 && t_protocol != OSPF && supported_ep(e_protocol) && level == V3)
+    if (t_protocol != -1 && t_protocol != OSPF && supported_ep(e_protocol) && supported_tr(t_protocol) && level == V3)
         fprintf(stdout, "\n[+4] Couche Transport:\n");
     else if (level == V3)
         fprintf(stdout, "\n");
@@ -107,7 +110,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     previewHeaderLength += to_add;
 
     //Couche applicative
-    if (t_protocol != OSPF && supported_ep(e_protocol) && (supported_app(sport) || supported_app(dport)) && level != V1)
+    if (t_protocol != OSPF && supported_ep(e_protocol) && supported_tr(t_protocol) && (supported_app(sport) || supported_app(dport)) && level != V1)
         fprintf(stdout, "\n[+7] Couche Application:\n");
     else if (level == V3)
         fprintf(stdout, "\n");
