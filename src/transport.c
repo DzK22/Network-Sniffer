@@ -3,16 +3,15 @@
 void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, int *to_add, int level) {
     switch (t_protocol) {
         case UDP:
-            //fprintf(stdout, "\tT_PROTOCOL : UDP\n");
             treat_udp(packet, sport, dport, level);
             *to_add = sizeof(struct udphdr);
             break;
 
         case TCP:
-            //fprintf(stdout, "\tT_PROTOCOL : TCP\n");
             treat_tcp(packet, to_add, sport, dport, level);
             break;
 
+        // OSPF n'est pas un protocole de transport mais je l'ai mis ici pour me faciliter l'implémentation par rapport au reste du code
         case OSPF:
             treat_ospf(packet, to_add, level);
             break;

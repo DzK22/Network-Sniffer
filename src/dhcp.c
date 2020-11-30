@@ -21,8 +21,6 @@ void treat_bootp (const unsigned char *packet, int level) {
     char *chaddr = ether_ntoa((struct ether_addr *)bootp->bp_chaddr);
     char *sname = *bootp->bp_sname ? ether_ntoa((struct ether_addr *)bootp->bp_sname) : "None";
     char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
-    //Utile pour inet_ntop plus tard
-    //char str_cip[LEN], str_yip[LEN], str_sip[LEN], str_gip[LEN];
     switch (level) {
         case V3:
             if (opcode == BOOTREPLY)

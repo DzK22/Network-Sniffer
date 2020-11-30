@@ -2,7 +2,6 @@
 
 //Appelée que si Verbose = 2 ou 3
 void treat_dns (const unsigned char *packet, int level) {
-
     HEADER *dns = (HEADER *)packet;
     uint16_t tID, nQuestions, nAnswers, nAuth, nAdd;
     tID = ntohs(dns->id);

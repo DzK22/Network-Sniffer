@@ -142,5 +142,6 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
 
     if (len <= 0 || level != V3)
         return;
+        
     print(packet, len);
 }
