@@ -3,59 +3,32 @@
 //Fonction qui gère le protocole ARP
 void treat_arp(const unsigned char *packet, int level) {
     struct arphdr *arp = (struct arphdr *)packet;
+    struct ether_arp *ea = (struct ether_arp *)packet;
     ushort hardware = ntohs(arp->ar_hrd);
     ushort p_type = ntohs(arp->ar_pro);
     u_char h_size = arp->ar_hln;
     u_char protocol = arp->ar_pln;
     ushort op_code = ntohs(arp->ar_op);
-    int i, cpt;
     int arphdr_len = sizeof(struct arphdr);
+    char str_ip_src[LEN];
+    char str_ip_dst[LEN];
     switch (level) {
         case V1:
-            fprintf(stdout, "|| [ARP]\t");
+            fprintf(stdout, "|| [ARP] %s => %s\t", inet_ntoa(*(struct in_addr *)&ea->arp_spa), inet_ntoa(*(struct in_addr *)&ea->arp_tpa));
             break;
 
         case V2:
             fprintf(stdout, "$> ARP: ");
-            //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
-            if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
-                fprintf(stdout, "@mac src: ");
-                for (i = 0; i < 6; i++) {
-                    printf("%02x", packet[arphdr_len + i]);
-                    if (i != 5)
-                        printf(":");
-                    else
-                        printf(", ");
-                }
-
-                fprintf(stdout, "@ip src: ");
-                for (cpt = 0; cpt < 4; cpt++) {
-                    printf("%d", packet[arphdr_len + i + cpt]);
-                    if (cpt != 3)
-                        printf(".");
-                    else
-                        printf(", ");
-                }
-
-                i += cpt;
-                fprintf(stdout, "@mac dst: ");
-                for (cpt = 0; cpt < 6; cpt++) {
-                    printf("%02x", packet[arphdr_len + i + cpt]);
-                    if (cpt != 5)
-                        printf(":");
-                    else
-                        printf(", ");
-                }
-
-                i += cpt;
-                fprintf(stdout, "@ip dst: ");
-                for (cpt = 0; cpt < 4; cpt++) {
-                    printf("%d", packet[arphdr_len + i + cpt]);
-                    if (cpt != 3)
-                        printf(".");
-                }
+            if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_spa, str_ip_src, LEN) == NULL) {
+                fprintf(stderr, "inet_ntop error\n");
+                return;
             }
-            fprintf(stdout, "\n");
+            if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_tpa, str_ip_dst, LEN) == NULL) {
+                fprintf(stderr, "inet_ntop error\n");
+                return;
+            }
+            fprintf(stdout, "From %s to %s ", str_ip_src, str_ip_dst);
+            put_arp_opcode(op_code);
             break;
 
         case V3:
@@ -99,45 +72,20 @@ void treat_arp(const unsigned char *packet, int level) {
             fprintf(stdout, "\tProtocol size: %d\n", protocol);
             //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
             if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
-                fprintf(stdout, "\tSrc @MAC => ");
-                for (i = 0; i < 6; i++) {
-                    printf("%02x", packet[arphdr_len + i]);
-                    if (i != 5)
-                        printf(":");
-                    else
-                        printf("\n");
+                if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_spa, str_ip_src, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop error\n");
+                    return;
                 }
-
-                fprintf(stdout, "\tSrc @IP => ");
-                for (cpt = 0; cpt < 4; cpt++) {
-                    printf("%d", packet[arphdr_len + i + cpt]);
-                    if (cpt != 3)
-                        printf(".");
-                    else
-                        printf("\n");
+                if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_tpa, str_ip_dst, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop error\n");
+                    return;
                 }
-
-                i += cpt;
-                fprintf(stdout, "\tDst @MAC => ");
-                for (cpt = 0; cpt < 6; cpt++) {
-                    printf("%02x", packet[arphdr_len + i + cpt]);
-                    if (cpt != 5)
-                        printf(":");
-                    else
-                        printf("\n");
-                }
-
-                i += cpt;
-                fprintf(stdout, "\tDst @IP => ");
-                for (cpt = 0; cpt < 4; cpt++) {
-                    printf("%d", packet[arphdr_len + i + cpt]);
-                    if (cpt != 3)
-                        printf(".");
-                    else
-                        printf("\n");
-                }
+                fprintf(stdout, "\tSrc Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                fprintf(stdout, "\tSrc IP Address => %s\n", str_ip_src);
+                fprintf(stdout, "\tDst Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_tha));
+                fprintf(stdout, "\tDst IP Address => %s\n", str_ip_dst);
             }
-            data_print(packet + i);
+            data_print(packet + arphdr_len);
             break;
     }
 }

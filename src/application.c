@@ -84,7 +84,7 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
                 break;
 
             case V2:
-                fprintf(stdout, "$> No App matching");
+                fprintf(stdout, "$> No App matching\n");
                 break;
 
             case V3:
