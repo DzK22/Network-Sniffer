@@ -2,17 +2,18 @@
 #define TELNET_H
 #include "application.h"
 //Options
-#define ECHO 1
+#define NL 0
 #define RECON 2
+#define ECHO 1
 #define SGO_AHEAD 3
 #define STS 5
-#define T_MARK 6
+#define TMG_MARK 6
 #define LINE_WIDTH 8
 #define T_TYPE 24
 #define W_SIZE 31
 #define T_SPEED 32
 #define REM_FCTRL 33
-#define LINEMODE 34
+#define LINE_MODE 34
 #define ENV_VAR 26
 
 //Commandes
@@ -35,7 +36,7 @@
 
 
 void treat_telnet (const unsigned char *, int, int);
-void put_cmd (int);
+void negoc(const unsigned char *, int);
 void put_opt (int);
 
 #endif
