@@ -99,6 +99,8 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     //Couche réseau
     if (supported_ep(e_protocol) && level == V3)
         fprintf(stdout, "\n[+3] Couche Réseau:\n");
+    else if (level == V1 && !supported_ep(e_protocol))
+        fprintf(stdout, "\n");
 
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
