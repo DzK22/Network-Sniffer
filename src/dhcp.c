@@ -266,7 +266,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                         fprintf(stdout, ", ");
                 }
                 if (level == V2)
-                    fprintf(stdout, " }");
+                    fprintf(stdout, " }\n");
                 i += (int)packet[i];
                 if (level == V3)
                     fprintf(stdout, "\n");
