@@ -111,8 +111,8 @@ void print_dhcp (const unsigned char *packet, int level) {
     unsigned i = 0;
     int cpt, len;
     u_int32_t time;
-    int *ip;
-    unsigned char *mac;
+    char str_ip[LEN];
+    struct in_addr *ip;
     //Le magic cookie a déjà été traité on prend donc les 60 octets suivant de Vendor spec
     do {
         if (level == V3)
@@ -173,14 +173,14 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "Subnet Mask: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                ip = get_ip(packet, i);
-                for (cpt = 0; cpt < 4; cpt++) {
-                    if (cpt != 3)
-                        fprintf(stdout, "%d.", ip[cpt]);
-                    else
-                        fprintf(stdout, "%d", ip[cpt]);
+
+                ip = (struct in_addr *) (packet + i);
+                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop\n");
+                    return;
                 }
-                free(ip);
+                fprintf(stdout, "%s", str_ip);
+
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
@@ -192,14 +192,14 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "DHCP Server ID: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                ip = get_ip(packet, i);
-                for (cpt = 0; cpt < 4; cpt++) {
-                    if (cpt != 3)
-                        fprintf(stdout, "%d.", ip[cpt]);
-                    else
-                        fprintf(stdout, "%d", ip[cpt]);
+
+                ip = (struct in_addr *) (packet + i);
+                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop\n");
+                    return;
                 }
-                free(ip);
+                fprintf(stdout, "%s", str_ip);
+
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
@@ -211,14 +211,14 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "Requested IP Address: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                ip = get_ip(packet, i);
-                for (cpt = 0; cpt < 4; cpt++) {
-                    if (cpt != 3)
-                        fprintf(stdout, "%d.", ip[cpt]);
-                    else
-                        fprintf(stdout, "%d", ip[cpt]);
+
+                ip = (struct in_addr *) (packet + i);
+                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop\n");
+                    return;
                 }
-                free(ip);
+                fprintf(stdout, "%s", str_ip);
+
                 i += len;
                 if (level == V3)
                     fprintf(stdout, "\n");
@@ -286,14 +286,8 @@ void print_dhcp (const unsigned char *packet, int level) {
                 i += 2;
                 //Si le type est ethernet alors c'est une @MAC
                 if ((int)packet[i] == 0x01) {
-                    mac = get_mac(packet, i);
-                    for (cpt = 0; cpt < 6; cpt++) {
-                        if (cpt != 5)
-                            fprintf(stdout, "%02x:", mac[cpt]);
-                        else
-                            fprintf(stdout, "%02x", mac[cpt]);
-                    }
-                    free(mac);
+                    struct ether_addr *mac = (struct ether_addr *)(packet + 6);
+                    fprintf(stdout, "%s", ether_ntoa(mac));
                 }
                 else
                     fprintf(stdout, "Unknown\n");
@@ -311,34 +305,6 @@ void print_dhcp (const unsigned char *packet, int level) {
 
 u_int32_t get_time (const unsigned char *packet, int i) {
     return packet[i] << 24 | packet[i + 1] << 16 | packet[i + 2] << 8 | packet[i + 3];
-}
-
-int *get_ip (const unsigned char *packet, int i) {
-    int *ip = malloc(sizeof(int) * 4);
-    if (ip == NULL) {
-        fprintf(stderr, "malloc error\n");
-        return NULL;
-    }
-    ip[0] = packet[i];
-    ip[1] = packet[i + 1];
-    ip[2] = packet[i + 2];
-    ip[3] = packet[i + 3];
-    return ip;
-}
-
-unsigned char *get_mac (const unsigned char *packet, int i) {
-    unsigned char *mac = malloc(sizeof(unsigned char) * 6);
-    if (mac == NULL) {
-        fprintf(stderr, "malloc error\n");
-        return NULL;
-    }
-    mac[0] = packet[i + 1];
-    mac[1] = packet[i + 2];
-    mac[2] = packet[i + 3];
-    mac[3] = packet[i + 4];
-    mac[4] = packet[i + 5];
-    mac[5] = packet[i + 6];
-    return mac;
 }
 
 void put_dhcp_options (int option) {

@@ -2,8 +2,7 @@
 
 //Fonction qui gère une en-tête ipv4
 uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen) {
-    char ip_source[LEN], ip_dest[LEN]/*, str_version[LEN], str_ihl[LEN]*/;
-    int res;
+    char ip_source[LEN], ip_dest[LEN];
     const struct ip *ip = (struct ip *)packet;
     struct in_addr src, dst;
     *to_add = ip->ip_hl*4;
@@ -11,12 +10,14 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
     src = ip->ip_src;
     dst = ip->ip_dst;
     uint8_t protocol = ip->ip_p;
-    res = snprintf(ip_source, LEN, "%s", inet_ntoa(src));
-    if (test_snprintf(res, LEN) == EXIT_FAILURE)
-        return 0;
-    res = snprintf(ip_dest, LEN, "%s", inet_ntoa(dst));
-    if (test_snprintf(res, LEN) == EXIT_FAILURE)
-        return 0;
+    if (inet_ntop(AF_INET, &src, ip_source, LEN) == NULL) {
+        fprintf(stderr, "inet_ntop\n");
+        return -1;
+    }
+    if (inet_ntop(AF_INET, &dst, ip_dest, LEN) == NULL) {
+        fprintf(stderr, "inet_ntop\n");
+        return -1;
+    }
     switch (level) {
         case V1:
             fprintf(stdout, "|| [IPv4] %s => %s\t", ip_source, ip_dest);

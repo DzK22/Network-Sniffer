@@ -68,9 +68,8 @@ void treat_dns (const unsigned char *packet, int level) {
                     char *class = get_class(ntohs(q_data->clss));
                     char *type = get_type(ntohs(q_data->type));
                     fprintf(stdout, "\t\t- Type: %s\n", type);
-                    fprintf(stdout, "\t\t- Class: %s\n", class);
+                    fprintf(stdout, "\t\t- Class: %s\n\n", class);
                     datas += 4;
-                    fprintf(stdout, "\n\n");
                 }
             }
             //Answers treatment
@@ -102,17 +101,25 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         fprintf(stdout, "\t\t- Ttl: %d\n", ntohl(data->ttl));
         fprintf(stdout, "\t\t- Length: %d\n", ntohs(data->len));
         datas += 10;
-        if (ntohs(data->clss) == IN && ntohs(data->type) == A) {
+        if (ntohs(data->clss) == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
-            if (inet_ntop(AF_INET, ip, str, 32) == NULL) {
-                fprintf(stderr, "inet_ntop error\n");
-                return;
+            if (ntohs(data->type) == A) {
+                if (inet_ntop(AF_INET, ip, str, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop error\n");
+                    return;
+                }
+                fprintf(stdout, "\t\t- Address: %s\n", str);
             }
-            fprintf(stdout, "\t\t- Address: %s\n\n", str);
+            else if (ntohs(data->type) == AAAA) {
+                if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
+                    fprintf(stderr, "inet_ntop error\n");
+                    return;
+                }
+                fprintf(stdout, "\t\t- Address: %s\n", str);
+            }
         }
-        else
-            fprintf(stdout, "\n");
+        fprintf(stdout, "\n");
         datas += len;
     }
 }
