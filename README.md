@@ -8,15 +8,15 @@ Protocoles Supporté :
 - UDP, TCP, ARP
 - BOOTP/DHCP, DNS, HTTP/HTTPS, FTP, SMPT, POP, IMAP, TELNET, OSPFv2
 
-#Architecture
+# Architecture
 - /src : Fichiers sources
 - /headers : fichiers include
 
-##Auteur
+## Auteur
 
 Danyl EL-KABIR
 
-##Utilisation
+## Utilisation
 
 1. make
 2. sudo ./nSniffeur avec les options suivantes :
