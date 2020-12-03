@@ -18,6 +18,7 @@ void treat_bootp (const unsigned char *packet, int level) {
     yip = bootp->bp_yiaddr;
     sip = bootp->bp_siaddr;
     gip = bootp->bp_giaddr;
+    u_int8_t magic_cookie[4] = VM_RFC1048;
     char *chaddr = ether_ntoa((struct ether_addr *)bootp->bp_chaddr);
     char *sname = *bootp->bp_sname ? ether_ntoa((struct ether_addr *)bootp->bp_sname) : "None";
     char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
@@ -58,13 +59,14 @@ void treat_bootp (const unsigned char *packet, int level) {
                 fprintf(stdout, "\tBoot file name not given\n");
             else
                 fprintf(stdout, "\tBoot file name: %s\n", file);
-            bool dhcp = is_dhcp(bootp->bp_vend);
+
             fprintf(stdout, "\tVendor Spec: ");
             unsigned i;
             for (i = 0; i < 4; i++)
-            fprintf(stdout, "%d ", bootp->bp_vend[i]);
+                fprintf(stdout, "%d ", bootp->bp_vend[i]);
             fprintf(stdout, "\n");
-            if (dhcp) {
+            
+            if (memcmp(bootp->bp_vend, magic_cookie, 4) == 0) {
                 fprintf(stdout, "\tMagic cookie: DHCP\n");
                 print_dhcp(bootp->bp_vend + 4, level);
             }
@@ -74,23 +76,11 @@ void treat_bootp (const unsigned char *packet, int level) {
 
         //Si Verbose 1 et 2 on affiche uniquement les options DHCP si DHCP présent
         default:
-            if (is_dhcp(bootp->bp_vend))
+            if (memcmp(bootp->bp_vend, magic_cookie, 4) == 0)
                 print_dhcp(bootp->bp_vend + 4, level);
             break;
 
     }
-}
-
-//Fonction qui check si bootp utilise l'option dhcp (à l'aide du magic cookie)
-bool is_dhcp (const unsigned char *cookie) {
-    bool ok = true;
-    unsigned magic_cookie[4] = VM_RFC1048;
-    unsigned i;
-    for (i = 0; i < 4; i++) {
-        if (magic_cookie[i] != cookie[i])
-            ok = false;
-    }
-    return ok;
 }
 
 void print_dhcp (const unsigned char *packet, int level) {

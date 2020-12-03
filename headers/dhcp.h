@@ -4,7 +4,6 @@
 #define IP_TYPE {TAG_SUBNET_MASK, TAG_SERVER_ID}
 
 void treat_bootp (const unsigned char *, int);
-bool is_dhcp (const unsigned char *);
 void print_dhcp (const unsigned char *, int);
 void put_dhcp_options (int);
 u_int32_t get_time (const unsigned char *, int);
