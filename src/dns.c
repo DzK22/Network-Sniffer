@@ -87,7 +87,7 @@ void treat_dns (const unsigned char *packet, int level) {
 }
 
 void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n) {
-    unsigned i, cpt = 0;
+    unsigned i;
     fprintf(stdout, "\t%s:\n", type);
     for (i = 0; i < n; i++) {
         fprintf(stdout, "\t\t- Name: ");
@@ -102,47 +102,46 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         fprintf(stdout, "\t\t- Ttl: %d\n", ntohl(data->ttl));
         fprintf(stdout, "\t\t- Length: %d\n", ntohs(data->len));
         datas += 10;
-        fprintf(stdout, "\t\t- Datas: ");
-        do {
-            if (isprint(datas[cpt++]))
-                fprintf(stdout, "%c", datas[cpt - 1]);
-            else
-                fprintf(stdout, ".");
-        } while (cpt < len);
-        fprintf(stdout, "\n\n");
+        if (ntohs(data->clss) == IN && ntohs(data->type) == A) {
+            struct in_addr *ip = (struct in_addr *)datas;
+            char str[LEN];
+            if (inet_ntop(AF_INET, ip, str, 32) == NULL) {
+                fprintf(stderr, "inet_ntop error\n");
+                return;
+            }
+            fprintf(stdout, "\t\t- Address: %s\n\n", str);
+        }
+        else
+            fprintf(stdout, "\n");
         datas += len;
     }
 }
 
 unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
-    bool ptr;
-    unsigned len = 0;
+    int total = 0, len, i = 0;
     //On lit le nom tant qu'il n'est pas terminé
-    for (;rest[len] != '\0';) {
+    while ((len = *(rest++)) != '\0') {
         //ON vérifie si le premier octet indique que c'est un pointeur
-        if (((u_int8_t)rest[len] & PTRMASK) == PTRVALUE) {
+        if (len & PTRMASK) {
             //Si le premier octet est un pointeur on récupère l'offset (sur 14 bits)
-            u_int16_t off = rest[len] << 8;
-            off |= rest[len + 1];
-            off &= PTRINDEXMASK;
-            ptr = true;
+            int off = (len & PTRINDEXMASK) << 8 | *(rest++);
             //On recherche le nom récursivement à l'offset indiqué
             resolve(packet, packet + off);
-            return 2;
+            total++;
+            break;
         }
         //Si le premier octet n'est pas un pointeur on affiche le nom
         else {
-            if (isprint(rest[len + 1]) && rest[len + 1] != '\n')
-                fprintf(stdout, "%c", rest[len + 1]);
-            else
-                fprintf(stdout, ".");
-            len++;
-            ptr = false;
+            total += (1 + len);
+            for (i = 0; i < len; i++) {
+                if (isprint(*rest))
+                    fprintf(stdout, "%c", *(rest++));
+            }
+            fprintf(stdout, ".");
         }
     }
-    if (!ptr)
-        len++;
-    return len;
+
+    return ++total;
 }
 
 void put_opcode(unsigned opcode) {

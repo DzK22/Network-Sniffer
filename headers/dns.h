@@ -19,7 +19,7 @@
 #define DNOTZONE 9
 #define PTRMASK 0b11000000
 #define PTRVALUE 192
-#define PTRINDEXMASK 0b0011111111111111
+#define PTRINDEXMASK 0b00111111
 #define IN 1
 #define CS 2
 #define CH 3
