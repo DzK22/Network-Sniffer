@@ -44,32 +44,18 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
             break;
     }
     //Couche liaison
-    if (level == V3)
-        fprintf(stdout, "[+2] Couche Liaison:\n");
-
     treat_ethernet(packet, &e_protocol, level);
     previewHeaderLength = sizeof(struct ether_header);
 
     //Couche réseau
-    if (supported_ep(e_protocol) && level == V3)
-        fprintf(stdout, "\n[+3] Couche Réseau:\n");
-    else if (level == V1 && !supported_ep(e_protocol))
-        fprintf(stdout, "\n");
-
     treat_network(packet + previewHeaderLength, e_protocol, &t_protocol, &to_add, level, &dataLen);
     previewHeaderLength += to_add;
 
     //Couche transport
-    if (supported_ep(e_protocol) && supported_tr(t_protocol) && level == V3)
-        fprintf(stdout, "\n[+4] Couche Transport:\n");
-
     treat_transport(packet + previewHeaderLength, t_protocol, &sport, &dport, &to_add, level);
     previewHeaderLength += to_add;
 
     //Couche applicative
-    if (supported_ep(e_protocol) && supported_tr(t_protocol) && (supported_app(sport) || supported_app(dport)) && level == V3)
-        fprintf(stdout, "\n[+7] Couche Application:\n");
-
     if (t_protocol == UDP)
         treat_app(packet + previewHeaderLength, sport, dport, level, len - dataLen);
     else if (t_protocol == TCP)

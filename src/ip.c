@@ -28,8 +28,7 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
             break;
 
         case V3:
-            fprintf(stdout, PINK"\t@ip src : %s\n"COL_RESET, ip_source);
-            fprintf(stdout, GREEN"\t@ip dest : %s\n"COL_RESET, ip_dest);
+            fprintf(stdout, YELLOW"   └─ IPv4 (0x0800) Packet: from %s to %s\n"COL_RESET, ip_source, ip_dest);
             int reserved, dontfrag, morefrag, foffset;
             uint16_t flags = ntohs(ip->ip_off);
             reserved = (flags & IP_RF) ? 1 : 0;
@@ -37,16 +36,16 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
             morefrag = (flags & IP_MF) ? 1 : 0;
             foffset = flags & IP_OFFMASK;
             flags = flags >> 13;
-            fprintf(stdout, "\tIHL : %d (%d bytes)\n", *to_add/4, *to_add);
-            fprintf(stdout, "\tToS : 0x%02x\n", ip->ip_tos);
-            fprintf(stdout, "\tFlags : 0x%02x\n", flags);
-            fprintf(stdout, "\t\t- Reserved bit : %d\n", reserved);
-            fprintf(stdout, "\t\t- Don't Fragment : %d\n", dontfrag);
-            fprintf(stdout, "\t\t- More Fragments : %d\n", morefrag);
-            fprintf(stdout, "\tFragment Offset : %d\n", foffset);
-            fprintf(stdout, "\tttl : %d \n", ip->ip_ttl);
-            fprintf(stdout, "\tProtocol : %s (%d) \n", get_protocol(protocol), protocol);
-            fprintf(stdout, "\tChecksum : 0x%04x\n", ntohs(ip->ip_sum));
+            fprintf(stdout, "     ├─ IHL : %d (%d bytes)\n", *to_add/4, *to_add);
+            fprintf(stdout, "     ├─ ToS : 0x%02x\n", ip->ip_tos);
+            fprintf(stdout, "     ├─ Flags : 0x%02x\n", flags);
+            fprintf(stdout, "     ├\t\t- Reserved bit : %d\n", reserved);
+            fprintf(stdout, "     ├\t\t- Don't Fragment : %d\n", dontfrag);
+            fprintf(stdout, "     ├\t\t- More Fragments : %d\n", morefrag);
+            fprintf(stdout, "     ├─ Fragment Offset : %d\n", foffset);
+            fprintf(stdout, "     ├─ ttl : %d \n", ip->ip_ttl);
+            fprintf(stdout, "     ├─ Protocol : %s (%d) \n", get_protocol(protocol), protocol);
+            fprintf(stdout, "     └─ Checksum : 0x%04x\n", ntohs(ip->ip_sum));
             break;
     }
     return protocol;
@@ -77,11 +76,10 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
             break;
 
         case V3:
-            fprintf(stdout, "\tPayload Length: %d\n", ntohs(ip6->ip6_plen));
-            fprintf(stdout, "\tNext Header: %s (%d)\n", get_protocol(next_header), next_header);
-            fprintf(stdout, "\tHop Limit: %d\n", ip6->ip6_hlim);
-            fprintf(stdout, "\t@ip src = %s\n", str_ip_src);
-            fprintf(stdout, "\t@ip dst = %s\n", str_ip_dst);
+            fprintf(stdout, YELLOW"   └─ IPv6 (0x86dd) Packet: from %s to %s\n"COL_RESET, str_ip_src, str_ip_dst);
+            fprintf(stdout, "     ├─ Payload Length: %d\n", ntohs(ip6->ip6_plen));
+            fprintf(stdout, "     ├─ Next Header: %s (%d)\n", get_protocol(next_header), next_header);
+            fprintf(stdout, "     └─ Hop Limit: %d\n", ip6->ip6_hlim);
             break;
     }
     return next_header;

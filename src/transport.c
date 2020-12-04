@@ -38,10 +38,9 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
             break;
 
         case V3:
-            fprintf(stdout, "\tSource port = %d\n", *sport);
-            fprintf(stdout, "\tDestination port = %d\n", *dport);
-            fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
-            fprintf(stdout, "\tLength = %d\n", dataLength);
+            fprintf(stdout, "       └─ UDP Segment: from port %d to port %d\n", *sport, *dport);
+            fprintf(stdout, "        ├─ Checksum = 0x%04x\n", checksum);
+            fprintf(stdout, "        └─ Length = %d\n", dataLength);
             break;
     }
 }
@@ -103,27 +102,31 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             break;
 
         case V3:
-            fprintf(stdout, "\tSource Port = %d\n", *sport);
-            fprintf(stdout, "\tDestination Port = %d\n", *dport);
-            fprintf(stdout, "\tSequence Num = %02x\n", seq);
-            fprintf(stdout, "\tAcknowledgment Num = %02x\n", ack_seq);
-            fprintf(stdout, "\tDate Offset = %d\n", dataOff);
-            fprintf(stdout, "\tFlags : \n");
-            fprintf(stdout, "\t\t- FIN : %d\n", fin);
-            fprintf(stdout, "\t\t- SYN : %d\n", syn);
-            fprintf(stdout, "\t\t- RST : %d\n", reset);
-            fprintf(stdout, "\t\t- PSH : %d\n", push);
-            fprintf(stdout, "\t\t- ACK : %d\n", ack);
-            fprintf(stdout, "\t\t- URG : %d\n", urg);
-            fprintf(stdout, "\tWindow = %d\n", window);
-            fprintf(stdout, "\tChecksum = 0x%04x\n", checksum);
-            fprintf(stdout, "\tUrgent Pointer = %d\n", urgPointer);
+            fprintf(stdout, "       └─ TCP Segment: from port %d to port %d\n", *sport, *dport);
+            fprintf(stdout, "         ├─ Sequence Num = %02x\n", seq);
+            fprintf(stdout, "         ├─ Acknowledgment Num = %02x\n", ack_seq);
+            fprintf(stdout, "         ├─ Date Offset = %d\n", dataOff);
+            fprintf(stdout, "         ├─ Flags : \n");
+            fprintf(stdout, "         ├\t\t- FIN : %d\n", fin);
+            fprintf(stdout, "         ├\t\t- SYN : %d\n", syn);
+            fprintf(stdout, "         ├\t\t- RST : %d\n", reset);
+            fprintf(stdout, "         ├\t\t- PSH : %d\n", push);
+            fprintf(stdout, "         ├\t\t- ACK : %d\n", ack);
+            fprintf(stdout, "         ├\t\t- URG : %d\n", urg);
+            fprintf(stdout, "         ├─ Window = %d\n", window);
+            fprintf(stdout, "         ├─ Checksum = 0x%04x\n", checksum);
+            if (*to_add <= 20)
+                fprintf(stdout, "         └─ Urgent Pointer = %d\n", urgPointer);
             //Si la taille de l'entete tcp est supérieure à 20 octets alors il y a des options tcp et on les affiche uniquement si le niveau de détails est au plus haut
             if (*to_add > 20) {
+                fprintf(stdout, "         ├─ Urgent Pointer = %d\n", urgPointer);
                 int i = sizeof(struct tcphdr), value, len;
-                fprintf(stdout, "\tOptions:\n");
+                fprintf(stdout, "         ├─ Options:\n");
                 do {
-                    fprintf(stdout, "\t\tTCP Option - ");
+                    if (i + (int)packet[i + 1] >= *to_add || i + 1 >= *to_add)
+                        fprintf(stdout, "         └─\t\tTCP Option - ");
+                    else
+                        fprintf(stdout, "         ├\t\tTCP Option - ");
                     switch (packet[i]) {
                         case NOP:
                             fprintf(stdout, "\tNo Operation (NOP)\n");
@@ -132,25 +135,21 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
 
                         case MSS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tMaximum Segment Size (%d)\n", packet[i]);
-                            fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                            fprintf(stdout, "\tMaximum Segment Size (%d): [Length: %d, ", packet[i], len);
                             value = packet[i + 2] << 8 | packet[i + 3];
-                            fprintf(stdout, "\t\t\t\tMSS Value: %d bytes\n", value);
+                            fprintf(stdout, "MSS Value: %d bytes]\n", value);
                             i += len;
                             break;
 
                         case WS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tWindow Scale (%d)\n", packet[i]);
-                            fprintf(stdout, "\t\t\t\tLength: %d\n", len);
-                            fprintf(stdout, "\t\t\t\tShift count: %d\n", packet[i + 2]);
+                            fprintf(stdout, "\tWindow Scale (%d): [Length: %d, Shift count: %d]\n", packet[i], len, packet[i + 2]);
                             i += len;
                             break;
 
                         case SACKP:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tSack Permitted (%d)\n", packet[i]);
-                            fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                            fprintf(stdout, "\tSack Permitted (%d): [Length: %d]\n", packet[i], len);
                             i += len;
                             break;
 
@@ -162,30 +161,21 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
 
                         case TS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tTimestamp (%d)\n", packet[i]);
-                            fprintf(stdout, "\t\t\t\tLength: %d\n", len);
+                            fprintf(stdout, "\tTimestamp (%d): ", packet[i]);
+                            fprintf(stdout, "[Length: %d, ", len);
                             value = get_timestamp(packet, i);
-                            fprintf(stdout, "\t\t\t\tTimestamp value: %d secs\n", value);
+                            fprintf(stdout, "Timestamp value: %d secs, ", value);
                             value = get_timestamp(packet, i + 4);
-                            fprintf(stdout, "\t\t\t\tTimestamp echo reply: %d secs\n", value);
+                            fprintf(stdout, "Timestamp echo reply: %d secs]\n", value);
                             i += len;
                             break;
 
                         default:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tUnknown \n");
-                            fprintf(stdout, "\t\t\tLength: %d\n", len);
-                            int cpt;
-                            if (len > 2) {
-                                fprintf(stdout, "\t\t\tValue: 0x");
-                                for (cpt = 2; cpt < len; cpt++)
-                                fprintf(stdout, "%02x", packet[i + cpt]);
-                            }
-                            fprintf(stdout, "\n");
+                            fprintf(stdout, "\tUnknown (%d): [Length: %d]\n", packet[i], len);
                             i += len;
                             break;
                     }
-                    fprintf(stdout, "\n");
                 } while (i < *to_add && packet[i] != 0x00);
             }
             break;

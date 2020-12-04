@@ -32,7 +32,8 @@ void treat_arp(const unsigned char *packet, int level) {
             break;
 
         case V3:
-            fprintf(stdout, "\tHardware Type : ");
+            fprintf(stdout, YELLOW"   └─ Type = ARP (0x0806)\n"COL_RESET);
+            fprintf(stdout, "     ├─ Hardware Type : ");
             switch (hardware) {
                 case ARPHRD_ETHER:
                     fprintf(stdout, "Ethernet\n");
@@ -50,10 +51,10 @@ void treat_arp(const unsigned char *packet, int level) {
                     fprintf(stdout, "Unknown Hardware (%d)\n", hardware);
                     break;
             }
-            fprintf(stdout, "\tOpcode : ");
+            fprintf(stdout, "     ├─ Opcode : ");
             put_arp_opcode(op_code);
 
-            fprintf(stdout, "\tProtocole Type : ");
+            fprintf(stdout, "     ├─ Protocole Type : ");
             switch (p_type) {
                 case ETHERTYPE_IP:
                     fprintf(stdout, "IPv4\n");
@@ -68,14 +69,14 @@ void treat_arp(const unsigned char *packet, int level) {
                     break;
             }
 
-            fprintf(stdout, "\tHardware size : %d\n", h_size);
-            fprintf(stdout, "\tProtocol size: %d\n", protocol);
+            fprintf(stdout, "     ├─ Hardware size : %d\n", h_size);
+            fprintf(stdout, "     ├─ Protocol size: %d\n", protocol);
 
             if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
-                fprintf(stdout, "\tSrc Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_sha));
-                fprintf(stdout, "\tSrc IP Address => %s\n", str_ip_src);
-                fprintf(stdout, "\tDst Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_tha));
-                fprintf(stdout, "\tDst IP Address => %s\n", str_ip_dst);
+                fprintf(stdout, "     ├─ Src Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                fprintf(stdout, "     ├─ Src IP Address => %s\n", str_ip_src);
+                fprintf(stdout, "     ├─ Dst Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_tha));
+                fprintf(stdout, "     └─ Dst IP Address => %s\n", str_ip_dst);
             }
             break;
     }

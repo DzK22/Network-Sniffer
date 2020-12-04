@@ -42,8 +42,6 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             break;
 
         case DHCP:
-            if (level == V3)
-                fprintf(stdout, "\tBOOTP [%d]\n", port);
             treat_bootp(packet, level);
             break;
 
@@ -88,7 +86,7 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
                 break;
 
             case V3:
-                fprintf(stderr, "\n\tThere is no app matching with ports number %d && %d\n", sport, dport);
+                fprintf(stderr, "           └─ There is no app matching with ports number %d && %d\n", sport, dport);
                 break;
         }
     }

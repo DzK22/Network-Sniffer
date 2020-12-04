@@ -22,52 +22,57 @@ void treat_bootp (const unsigned char *packet, int level) {
     char *chaddr = ether_ntoa((struct ether_addr *)bootp->bp_chaddr);
     char *sname = *bootp->bp_sname ? ether_ntoa((struct ether_addr *)bootp->bp_sname) : "None";
     char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
+    int is_dhcp = memcmp(bootp->bp_vend, magic_cookie, 4);
     switch (level) {
         case V3:
+            fprintf(stdout, "           └─ BOOTP Message\n");
             if (opcode == BOOTREPLY)
-                fprintf(stdout, "\tMessage type: Reply (%d)\n", opcode);
+                fprintf(stdout, "             ├─ Message type: Reply (%d)\n", opcode);
             else
-                fprintf(stdout, "\tMessage type: Request (%d)\n", opcode);
+                fprintf(stdout, "             ├─ Message type: Request (%d)\n", opcode);
             switch (htype) {
                 case 1:
-                    fprintf(stdout, "\tHardware type: Ethernet (0x%02x)\n", htype);
+                    fprintf(stdout, "             ├─ Hardware type: Ethernet (0x%02x)\n", htype);
                     break;
 
                 case 2:
-                    fprintf(stdout, "\tHardware type: Experimental Ethernet (0x%02x)\n", htype);
+                    fprintf(stdout, "             ├─ Hardware type: Experimental Ethernet (0x%02x)\n", htype);
                     break;
 
                 default:
-                    fprintf(stdout, "\tHardware type: Unknown (0x%02x)\n", htype);
+                    fprintf(stdout, "             ├─ Hardware type: Unknown (0x%02x)\n", htype);
                     break;
             }
-            fprintf(stdout, "\tHardware address length: %d\n", hlen);
-            fprintf(stdout, "\tHops: %d\n", hops);
-            fprintf(stdout, "\tTransaction ID: 0x%08x\n", xID);
-            fprintf(stdout, "\tSeconds elapsed: %d\n", secs);
-            fprintf(stdout, "\tBootp flags: 0x%04x\n", flags);
-            fprintf(stdout, "\tClient IP address: %s\n", inet_ntoa(cip));
-            fprintf(stdout, "\tYour (client) IP address: %s\n", inet_ntoa(yip));
-            fprintf(stdout, "\tNext server IP address: %s\n", inet_ntoa(sip));
-            fprintf(stdout, "\tRelay agent IP address: %s\n", inet_ntoa(gip));
-            fprintf(stdout, "\tClient MAC address: %s\n", chaddr);
+            fprintf(stdout, "             ├─ Hardware address length: %d\n", hlen);
+            fprintf(stdout, "             ├─ Hops: %d\n", hops);
+            fprintf(stdout, "             ├─ Transaction ID: 0x%08x\n", xID);
+            fprintf(stdout, "             ├─ Seconds elapsed: %d\n", secs);
+            fprintf(stdout, "             ├─ Bootp flags: 0x%04x\n", flags);
+            fprintf(stdout, "             ├─ Client IP address: %s\n", inet_ntoa(cip));
+            fprintf(stdout, "             ├─ Your (client) IP address: %s\n", inet_ntoa(yip));
+            fprintf(stdout, "             ├─ Next server IP address: %s\n", inet_ntoa(sip));
+            fprintf(stdout, "             ├─ Relay agent IP address: %s\n", inet_ntoa(gip));
+            fprintf(stdout, "             ├─ Client MAC address: %s\n", chaddr);
             if (strcmp(sname, "None") == 0)
-                fprintf(stdout, "\tServer host name not given\n");
+                fprintf(stdout, "             ├─ Server host name not given\n");
             else
-                fprintf(stdout, "\tServer host name: %s\n", sname);
+                fprintf(stdout, "             ├─ Server host name: %s\n", sname);
             if (strcmp(file, "None") == 0)
-                fprintf(stdout, "\tBoot file name not given\n");
+                fprintf(stdout, "             ├─ Boot file name not given\n");
             else
-                fprintf(stdout, "\tBoot file name: %s\n", file);
+                fprintf(stdout, "             ├─ Boot file name: %s\n", file);
 
-            fprintf(stdout, "\tVendor Spec: ");
+            if (is_dhcp == 0)
+                fprintf(stdout, "             ├─ Vendor Spec: ");
+            else
+                fprintf(stdout, "             └─ Vendor Spec: ");
             unsigned i;
             for (i = 0; i < 4; i++)
                 fprintf(stdout, "%d ", bootp->bp_vend[i]);
             fprintf(stdout, "\n");
-            
-            if (memcmp(bootp->bp_vend, magic_cookie, 4) == 0) {
-                fprintf(stdout, "\tMagic cookie: DHCP\n");
+
+            if (is_dhcp == 0) {
+                fprintf(stdout, "             ├─ Magic cookie: DHCP\n");
                 print_dhcp(bootp->bp_vend + 4, level);
             }
             else
@@ -76,7 +81,7 @@ void treat_bootp (const unsigned char *packet, int level) {
 
         //Si Verbose 1 et 2 on affiche uniquement les options DHCP si DHCP présent
         default:
-            if (memcmp(bootp->bp_vend, magic_cookie, 4) == 0)
+            if (is_dhcp == 0)
                 print_dhcp(bootp->bp_vend + 4, level);
             break;
 
@@ -94,7 +99,7 @@ void print_dhcp (const unsigned char *packet, int level) {
             break;
 
         case V3:
-            fprintf(stdout, "\tDHCP:\n");
+            fprintf(stdout, "             ├─ DHCP:\n");
             break;
     }
 
@@ -105,8 +110,12 @@ void print_dhcp (const unsigned char *packet, int level) {
     struct in_addr *ip;
     //Le magic cookie a déjà été traité on prend donc les 60 octets suivant de Vendor spec
     do {
-        if (level == V3)
-            fprintf(stdout, "\t\tOption: ");
+        if (level == V3) {
+            if ((int)packet[i] == TAG_END)
+                fprintf(stdout, "             └─ \tOption: ");
+            else
+                fprintf(stdout, "             ├ \t\tOption: ");
+        }
         switch ((int)packet[i]) {
             case TAG_DHCP_MESSAGE:
                 fprintf(stdout, "DHCP Message type: ");
@@ -218,34 +227,25 @@ void print_dhcp (const unsigned char *packet, int level) {
 
             case TAG_PARM_REQUEST:
                 if (level == V3)
-                    fprintf(stdout, "Parameter Request List\n");
+                    fprintf(stdout, "Parameter Request List [");
                 if (level == V2)
                     fprintf(stdout, "Parameter Request List Item: { ");
                 len = (int)packet[i + 1];
                 for (cpt = 0; cpt < len; cpt++) {
-                    if (level == V3)
-                        fprintf(stdout, "\t\t\t- Parameter Request List Item: ");
                     int param = packet[i + cpt + 2];
                     switch (param) {
                         case TAG_SUBNET_MASK:
                             fprintf(stdout, "(%d) Subnet Mask", param);
-                            if (level == V3)
-                                fprintf(stdout, "\n");
                             break;
                         case TAG_GATEWAY:
                             fprintf(stdout, "(%d) Router", param);
-                            if (level == V3)
-                                fprintf(stdout, "\n");
                             break;
                         case TAG_DOMAIN_SERVER:
                             fprintf(stdout, "(%d) Domain Name Server", param);
-                            if (level == V3)
-                                fprintf(stdout, "\n");
                             break;
                         case TAG_NTP_SERVERS:
                             fprintf(stdout, "(%d) Network Time Protocol Servers", param);
-                            if (level == V3)
-                                fprintf(stdout, "\n");
+
                             break;
                         default:
                             if (level == V3)
@@ -259,7 +259,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                     fprintf(stdout, " }\n");
                 i += (int)packet[i];
                 if (level == V3)
-                    fprintf(stdout, "\n");
+                    fprintf(stdout, "]\n");
                 else if (i < 60)
                     fprintf(stdout, ", ");
                 break;
