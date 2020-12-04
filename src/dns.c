@@ -19,89 +19,94 @@ void treat_dns (const unsigned char *packet, int level) {
             break;
 
         case V3:
-            fprintf(stdout, "\tTransaction ID : 0x%04x\n", tID);
+            fprintf(stdout , "          └─ DNS ");
             if (dns->qr)
-                fprintf(stdout, "\tResponse: Message is a response\n");
+                fprintf(stdout, "Response\n");
             else
-                fprintf(stdout, "\tResponse: Message is a query\n");
+                fprintf(stdout, "Query\n");
+            fprintf(stdout, "            ├─ Transaction ID : 0x%04x\n", tID);
             put_opcode(dns->opcode);
             //Answers only in responses
             if (dns->qr) {
                 if (dns->aa)
-                    fprintf(stdout, "\tAuthoritative: Server is an authority for domain\n");
+                    fprintf(stdout, "            ├─ Authoritative: Server is an authority for domain\n");
                 else
-                    fprintf(stdout, "\tAuthoritative: Server is not an authority for domain\n");
+                    fprintf(stdout, "            ├─ Authoritative: Server is not an authority for domain\n");
                 if (dns->ra)
-                    fprintf(stdout, "\tRecursion available: Server can do recursive queries\n");
+                    fprintf(stdout, "            ├─ Recursion available: Server can do recursive queries\n");
                 if (!dns->ad)
-                    fprintf(stdout, "\tAnswer authenticated: Answer/authority portion was not authenticated by the server\n");
+                    fprintf(stdout, "            ├─ Answer authenticated: Answer/authority portion was not authenticated by the server\n");
                 put_rcode(dns->rcode);
             }
             if (dns->tc)
-                fprintf(stdout, "\tTruncated: Message is truncated\n");
+                fprintf(stdout, "            ├─ Truncated: Message is truncated\n");
             else
-                fprintf(stdout, "\tTruncated: Message is not truncated\n");
+                fprintf(stdout, "            ├─ Truncated: Message is not truncated\n");
             if (dns->rd)
-                fprintf(stdout, "\tRecursion desired: Do query recursively\n");
+                fprintf(stdout, "            ├─ Recursion desired: Do query recursively\n");
             else
-                fprintf(stdout, "\tRecursion desired: Do not query recursively\n");
+                fprintf(stdout, "            ├─ Recursion desired: Do not query recursively\n");
             if (dns->cd)
-                fprintf(stdout, "\tNon-authenticated data: Acceptable\n");
+                fprintf(stdout, "            ├─ Non-authenticated data: Acceptable\n");
             else
-                fprintf(stdout, "\tNon-authenticated data: Unacceptable\n");
-
-            fprintf(stdout, "\tQuestions : %d\n", nQuestions);
-            fprintf(stdout, "\tAnswers RRs: %d\n", nAnswers);
-            fprintf(stdout, "\tAuthority RRs : %d\n", nAuth);
-            fprintf(stdout, "\tAdditionnal RRs : %d\n", nAdd);
+                fprintf(stdout, "            ├─ Non-authenticated data: Unacceptable\n");
 
             const unsigned char *datas = packet + sizeof(HEADER);
             unsigned i;
             //Questions treatment
             if (nQuestions) {
-                fprintf(stdout, "\tQuestions:\n");
+                fprintf(stdout, "            ├─ Questions:\n");
                 for (i = 0; i < nQuestions; i++) {
-                    fprintf(stdout, "\t\t- Name: ");
+                    fprintf(stdout, "            ├ \t\t- Name: ");
                     datas += resolve(packet, datas);
                     struct q_datas *q_data = (struct q_datas *)datas;
                     fprintf(stdout, "\n");
                     char *class = get_class(ntohs(q_data->clss));
                     char *type = get_type(ntohs(q_data->type));
-                    fprintf(stdout, "\t\t- Type: %s\n", type);
-                    fprintf(stdout, "\t\t- Class: %s\n\n", class);
+                    fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
+                    if (nAnswers || nAuth || nAdd)
+                        fprintf(stdout, "            ├ \t\t- Class: %s\n", class);
+                    else
+                        fprintf(stdout, "            └─ \t\t- Class: %s\n", class);
                     datas += 4;
                 }
             }
             //Answers treatment
             if (nAnswers)
-                dns_print("Answers", packet, datas, nAnswers);
+                dns_print("Answers", packet, datas, nAnswers, nAuth || nAdd ? true : false);
             //Authorities treatment
             if (nAuth)
-                dns_print("Authorities", packet, datas, nAuth);
+                dns_print("Authorities", packet, datas, nAuth, nAdd ? true : false);
             //Additionnals treatment
             if (nAdd)
-                dns_print("Additionnals", packet, datas, nAdd);
+                dns_print("Additionnals", packet, datas, nAdd, false);
             break;
     }
 }
 
-void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n) {
+void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n, bool is_following) {
     unsigned i;
-    fprintf(stdout, "\t%s:\n", type);
+    fprintf(stdout, "            ├─ %s:\n", type);
     for (i = 0; i < n; i++) {
-        fprintf(stdout, "\t\t- Name: ");
+        fprintf(stdout, "            ├ \t\t- Name: ");
         datas += resolve(packet, datas);
         struct r_datas *data = (struct r_datas *)datas;
-        u_int16_t len = ntohs(data->len);
+        u_int16_t len = ntohs(data->len), class = ntohs(data->clss), type = ntohs(data->type);
         fprintf(stdout, "\n");
-        char *class = get_class(ntohs(data->clss));
-        char *type = get_type(ntohs(data->type));
-        fprintf(stdout, "\t\t- Type: %s\n", type);
-        fprintf(stdout, "\t\t- Class: %s\n", class);
-        fprintf(stdout, "\t\t- Ttl: %d\n", ntohl(data->ttl));
-        fprintf(stdout, "\t\t- Length: %d\n", ntohs(data->len));
+        char *str_class = get_class(class);
+        char *str_type = get_type(type);
+        fprintf(stdout, "            ├ \t\t- Type: %s\n", str_type);
+        fprintf(stdout, "            ├ \t\t- Class: %s\n", str_class);
+        fprintf(stdout, "            ├ \t\t- Ttl: %d\n", ntohl(data->ttl));
+        bool fin = (class == IN) && (type == A || type == AAAA);
+
+        if (i != ((unsigned)n - 1) || !fin || is_following)
+            fprintf(stdout, "            ├ \t\t- Length: %d\n            ├ \n", len);
+        else if ((fin && i == ((unsigned)n - 1)) || !is_following)
+            fprintf(stdout, "            └─ \t\t- Length: %d\n", len);
+
         datas += 10;
-        if (ntohs(data->clss) == IN) {
+        if (class == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
             if (ntohs(data->type) == A) {
@@ -109,17 +114,22 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                fprintf(stdout, "\t\t- Address: %s\n", str);
+                if (i != ((unsigned)n - 1) && is_following)
+                    fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
+                else if (!is_following)
+                    fprintf(stdout, "            └─ \t\t- Address: %s\n", str);
             }
-            else if (ntohs(data->type) == AAAA) {
+            else if (type == AAAA) {
                 if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                fprintf(stdout, "\t\t- Address: %s\n", str);
+                if (i != ((unsigned)n - 1) && is_following)
+                    fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
+                else
+                    fprintf(stdout, "            └─ \t\t- Address: %s\n", str);
             }
         }
-        fprintf(stdout, "\n");
         datas += len;
     }
 }
@@ -152,7 +162,7 @@ unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
 }
 
 void put_opcode(unsigned opcode) {
-    fprintf(stdout, "\tOpcode: ");
+    fprintf(stdout, "            ├─ Operation: ");
     switch (opcode) {
         case DNSQUERY:
             fprintf(stdout, "Query (%d)\n", opcode);
@@ -176,7 +186,7 @@ void put_opcode(unsigned opcode) {
 }
 
 void put_rcode (unsigned rcode) {
-    fprintf(stdout, "\tReply Code: ");
+    fprintf(stdout, "            ├─ Reply Code: ");
     switch (rcode) {
         case DNOERROR:
             fprintf(stdout, "DNS Query completed successfully (%d)\n", rcode);

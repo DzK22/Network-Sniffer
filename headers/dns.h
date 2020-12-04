@@ -38,7 +38,7 @@ void treat_dns (const unsigned char *, int);
 void put_opcode (unsigned);
 void put_rcode (unsigned);
 unsigned resolve (const unsigned char *, const unsigned char *);
-void dns_print(const char *, const unsigned char *, const unsigned char *, u_int16_t);
+void dns_print(const char *, const unsigned char *, const unsigned char *, u_int16_t, bool);
 char *get_class (u_int16_t);
 char *get_type (u_int16_t);
 

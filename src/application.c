@@ -36,8 +36,6 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             break;
 
         case DNS:
-            if (level == V3)
-                fprintf(stdout, "\tDNS [%d]\n", port);
             treat_dns(packet, level);
             break;
 
