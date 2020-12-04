@@ -91,26 +91,26 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         fprintf(stdout, "            ├ \t\t- Name: ");
         datas += resolve(packet, datas);
         struct r_datas *data = (struct r_datas *)datas;
-        u_int16_t len = ntohs(data->len);
+        u_int16_t len = ntohs(data->len), num_class = ntohs(data->clss), num_type = ntohs(data->type);
         fprintf(stdout, "\n");
-        char *class = get_class(ntohs(data->clss));
-        char *type = get_type(ntohs(data->type));
+        char *class = get_class(num_class);
+        char *type = get_type(num_type);
         fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
         fprintf(stdout, "            ├ \t\t- Class: %s\n", class);
         fprintf(stdout, "            ├ \t\t- Ttl: %d\n", ntohl(data->ttl));
-        fprintf(stdout, "            ├ \t\t- Length: %d\n", ntohs(data->len));
+        fprintf(stdout, "            ├ \t\t- Length: %d\n", len);
         datas += 10;
-        if (ntohs(data->clss) == IN) {
+        if (num_class == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
-            if (ntohs(data->type) == A) {
+            if (num_type == A) {
                 if (inet_ntop(AF_INET, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
                 fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
             }
-            else if (ntohs(data->type) == AAAA) {
+            else if (num_type == AAAA) {
                 if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
