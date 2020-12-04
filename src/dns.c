@@ -86,27 +86,22 @@ void treat_dns (const unsigned char *packet, int level) {
 
 void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n, bool is_following) {
     unsigned i;
-    fprintf(stdout, "            ├─ %s:\n", type);
+    (void)is_following;
+    fprintf(stdout, "            ├─ \t%s:\n", type);
     for (i = 0; i < n; i++) {
         fprintf(stdout, "            ├ \t\t- Name: ");
         datas += resolve(packet, datas);
         struct r_datas *data = (struct r_datas *)datas;
-        u_int16_t len = ntohs(data->len), class = ntohs(data->clss), type = ntohs(data->type);
+        u_int16_t len = ntohs(data->len);
         fprintf(stdout, "\n");
-        char *str_class = get_class(class);
-        char *str_type = get_type(type);
-        fprintf(stdout, "            ├ \t\t- Type: %s\n", str_type);
-        fprintf(stdout, "            ├ \t\t- Class: %s\n", str_class);
+        char *class = get_class(ntohs(data->clss));
+        char *type = get_type(ntohs(data->type));
+        fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
+        fprintf(stdout, "            ├ \t\t- Class: %s\n", class);
         fprintf(stdout, "            ├ \t\t- Ttl: %d\n", ntohl(data->ttl));
-        bool fin = (class == IN) && (type == A || type == AAAA);
-
-        if (i != ((unsigned)n - 1) || !fin || is_following)
-            fprintf(stdout, "            ├ \t\t- Length: %d\n            ├ \n", len);
-        else if ((fin && i == ((unsigned)n - 1)) || !is_following)
-            fprintf(stdout, "            └─ \t\t- Length: %d\n", len);
-
+        fprintf(stdout, "            ├ \t\t- Length: %d\n", ntohs(data->len));
         datas += 10;
-        if (class == IN) {
+        if (ntohs(data->clss) == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
             if (ntohs(data->type) == A) {
@@ -114,22 +109,20 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                if (i != ((unsigned)n - 1) && is_following)
-                    fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
-                else if (!is_following)
-                    fprintf(stdout, "            └─ \t\t- Address: %s\n", str);
+                fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
             }
-            else if (type == AAAA) {
+            else if (ntohs(data->type) == AAAA) {
                 if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                if (i != ((unsigned)n - 1) && is_following)
-                    fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
-                else
-                    fprintf(stdout, "            └─ \t\t- Address: %s\n", str);
+                fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
             }
         }
+        if (i != ((unsigned)n - 1) || is_following)
+            fprintf(stdout, "            ├ \n");
+        else
+            fprintf(stdout, "            └─ \n");
         datas += len;
     }
 }
