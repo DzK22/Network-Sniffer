@@ -5,7 +5,6 @@
 
 void treat_bootp (const unsigned char *, int);
 void print_dhcp (const unsigned char *, int);
-void put_dhcp_options (int);
 u_int32_t get_time (const unsigned char *, int);
 char *get_dhcp_type (int);
 

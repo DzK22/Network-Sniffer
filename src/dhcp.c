@@ -298,37 +298,6 @@ u_int32_t get_time (const unsigned char *packet, int i) {
     return packet[i] << 24 | packet[i + 1] << 16 | packet[i + 2] << 8 | packet[i + 3];
 }
 
-void put_dhcp_options (int option) {
-    char *dhcp_type = NULL;
-    switch (option) {
-        case TAG_DHCP_MESSAGE:
-            fprintf(stdout, "\t\tDHCP Message Type\t");
-            dhcp_type = get_dhcp_type(option);
-            break;
-        case TAG_RENEWAL_TIME:
-            fprintf(stdout, "\t\tRenewal Time Value\t");
-            break;
-        case TAG_IP_LEASE:
-            fprintf(stdout, "\t\tIP Address Lease Time\t");
-            break;
-        case TAG_SERVER_ID:
-            fprintf(stdout, "\t\tDHCP Server Identifier\t");
-            break;
-        case TAG_SUBNET_MASK:
-            fprintf(stdout, "\t\tSubnet Mask\t\t");
-            break;
-        case TAG_REBIND_TIME:
-            fprintf(stdout, "\t\tRebinding Time Value\t");
-            break;
-        default:
-            fprintf(stdout, "\t\tUnknown\t");
-            break;
-    }
-    if (dhcp_type != NULL)
-        return;
-    fprintf(stdout, "(%d) ", option);
-}
-
 char *get_dhcp_type (int type) {
     switch (type) {
         case DHCPDISCOVER:
