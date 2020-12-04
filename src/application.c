@@ -93,7 +93,7 @@ int c_print(char c) {
 
 void print(const unsigned char *packet, int len) {
     int i;
-    fprintf(stdout, "\t");
+    fprintf(stdout, "            └─ \t");
     for (i = 0; i < len; i++) {
         if (c_print(packet[i]) == '\n')
             fprintf(stdout, "\t");
