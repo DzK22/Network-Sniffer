@@ -21,9 +21,9 @@ void treat_dns (const unsigned char *packet, int level) {
         case V3:
             fprintf(stdout , "          └─ DNS ");
             if (dns->qr)
-                fprintf(stdout, "Response\n");
+                fprintf(stdout, "Response with %d Questions, %d Answers, %d Auths, %d Adds\n", nQuestions, nAnswers, nAuth, nAdd);
             else
-                fprintf(stdout, "Query\n");
+                fprintf(stdout, "Query with %d Questions, %d Answers, %d Auths, %d Adds\n", nQuestions, nAnswers, nAuth, nAdd);
             fprintf(stdout, "            ├─ Transaction ID : 0x%04x\n", tID);
             put_opcode(dns->opcode);
             //Answers only in responses
@@ -86,7 +86,6 @@ void treat_dns (const unsigned char *packet, int level) {
 
 void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n, bool is_following) {
     unsigned i;
-    (void)is_following;
     fprintf(stdout, "            ├─ \t%s:\n", type);
     for (i = 0; i < n; i++) {
         fprintf(stdout, "            ├ \t\t- Name: ");
