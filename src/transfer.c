@@ -6,15 +6,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case HTTP:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| HTTP\n");
-                    return;
+                    fprintf(stdout, "|| HTTP");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> HTTP:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tHTTP [%d] =>", port);
+                    fprintf(stdout, "           └─ HTTP ");
                     break;
             }
             break;
@@ -22,15 +22,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case HTTPS:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| HTTPS\n");
-                    return;
+                    fprintf(stdout, "|| HTTPS");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> HTTPS:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tHTTPS [%d] =>", port);
+                    fprintf(stdout, "           └─ HTTPS ");
                     break;
             }
             break;
@@ -38,15 +38,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case FTPD:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| FTP Data\n");
-                    return;
+                    fprintf(stdout, "|| FTP Data");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> FTP Data:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tFTP Data [%d] =>", port);
+                    fprintf(stdout, "           └─ FTP Data");
                     break;
             }
             break;
@@ -54,15 +54,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case FTPC:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| FTP Control\n");
-                    return;
+                    fprintf(stdout, "|| FTP Control");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> FTP Control:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tFTP Control [%d] =>", port);
+                    fprintf(stdout, "           └─ FTP Control ");
                     break;
             }
             break;
@@ -70,15 +70,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case SMTP:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| SMTP\n");
-                    return;
+                    fprintf(stdout, "|| SMTP");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> SMTP:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tSMTP [%d] =>", port);
+                    fprintf(stdout, "           └─ SMTP ");
                     break;
             }
             break;
@@ -86,15 +86,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case SMTPS:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| SMTPS\n");
-                    return;
+                    fprintf(stdout, "|| SMTPS");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> SMTPS:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tSMTPS [%d] =>", port);
+                    fprintf(stdout, "           └─ SMTPS ");
                     break;
             }
             break;
@@ -102,15 +102,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case POP:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| POP\n");
-                    return;
+                    fprintf(stdout, "|| POP");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> POP:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tPOP [%d] =>", port);
+                    fprintf(stdout, "           └─ POP ");
                     break;
             }
             break;
@@ -118,15 +118,15 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
         case IMAP:
             switch (level) {
                 case V1:
-                    fprintf(stdout, "|| IMAP\n");
-                    return;
+                    fprintf(stdout, "|| IMAP");
+                    break;
 
                 case V2:
                     fprintf(stdout, "$> IMAP:");
                     break;
 
                 case V3:
-                    fprintf(stdout, "\tIMAP [%d] =>", port);
+                    fprintf(stdout, "           └─ IMAP ");
                     break;
             }
             break;

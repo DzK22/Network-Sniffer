@@ -49,22 +49,6 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             treat_telnet(packet, len, level);
             break;
 
-        case MDNS:
-            switch (level) {
-                case V1:
-                    fprintf(stdout, "|| MDNS");
-                    break;
-
-                case V2:
-                    fprintf(stdout, "$> MDNS: port: %d\n", port);
-                    break;
-
-                case V3:
-                    fprintf(stdout, "\tMDNS [%d]\n", port);
-                    break;
-            }
-            break;
-
         default:
             return false;
     }

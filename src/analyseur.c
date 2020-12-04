@@ -12,7 +12,7 @@ static inline bool supported_tr (int t_protocol) {
 
 static inline bool supported_app (int app) {
     return (app == HTTP) || (app == HTTPS) || (app == FTPC) || (app == FTPD) || \
-    (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || (app == MDNS) || \
+    (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || \
     (app == TELNET) || (app == POP) || (app == IMAP);
 }
 

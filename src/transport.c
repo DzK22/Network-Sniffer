@@ -80,7 +80,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                 fprintf(stdout, "ACK ");
             if (urg)
                 fprintf(stdout, "URG ");
-            fprintf(stdout, "}\t");
+            fprintf(stdout, "}, Window: %d\t", window);
             break;
 
         case V2:
@@ -98,7 +98,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                 fprintf(stdout, "ACK ");
             if (urg)
                 fprintf(stdout, "URG ");
-            fprintf(stdout, "}\n");
+            fprintf(stdout, "}, Window: %d\n", window);
             break;
 
         case V3:
