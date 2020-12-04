@@ -16,52 +16,6 @@ static inline bool supported_app (int app) {
     (app == TELNET) || (app == POP) || (app == IMAP);
 }
 
-int c_print(char c) {
-    if (c == '\r')
-        fprintf(stdout, "\\r");
-
-    else if (c == '\n') {
-        fprintf(stdout, "\\n");
-        fprintf(stdout, "\n");
-    }
-    else if (isprint(c) || isspace(c))
-        fprintf(stdout, "%c", c);
-    else {
-        fprintf(stdout, ".");
-        return -1;
-    }
-    return c;
-}
-
-void print(const unsigned char *packet, int len) {
-    int i;
-    fprintf(stdout, "\t");
-    for (i = 0; i < len; i++) {
-        if (c_print(packet[i]) == '\n')
-            fprintf(stdout, "\t");
-    }
-    fprintf(stdout, "\n");
-}
-
-void data_print(const unsigned char *packet) {
-    unsigned i;
-    fprintf(stdout, "\tDatas: ");
-    for (i = 0; i < 50; i++) {
-        if (packet[i])
-            fprintf(stdout, "%02x", packet[i]);
-        else
-            break;
-    }
-    fprintf(stdout, " ...\n");
-}
-
-void print_packet (const unsigned char *packet, int len) {
-    int i;
-    for (i = 0; i < len; i++)
-        fprintf(stdout, "%02x ", packet[i]);
-    fprintf(stdout, "\n\n");
-}
-
 void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
     packetID++;
     struct tm res;

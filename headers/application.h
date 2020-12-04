@@ -22,5 +22,7 @@
 
 bool get_app (const unsigned char *, int, bool, int, int);
 void treat_app (const unsigned char *, int, int, int, int);
+int c_print(char);
+void print(const unsigned char*, int);
 
 #endif

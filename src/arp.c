@@ -9,7 +9,6 @@ void treat_arp(const unsigned char *packet, int level) {
     u_char h_size = arp->ar_hln;
     u_char protocol = arp->ar_pln;
     ushort op_code = ntohs(arp->ar_op);
-    int arphdr_len = sizeof(struct arphdr);
     char str_ip_src[LEN];
     char str_ip_dst[LEN];
     if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_spa, str_ip_src, LEN) == NULL) {
@@ -71,14 +70,13 @@ void treat_arp(const unsigned char *packet, int level) {
 
             fprintf(stdout, "\tHardware size : %d\n", h_size);
             fprintf(stdout, "\tProtocol size: %d\n", protocol);
-            //J'ai dû affiché les IP en brute en parcourant le paquet car les fonctions inet_ntoa et inet_ntop renvoyer des résultats faux
+
             if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
                 fprintf(stdout, "\tSrc Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_sha));
                 fprintf(stdout, "\tSrc IP Address => %s\n", str_ip_src);
                 fprintf(stdout, "\tDst Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_tha));
                 fprintf(stdout, "\tDst IP Address => %s\n", str_ip_dst);
             }
-            data_print(packet + arphdr_len);
             break;
     }
 }
