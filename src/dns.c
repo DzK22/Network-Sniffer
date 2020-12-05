@@ -19,55 +19,55 @@ void treat_dns (const unsigned char *packet, int level, int type) {
             break;
 
         case V3:
-            fprintf(stdout , "          └─ %s ", type == DNS ? "DNS" : "MDNS");
+            fprintf(stdout , CYAN"          └─ %s ", type == DNS ? "DNS" : "MDNS");
             if (dns->qr)
-                fprintf(stdout, "Response with %d Questions, %d Answers, %d Auths, %d Adds\n", nQuestions, nAnswers, nAuth, nAdd);
+                fprintf(stdout, "Response with %d Questions, %d Answers, %d Auths, %d Adds\n"COL_RESET, nQuestions, nAnswers, nAuth, nAdd);
             else
-                fprintf(stdout, "Query with %d Questions, %d Answers, %d Auths, %d Adds\n", nQuestions, nAnswers, nAuth, nAdd);
-            fprintf(stdout, "            ├─ Transaction ID : 0x%04x\n", tID);
+                fprintf(stdout, "Query with %d Questions, %d Answers, %d Auths, %d Adds\n"COL_RESET, nQuestions, nAnswers, nAuth, nAdd);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Transaction ID : 0x%04x\n", tID);
             put_opcode(dns->opcode);
             //Answers only in responses
             if (dns->qr) {
                 if (dns->aa)
-                    fprintf(stdout, "            ├─ Authoritative: Server is an authority for domain\n");
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Authoritative: Server is an authority for domain\n");
                 else
-                    fprintf(stdout, "            ├─ Authoritative: Server is not an authority for domain\n");
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Authoritative: Server is not an authority for domain\n");
                 if (dns->ra)
-                    fprintf(stdout, "            ├─ Recursion available: Server can do recursive queries\n");
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Recursion available: Server can do recursive queries\n");
                 if (!dns->ad)
-                    fprintf(stdout, "            ├─ Answer authenticated: Answer/authority portion was not authenticated by the server\n");
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Answer authenticated: Answer/authority portion was not authenticated by the server\n");
                 put_rcode(dns->rcode);
             }
             if (dns->tc)
-                fprintf(stdout, "            ├─ Truncated: Message is truncated\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Truncated: Message is truncated\n");
             else
-                fprintf(stdout, "            ├─ Truncated: Message is not truncated\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Truncated: Message is not truncated\n");
             if (dns->rd)
-                fprintf(stdout, "            ├─ Recursion desired: Do query recursively\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Recursion desired: Do query recursively\n");
             else
-                fprintf(stdout, "            ├─ Recursion desired: Do not query recursively\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Recursion desired: Do not query recursively\n");
             if (dns->cd)
-                fprintf(stdout, "            ├─ Non-authenticated data: Acceptable\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Acceptable\n");
             else
-                fprintf(stdout, "            ├─ Non-authenticated data: Unacceptable\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Unacceptable\n");
 
             const unsigned char *datas = packet + sizeof(HEADER);
             unsigned i;
             //Questions treatment
             if (nQuestions) {
-                fprintf(stdout, "            ├─ Questions:\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Questions:\n");
                 for (i = 0; i < nQuestions; i++) {
-                    fprintf(stdout, "            ├ \t\t- Name: ");
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Name: ");
                     datas += resolve(packet, datas);
                     struct q_datas *q_data = (struct q_datas *)datas;
                     fprintf(stdout, "\n");
                     char *class = get_class(ntohs(q_data->clss));
                     char *type = get_type(ntohs(q_data->type));
-                    fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", type);
                     if (nAnswers || nAuth || nAdd)
-                        fprintf(stdout, "            ├ \t\t- Class: %s\n            ├ \n", class);
+                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n            ├ \n", class);
                     else
-                        fprintf(stdout, "            └─ \t\t- Class: %s\n", class);
+                        fprintf(stdout, CYAN"            └─"COL_RESET" \t\t- Class: %s\n", class);
                     datas += 4;
                 }
             }
@@ -86,19 +86,19 @@ void treat_dns (const unsigned char *packet, int level, int type) {
 
 void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n, bool is_following) {
     unsigned i;
-    fprintf(stdout, "            ├─ \t%s:\n", type);
+    fprintf(stdout, CYAN"            ├─"COL_RESET" \t%s:\n", type);
     for (i = 0; i < n; i++) {
-        fprintf(stdout, "            ├ \t\t- Name: ");
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Name: ");
         datas += resolve(packet, datas);
         struct r_datas *data = (struct r_datas *)datas;
         u_int16_t len = ntohs(data->len), num_class = ntohs(data->clss), num_type = ntohs(data->type);
         fprintf(stdout, "\n");
         char *class = get_class(num_class);
         char *type = get_type(num_type);
-        fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
-        fprintf(stdout, "            ├ \t\t- Class: %s\n", class);
-        fprintf(stdout, "            ├ \t\t- Ttl: %d\n", ntohl(data->ttl));
-        fprintf(stdout, "            ├ \t\t- Length: %d\n", len);
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", type);
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Ttl: %d\n", ntohl(data->ttl));
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Length: %d\n", len);
         datas += 10;
         if (num_class == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
@@ -108,20 +108,20 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
             }
             else if (num_type == AAAA) {
                 if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
-                fprintf(stdout, "            ├ \t\t- Address: %s\n", str);
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
             }
         }
         if (i != ((unsigned)n - 1) || is_following)
-            fprintf(stdout, "            ├ \n");
+            fprintf(stdout, CYAN"            ├"COL_RESET" \n");
         else
-            fprintf(stdout, "            └─ \n");
+            fprintf(stdout, CYAN"            └─"COL_RESET" \n");
         datas += len;
     }
 }
@@ -154,7 +154,7 @@ unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
 }
 
 void put_opcode(unsigned opcode) {
-    fprintf(stdout, "            ├─ Operation: ");
+    fprintf(stdout, CYAN"            ├─"COL_RESET" Operation: ");
     switch (opcode) {
         case DNSQUERY:
             fprintf(stdout, "Query (%d)\n", opcode);
@@ -178,7 +178,7 @@ void put_opcode(unsigned opcode) {
 }
 
 void put_rcode (unsigned rcode) {
-    fprintf(stdout, "            ├─ Reply Code: ");
+    fprintf(stdout, CYAN"            ├─"COL_RESET" Reply Code: ");
     switch (rcode) {
         case DNOERROR:
             fprintf(stdout, "DNS Query completed successfully (%d)\n", rcode);

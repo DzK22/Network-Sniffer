@@ -7,7 +7,7 @@ void treat_telnet (const unsigned char *packet, int len, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "$> TELNET\n");
+            fprintf(stdout, CYAN"$> TELNET\n"COL_RESET);
             break;
 
         case V3:
@@ -23,88 +23,91 @@ void negoc(const unsigned char *packet, int len) {
     unsigned char *byte = (unsigned char *)packet;
     unsigned char *last;
     int r = 0;
+    if (len > 0)
+        fprintf(stdout, CYAN"           └─"COL_RESET" ");
     while (*byte == IAC && r < len) {
         byte++;
         r++;
+        if (r != 1)
+            fprintf(stdout, "\t\t");
+        else
+            fprintf(stdout, "  ");
         switch (*byte) {
             case DO:
-                fprintf(stdout, "\tDo ");
+                fprintf(stdout, "Do ");
                 byte++;
                 r++;
                 put_opt(*byte);
                 break;
 
             case DONT:
-                fprintf(stdout, "\tDont ");
+                fprintf(stdout, "Dont ");
                 byte++;
                 r++;
                 put_opt(*byte);
                 break;
 
             case WILL:
-                fprintf(stdout, "\tWill ");
+                fprintf(stdout, "Will ");
                 byte++;
                 r++;
                 put_opt(*byte);
                 break;
 
             case WONT:
-                fprintf(stdout, "\tWont ");
+                fprintf(stdout, "Wont ");
                 byte++;
                 r++;
                 put_opt(*byte);
                 break;
 
             case EC:
-                fprintf(stdout, "\tErase char ");
+                fprintf(stdout, "Erase char ");
                 break;
 
             case EL:
-                fprintf(stdout, "\tErase line ");
+                fprintf(stdout, "Erase line ");
                 break;
 
             case GA:
-                fprintf(stdout, "\tGo ahead ");
+                fprintf(stdout, "Go ahead ");
                 break;
 
             case SBEGIN:
-                fprintf(stdout, "\tSubnegoc\n");
+                fprintf(stdout, "Subnegoc: ");
                 byte++;
                 r++;
                 put_opt(*byte);
-                fprintf(stdout, " value: ");
                 last = byte - 1;
                 while (r < len && *byte != SEND && *last != SEND) {
-                    fprintf(stdout, "%0hhX ", *byte);
                     last = byte;
                     byte++;
                     r++;
                 }
-                fprintf(stdout, "%0hhX ", *byte);
                 break;
 
             case AO:
-                fprintf(stdout, "\tAbort output ");
+                fprintf(stdout, "Abort output ");
                 break;
 
             case NNOP:
-                fprintf(stdout, "\tNo option ");
+                fprintf(stdout, "No option ");
                 break;
 
             case DM:
-                fprintf(stdout, "\tData mark ");
+                fprintf(stdout, "Data mark ");
                 break;
 
             case IP:
-                fprintf(stdout, "\tInterrupt ");
+                fprintf(stdout, "Interrupt ");
                 break;
 
             case AYT:
-                fprintf(stdout, "\tAre you there ");
+                fprintf(stdout, "Are you there ");
                 break;
 
             default:
-                fprintf(stdout, "\tUnknown");
+                fprintf(stdout, "Unknown");
                 break;
         }
         byte++;
@@ -156,8 +159,8 @@ void put_opt (int opt) {
             break;
 
         default:
-            fprintf(stdout, "Unknow ");
+            fprintf(stdout, "Unknown ");
             break;
     }
-    fprintf(stdout, "(%d)\n", opt);
+    fprintf(stdout, "(%d)", opt);
 }

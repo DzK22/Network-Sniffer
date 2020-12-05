@@ -44,7 +44,7 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
             fprintf(stdout, YELLOW"     ├"COL_RESET"\t\t- More Fragments : %d\n", morefrag);
             fprintf(stdout, YELLOW"     ├─"COL_RESET" Fragment Offset : %d\n", foffset);
             fprintf(stdout, YELLOW"     ├─"COL_RESET" ttl : %d \n", ip->ip_ttl);
-            fprintf(stdout, YELLOW"     ├─"COL_RESET" Protocol :YELLOW %s (%d) \n", get_protocol(protocol), protocol);
+            fprintf(stdout, YELLOW"     ├─"COL_RESET" Protocol : %s (%d) \n", get_protocol(protocol), protocol);
             fprintf(stdout, YELLOW"     └─"COL_RESET" Checksum : 0x%04x\n", ntohs(ip->ip_sum));
             break;
     }

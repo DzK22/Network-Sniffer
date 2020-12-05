@@ -40,7 +40,7 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             break;
 
         case DNS:
-            treat_dns(packet, level, MDNS);
+            treat_dns(packet, level, DNS);
             break;
 
         case DHCP:
