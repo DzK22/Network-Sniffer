@@ -1,7 +1,7 @@
 #include "../headers/dns.h"
 
 //Appelée que si Verbose = 2 ou 3
-void treat_dns (const unsigned char *packet, int level) {
+void treat_dns (const unsigned char *packet, int level, int type) {
     HEADER *dns = (HEADER *)packet;
     uint16_t tID, nQuestions, nAnswers, nAuth, nAdd;
     tID = ntohs(dns->id);
@@ -11,15 +11,15 @@ void treat_dns (const unsigned char *packet, int level) {
     nAdd = ntohs(dns->arcount);
     switch (level) {
         case V1:
-            fprintf(stdout, "|| DNS\n");
+            fprintf(stdout, "|| %s\n", type == DNS ? "DNS" : "MDNS");
             break;
 
         case V2:
-            fprintf(stdout, "$> DNS: Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", nQuestions, nAnswers, nAuth, nAdd);
+            fprintf(stdout, CYAN"$> %s:"COL_RESET" Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", type == DNS ? "DNS" : "MDNS", nQuestions, nAnswers, nAuth, nAdd);
             break;
 
         case V3:
-            fprintf(stdout , "          └─ DNS ");
+            fprintf(stdout , "          └─ %s ", type == DNS ? "DNS" : "MDNS");
             if (dns->qr)
                 fprintf(stdout, "Response with %d Questions, %d Answers, %d Auths, %d Adds\n", nQuestions, nAnswers, nAuth, nAdd);
             else
@@ -65,7 +65,7 @@ void treat_dns (const unsigned char *packet, int level) {
                     char *type = get_type(ntohs(q_data->type));
                     fprintf(stdout, "            ├ \t\t- Type: %s\n", type);
                     if (nAnswers || nAuth || nAdd)
-                        fprintf(stdout, "            ├ \t\t- Class: %s\n", class);
+                        fprintf(stdout, "            ├ \t\t- Class: %s\n            ├ \n", class);
                     else
                         fprintf(stdout, "            └─ \t\t- Class: %s\n", class);
                     datas += 4;

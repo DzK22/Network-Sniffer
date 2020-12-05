@@ -35,8 +35,12 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
             treat_transfer(packet, resp, len, level, IMAP);
             break;
 
+        case MDNS:
+            treat_dns(packet, level, MDNS);
+            break;
+
         case DNS:
-            treat_dns(packet, level);
+            treat_dns(packet, level, MDNS);
             break;
 
         case DHCP:
@@ -45,7 +49,7 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
 
         case TELNET:
             if (level == V3)
-                fprintf(stdout, "\tTELNET [%d]\n", port);
+                fprintf(stdout, CYAN"          └─ TELNET [%d]\n"COL_RESET, port);
             treat_telnet(packet, len, level);
             break;
 
@@ -64,11 +68,11 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
                 break;
 
             case V2:
-                fprintf(stdout, "$> No App matching\n");
+                fprintf(stdout, CYAN"$> No App matching\n"COL_RESET);
                 break;
 
             case V3:
-                fprintf(stderr, "           └─ There is no app matching with ports number %d && %d\n", sport, dport);
+                fprintf(stderr, CYAN"           └─ There is no app matching with ports number %d && %d\n"COL_RESET, sport, dport);
                 break;
         }
     }
@@ -93,10 +97,11 @@ int c_print(char c) {
 
 void print(const unsigned char *packet, int len) {
     int i;
-    fprintf(stdout, "            └─ \t");
+    if (len > 0)
+        fprintf(stdout, CYAN"            └─"COL_RESET" \t");
     for (i = 0; i < len; i++) {
         if (c_print(packet[i]) == '\n')
-            fprintf(stdout, "\t");
+            fprintf(stdout, "\t\t");
     }
     fprintf(stdout, "\n");
 }

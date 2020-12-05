@@ -34,13 +34,13 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
             fprintf(stdout, "|| UDP\t");
             break;
         case V2:
-            fprintf(stdout, "$> UDP: sport: %d, dport: %d\n", *sport, *dport);
+            fprintf(stdout, PINK"$> UDP:"COL_RESET" sport: %d, dport: %d\n", *sport, *dport);
             break;
 
         case V3:
-            fprintf(stdout, "       └─ UDP Segment: from port %d to port %d\n", *sport, *dport);
-            fprintf(stdout, "        ├─ Checksum = 0x%04x\n", checksum);
-            fprintf(stdout, "        └─ Length = %d\n", dataLength);
+            fprintf(stdout, PINK"       └─ UDP Segment: from port %d to port %d\n"COL_RESET, *sport, *dport);
+            fprintf(stdout, PINK"        ├─"COL_RESET" Checksum = 0x%04x\n", checksum);
+            fprintf(stdout, PINK"        └─"COL_RESET" Length = %d\n", dataLength);
             break;
     }
 }
@@ -84,7 +84,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             break;
 
         case V2:
-            fprintf(stdout, "$> TCP: sport: %d, dport: %d ", *sport, *dport);
+            fprintf(stdout, PINK"$> TCP:"COL_RESET" sport: %d, dport: %d ", *sport, *dport);
             fprintf(stdout, "{ ");
             if (fin)
                 fprintf(stdout, "FIN ");
@@ -102,31 +102,31 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             break;
 
         case V3:
-            fprintf(stdout, "       └─ TCP Segment: from port %d to port %d\n", *sport, *dport);
-            fprintf(stdout, "         ├─ Sequence Num = %02x\n", seq);
-            fprintf(stdout, "         ├─ Acknowledgment Num = %02x\n", ack_seq);
-            fprintf(stdout, "         ├─ Date Offset = %d\n", dataOff);
-            fprintf(stdout, "         ├─ Flags : \n");
-            fprintf(stdout, "         ├\t\t- FIN : %d\n", fin);
-            fprintf(stdout, "         ├\t\t- SYN : %d\n", syn);
-            fprintf(stdout, "         ├\t\t- RST : %d\n", reset);
-            fprintf(stdout, "         ├\t\t- PSH : %d\n", push);
-            fprintf(stdout, "         ├\t\t- ACK : %d\n", ack);
-            fprintf(stdout, "         ├\t\t- URG : %d\n", urg);
-            fprintf(stdout, "         ├─ Window = %d\n", window);
-            fprintf(stdout, "         ├─ Checksum = 0x%04x\n", checksum);
+            fprintf(stdout, PINK"       └─ TCP Segment: from port %d to port %d\n"COL_RESET, *sport, *dport);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Sequence Num = %02x\n", seq);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Acknowledgment Num = %02x\n", ack_seq);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Date Offset = %d\n", dataOff);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Flags : \n");
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- FIN : %d\n", fin);
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- SYN : %d\n", syn);
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- RST : %d\n", reset);
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- PSH : %d\n", push);
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- ACK : %d\n", ack);
+            fprintf(stdout, PINK"         ├"COL_RESET"\t\t- URG : %d\n", urg);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Window = %d\n", window);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Checksum = 0x%04x\n", checksum);
             if (*to_add <= 20)
-                fprintf(stdout, "         └─ Urgent Pointer = %d\n", urgPointer);
+                fprintf(stdout, PINK"         └─"COL_RESET" Urgent Pointer = %d\n", urgPointer);
             //Si la taille de l'entete tcp est supérieure à 20 octets alors il y a des options tcp et on les affiche uniquement si le niveau de détails est au plus haut
             if (*to_add > 20) {
-                fprintf(stdout, "         ├─ Urgent Pointer = %d\n", urgPointer);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Urgent Pointer = %d\n", urgPointer);
                 int i = sizeof(struct tcphdr), value, len;
-                fprintf(stdout, "         ├─ Options:\n");
+                fprintf(stdout, PINK"         ├─"COL_RESET" Options:\n");
                 do {
                     if (i + (int)packet[i + 1] >= *to_add || i + 1 >= *to_add)
-                        fprintf(stdout, "         └─\t\tTCP Option - ");
+                        fprintf(stdout, PINK"         └─"COL_RESET"\t\tTCP Option - ");
                     else
-                        fprintf(stdout, "         ├\t\tTCP Option - ");
+                        fprintf(stdout, PINK"         ├"COL_RESET"\t\tTCP Option - ");
                     switch (packet[i]) {
                         case NOP:
                             fprintf(stdout, "\tNo Operation (NOP)\n");

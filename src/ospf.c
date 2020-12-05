@@ -12,11 +12,11 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
             break;
 
         case V2:
-            fprintf(stdout, "$> OSPF: version: %d, msg type: %s (%d)\n", ospf->version, get_ptype(ospf->type), ospf->type);
+            fprintf(stdout, PINK"$> OSPF:"COL_RESET" version: %d, msg type: %s (%d)\n", ospf->version, get_ptype(ospf->type), ospf->type);
             break;
 
         case V3:
-            fprintf(stdout, "       └─ OSPFv2 Messsage\n");
+            fprintf(stdout, PINK"       └─ OSPFv2 Messsage\n"COL_RESET);
             fprintf(stdout, "         ├─ Version: %d\n", ospf->version);
             fprintf(stdout, "         ├─ Message Type: %s (%d)\n", get_ptype(ospf->type), ospf->type);
             fprintf(stdout, "         ├─ Packet Length: %d\n", len);

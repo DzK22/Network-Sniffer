@@ -34,7 +34,7 @@
 #define TXT 16
 #define HINFO 13
 
-void treat_dns (const unsigned char *, int);
+void treat_dns (const unsigned char *, int, int);
 void put_opcode (unsigned);
 void put_rcode (unsigned);
 unsigned resolve (const unsigned char *, const unsigned char *);

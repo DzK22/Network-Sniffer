@@ -18,6 +18,7 @@
 #define FTPD   20
 #define FTPC   21
 #define ICMP 1
+#define MDNS 5353
 
 bool get_app (const unsigned char *, int, bool, int, int);
 void treat_app (const unsigned char *, int, int, int, int);

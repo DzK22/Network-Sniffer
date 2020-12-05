@@ -10,11 +10,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> HTTP:");
+                    fprintf(stdout, CYAN"$> HTTP:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ HTTP ");
+                    fprintf(stdout, CYAN"           └─ HTTP ");
                     break;
             }
             break;
@@ -26,11 +26,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> HTTPS:");
+                    fprintf(stdout, CYAN"$> HTTPS:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ HTTPS ");
+                    fprintf(stdout, CYAN"           └─ HTTPS ");
                     break;
             }
             break;
@@ -42,11 +42,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> FTP Data:");
+                    fprintf(stdout, CYAN"$> FTP Data:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ FTP Data");
+                    fprintf(stdout, CYAN"           └─ FTP Data");
                     break;
             }
             break;
@@ -58,11 +58,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> FTP Control:");
+                    fprintf(stdout, CYAN"$> FTP Control:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ FTP Control ");
+                    fprintf(stdout, CYAN"           └─ FTP Control ");
                     break;
             }
             break;
@@ -74,11 +74,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> SMTP:");
+                    fprintf(stdout, CYAN"$> SMTP:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ SMTP ");
+                    fprintf(stdout, CYAN"           └─ SMTP ");
                     break;
             }
             break;
@@ -90,11 +90,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> SMTPS:");
+                    fprintf(stdout, CYAN"$> SMTPS:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ SMTPS ");
+                    fprintf(stdout, CYAN"           └─ SMTPS ");
                     break;
             }
             break;
@@ -106,11 +106,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> POP:");
+                    fprintf(stdout, CYAN"$> POP:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ POP ");
+                    fprintf(stdout, CYAN"           └─ POP ");
                     break;
             }
             break;
@@ -122,11 +122,11 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
                     break;
 
                 case V2:
-                    fprintf(stdout, "$> IMAP:");
+                    fprintf(stdout, CYAN"$> IMAP:"COL_RESET);
                     break;
 
                 case V3:
-                    fprintf(stdout, "           └─ IMAP ");
+                    fprintf(stdout, CYAN"           └─ IMAP ");
                     break;
             }
             break;
@@ -136,9 +136,9 @@ void treat_transfer (const unsigned char *packet, bool resp, int len, int level,
     }
 
     if (!resp)
-        fprintf(stdout, " REQUEST\n");
+        fprintf(stdout, " REQUEST\n"COL_RESET);
     else
-        fprintf(stdout, " RESPONSE\n");
+        fprintf(stdout, " RESPONSE\n"COL_RESET);
 
     if (len <= 0 || level != V3)
         return;

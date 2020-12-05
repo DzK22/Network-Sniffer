@@ -25,54 +25,54 @@ void treat_bootp (const unsigned char *packet, int level) {
     int is_dhcp = memcmp(bootp->bp_vend, magic_cookie, 4);
     switch (level) {
         case V3:
-            fprintf(stdout, "          └─ BOOTP Message\n");
+            fprintf(stdout, CYAN"          └─ BOOTP Message\n"COL_RESET);
             if (opcode == BOOTREPLY)
-                fprintf(stdout, "            ├─ Message type: Reply (%d)\n", opcode);
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Message type: Reply (%d)\n", opcode);
             else
-                fprintf(stdout, "            ├─ Message type: Request (%d)\n", opcode);
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Message type: Request (%d)\n", opcode);
             switch (htype) {
                 case 1:
-                    fprintf(stdout, "            ├─ Hardware type: Ethernet (0x%02x)\n", htype);
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Hardware type: Ethernet (0x%02x)\n", htype);
                     break;
 
                 case 2:
-                    fprintf(stdout, "            ├─ Hardware type: Experimental Ethernet (0x%02x)\n", htype);
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Hardware type: Experimental Ethernet (0x%02x)\n", htype);
                     break;
 
                 default:
-                    fprintf(stdout, "            ├─ Hardware type: Unknown (0x%02x)\n", htype);
+                    fprintf(stdout, CYAN"            ├─"COL_RESET" Hardware type: Unknown (0x%02x)\n", htype);
                     break;
             }
-            fprintf(stdout, "            ├─ Hardware address length: %d\n", hlen);
-            fprintf(stdout, "            ├─ Hops: %d\n", hops);
-            fprintf(stdout, "            ├─ Transaction ID: 0x%08x\n", xID);
-            fprintf(stdout, "            ├─ Seconds elapsed: %d\n", secs);
-            fprintf(stdout, "            ├─ Bootp flags: 0x%04x\n", flags);
-            fprintf(stdout, "            ├─ Client IP address: %s\n", inet_ntoa(cip));
-            fprintf(stdout, "            ├─ Your (client) IP address: %s\n", inet_ntoa(yip));
-            fprintf(stdout, "            ├─ Next server IP address: %s\n", inet_ntoa(sip));
-            fprintf(stdout, "            ├─ Relay agent IP address: %s\n", inet_ntoa(gip));
-            fprintf(stdout, "            ├─ Client MAC address: %s\n", chaddr);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Hardware address length: %d\n", hlen);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Hops: %d\n", hops);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Transaction ID: 0x%08x\n", xID);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Seconds elapsed: %d\n", secs);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Bootp flags: 0x%04x\n", flags);
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Client IP address: %s\n", inet_ntoa(cip));
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Your (client) IP address: %s\n", inet_ntoa(yip));
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Next server IP address: %s\n", inet_ntoa(sip));
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Relay agent IP address: %s\n", inet_ntoa(gip));
+            fprintf(stdout, CYAN"            ├─"COL_RESET" Client MAC address: %s\n", chaddr);
             if (strcmp(sname, "None") == 0)
-                fprintf(stdout, "            ├─ Server host name not given\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Server host name not given\n");
             else
-                fprintf(stdout, "            ├─ Server host name: %s\n", sname);
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Server host name: %s\n", sname);
             if (strcmp(file, "None") == 0)
-                fprintf(stdout, "            ├─ Boot file name not given\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Boot file name not given\n");
             else
-                fprintf(stdout, "            ├─ Boot file name: %s\n", file);
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Boot file name: %s\n", file);
 
             if (is_dhcp == 0)
-                fprintf(stdout, "            ├─ Vendor Spec: ");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Vendor Spec: ");
             else
-                fprintf(stdout, "            └─ Vendor Spec: ");
+                fprintf(stdout, CYAN"            └─"COL_RESET" Vendor Spec: ");
             unsigned i;
             for (i = 0; i < 4; i++)
                 fprintf(stdout, "%d ", bootp->bp_vend[i]);
             fprintf(stdout, "\n");
 
             if (is_dhcp == 0) {
-                fprintf(stdout, "            ├─ Magic cookie: DHCP\n");
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Magic cookie: DHCP\n");
                 print_dhcp(bootp->bp_vend + 4, level);
             }
             else
@@ -95,11 +95,11 @@ void print_dhcp (const unsigned char *packet, int level) {
             return;
 
         case V2:
-            fprintf(stdout, "$> DHCP: ");
+            fprintf(stdout, CYAN"$> DHCP: "COL_RESET);
             break;
 
         case V3:
-            fprintf(stdout, "            ├─ DHCP:\n");
+            fprintf(stdout, CYAN"            ├─"COL_RESET" DHCP:\n");
             break;
     }
 
@@ -112,9 +112,9 @@ void print_dhcp (const unsigned char *packet, int level) {
     do {
         if (level == V3) {
             if ((int)packet[i] == TAG_END || (int)packet[i] == TAG_PARM_REQUEST)
-                fprintf(stdout, "            └─\t\tOption: ");
+                fprintf(stdout, CYAN"            └─"COL_RESET"\t\tOption: ");
             else
-                fprintf(stdout, "            ├ \t\tOption: ");
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\tOption: ");
         }
         switch ((int)packet[i]) {
             case TAG_DHCP_MESSAGE:

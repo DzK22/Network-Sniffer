@@ -25,10 +25,9 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
     }
     char str_time[LEN];
     int e_protocol, t_protocol, sport, dport, len = header->len, level = args[0], previewHeaderLength, to_add, dataLen;
-    fprintf(stdout, "<----------------------------------------------------------------------------------------------------->\n");
     switch (level) {
         case V1:
-            fprintf(stdout, "[%ld]: ", packetID);
+            fprintf(stdout, "%ld) ", packetID);
             break;
 
         case V2:
@@ -66,7 +65,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
         exit(EXIT_FAILURE);
     }
 
-    fprintf(stdout, "\n");
+    fprintf(stdout, "\n\n");
 }
 
 void usage (int argc) {

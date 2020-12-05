@@ -21,7 +21,7 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
 
         default :
             if (level == V3)
-                fprintf(stdout, "\t└─ Unknown Type (0x%04x)\n", e_protocol);
+                fprintf(stdout, YELLOW"\t└─ Unknown Type (0x%04x)\n"COL_RESET, e_protocol);
             break;
     }
     fprintf(stdout, COL_RESET);
