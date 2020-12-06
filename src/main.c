@@ -136,12 +136,11 @@ int main (int argc, char **argv) {
                 fprintf(stderr, "Error filter setting\n");
                 return EXIT_FAILURE;
             }
+            fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
         }
-        fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
     }
 
     args[0] = (unsigned char) level;
-    args[1] = (int)0;
     if (pcap_loop(packet, -1, callback, args) == PCAP_ERROR) {
         fprintf(stderr, "pcap_loop error\n");
         return EXIT_FAILURE;

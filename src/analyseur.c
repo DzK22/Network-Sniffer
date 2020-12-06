@@ -1,21 +1,6 @@
 #include "../headers/analyseur.h"
 unsigned long packetID = 0;
 
-//Fonction qui check si le protocole ethernet est supporté par l'analyseur (Utile pour balayer certains affichages)
-static inline bool supported_ep (int e_protocol) {
-    return (e_protocol == ETHERTYPE_IP) || (e_protocol == ETHERTYPE_IPV6) || (e_protocol == ETHERTYPE_ARP);
-}
-
-static inline bool supported_tr (int t_protocol) {
-    return (t_protocol == UDP) || (t_protocol == TCP);
-}
-
-static inline bool supported_app (int app) {
-    return (app == HTTP) || (app == HTTPS) || (app == FTPC) || (app == FTPD) || \
-    (app == SMTP) || (app == SMTPS) || (app == DNS) || (app == DHCP) || \
-    (app == TELNET) || (app == POP) || (app == IMAP);
-}
-
 void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
     packetID++;
     struct tm res;
@@ -39,7 +24,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
                 fprintf(stderr, "strftime error\n");
                 exit(EXIT_FAILURE);
             }
-            fprintf(stdout, "Packet ID = %ld arrived at %s with Length : %d bytes\n", packetID, str_time, header->len);
+            fprintf(stdout, "Packet ID = %ld arrived at %s with Length : %d bytes\n", packetID, str_time, len);
             break;
     }
     //Couche liaison
