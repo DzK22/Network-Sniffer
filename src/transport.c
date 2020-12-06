@@ -16,6 +16,10 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
             treat_ospf(packet, to_add, level);
             break;
 
+        case ICMP:
+            treat_icmp(packet, level);
+            *to_add = sizeof(struct icmphdr) + 8;
+
         default:
             break;
     }

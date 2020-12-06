@@ -5,7 +5,7 @@ SRC_DIR = src/
 OBJ_DIR = obj/
 HD_DIR = headers/
 
-$(EXEC): $(OBJ_DIR)$(EXEC).o $(OBJ_DIR)liaison.o $(OBJ_DIR)analyseur.o $(OBJ_DIR)network.o $(OBJ_DIR)ip.o $(OBJ_DIR)arp.o $(OBJ_DIR)transport.o $(OBJ_DIR)ospf.o $(OBJ_DIR)application.o $(OBJ_DIR)dns.o $(OBJ_DIR)transfer.o $(OBJ_DIR)dhcp.o $(OBJ_DIR)telnet.o
+$(EXEC): $(OBJ_DIR)$(EXEC).o $(OBJ_DIR)liaison.o $(OBJ_DIR)analyseur.o $(OBJ_DIR)network.o $(OBJ_DIR)ip.o $(OBJ_DIR)icmp.o $(OBJ_DIR)arp.o $(OBJ_DIR)transport.o $(OBJ_DIR)ospf.o $(OBJ_DIR)application.o $(OBJ_DIR)dns.o $(OBJ_DIR)transfer.o $(OBJ_DIR)dhcp.o $(OBJ_DIR)telnet.o
 	$(CC) -o nSniffer $^ $(CFLAGS)
 
 $(OBJ_DIR)$(EXEC).o: $(SRC_DIR)$(EXEC).c $(HD_DIR)analyseur.h
@@ -18,7 +18,7 @@ $(OBJ_DIR)liaison.o: $(SRC_DIR)liaison.c $(HD_DIR)liaison.h
 	mkdir -p $(OBJ_DIR)
 	mv liaison.o $(OBJ_DIR)
 
-$(OBJ_DIR)network.o: $(SRC_DIR)network.c $(HD_DIR)network.h $(HD_DIR)ip.h $(HD_DIR)arp.h
+$(OBJ_DIR)network.o: $(SRC_DIR)network.c $(HD_DIR)network.h $(HD_DIR)ip.h $(HD_DIR)arp.h $(HD_DIR)icmp.h
 	$(CC) -c $< $(CFLAGS)
 	mkdir -p $(OBJ_DIR)
 	mv network.o $(OBJ_DIR)
@@ -27,6 +27,11 @@ $(OBJ_DIR)ip.o: $(SRC_DIR)ip.c $(HD_DIR)ip.h
 	$(CC) -c $< $(CFLAGS)
 	mkdir -p $(OBJ_DIR)
 	mv ip.o $(OBJ_DIR)
+
+$(OBJ_DIR)icmp.o: $(SRC_DIR)icmp.c $(HD_DIR)icmp.h
+	$(CC) -c $< $(CFLAGS)
+	mkdir -p $(OBJ_DIR)
+	mv icmp.o $(OBJ_DIR)
 
 $(OBJ_DIR)arp.o: $(SRC_DIR)arp.c $(HD_DIR)arp.h
 	$(CC) -c $< $(CFLAGS)

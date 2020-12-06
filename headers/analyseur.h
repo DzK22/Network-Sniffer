@@ -13,6 +13,7 @@
 #include <arpa/nameser_compat.h>
 #include <net/ethernet.h>
 #include <netinet/ether.h>
+#include <netinet/ip_icmp.h>
 #include <netinet/ip.h>
 #include <unistd.h>
 #include "liaison.h"
