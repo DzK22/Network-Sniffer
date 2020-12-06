@@ -125,7 +125,7 @@ int main (int argc, char **argv) {
             return EXIT_FAILURE;
         }
         pcap_freealldevs(alldevs);
-        /*if (f) {
+        if (f) {
             struct bpf_program bfp_f;
             bpf_u_int32 maskp = 0;
             if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
@@ -136,7 +136,8 @@ int main (int argc, char **argv) {
                 fprintf(stderr, "Error filter setting\n");
                 return EXIT_FAILURE;
             }
-        }*/
+        }
+        fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
     }
 
     args[0] = (unsigned char) level;
