@@ -1,5 +1,6 @@
 #include "../headers/transport.h"
 
+//Fonction qui gère la couche transport en appelant la fonction associée au protocole de transport.
 void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, int *to_add, int level) {
     switch (t_protocol) {
         case UDP:
@@ -15,7 +16,7 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
         case OSPF:
             treat_ospf(packet, to_add, level);
             break;
-
+        // ICMP n'est pas un protocole de transport mais je l'ai mis ici pour me faciliter l'implémentation par rapport au reste du code
         case ICMP:
             treat_icmp(packet, level);
             *to_add = sizeof(struct icmphdr) + 8;
@@ -25,6 +26,7 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
     }
 }
 
+//Fonction qui gère l'en-tête udp
 void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     struct udphdr *udp = (struct udphdr *)packet;
     int checksum, dataLength;

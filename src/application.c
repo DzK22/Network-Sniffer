@@ -4,43 +4,19 @@
 bool get_app (const unsigned char *packet, int port, bool resp, int level, int len) {
     switch (port) {
         case HTTPS:
-            treat_transfer(packet, resp, len, level, HTTPS);
-            break;
-
         case HTTP:
-            treat_transfer(packet, resp, len, level, HTTP);
-            break;
-
         case FTPC:
-            treat_transfer(packet, resp, len, level, FTPC);
-            break;
-
         case FTPD:
-            treat_transfer(packet, resp, len, level, FTPD);
-            break;
-
         case SMTP:
-            treat_transfer(packet, resp, len, level, SMTP);
-            break;
-
         case SMTPS:
-            treat_transfer(packet, resp, len, level, SMTPS);
-            break;
-
         case POP:
-            treat_transfer(packet, resp, len, level, POP);
-            break;
-
         case IMAP:
-            treat_transfer(packet, resp, len, level, IMAP);
+            treat_transfer(packet, resp, len, level, port);
             break;
 
         case MDNS:
-            treat_dns(packet, level, MDNS);
-            break;
-
         case DNS:
-            treat_dns(packet, level, DNS);
+            treat_dns(packet, level, port);
             break;
 
         case DHCP:
@@ -59,7 +35,7 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
     return true;
 }
 
-//Fonction qui vérifie si un des ports sources et destinations match avec un port applicatif
+//Fonction qui vérifie si un des ports source ou destination match avec un port applicatif (traité)
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
     if (!get_app(packet, sport, true, level, len) && !get_app(packet, dport, false, level, len)) {
         switch (level) {
@@ -98,7 +74,7 @@ int c_print(char c) {
 void print(const unsigned char *packet, int len) {
     int i;
     if (len > 0)
-        fprintf(stdout, CYAN"             └─"COL_RESET" \t");
+        fprintf(stdout, CYAN"             └─ "COL_RESET);
     for (i = 0; i < len; i++) {
         if (c_print(packet[i]) == '\n')
             fprintf(stdout, "\t\t");

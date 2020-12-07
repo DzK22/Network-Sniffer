@@ -4,7 +4,7 @@ Projet Service Réseaux M1 SIRIS - Université de Strasbourg
 
 Protocoles Supporté :
 - Ethernet
-- IPv4, IPv6, ARP, OSPFv2
+- IPv4, IPv6, ARP, OSPFv2, ICMP
 - UDP, TCP, ARP
 - BOOTP/DHCP, (M)DNS, HTTP(S), FTP, SMPT(S), POP, IMAP, TELNET
 
