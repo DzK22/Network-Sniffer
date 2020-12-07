@@ -1,7 +1,8 @@
 #include "../headers/arp.h"
 
 //Fonction qui gère le protocole ARP
-void treat_arp(const unsigned char *packet, int level) {
+void treat_arp(const unsigned char *packet, int level, int type) {
+    (void)type;
     struct arphdr *arp = (struct arphdr *)packet;
     struct ether_arp *ea = (struct ether_arp *)packet;
     ushort hardware = ntohs(arp->ar_hrd);
@@ -21,13 +22,48 @@ void treat_arp(const unsigned char *packet, int level) {
     }
     switch (level) {
         case V1:
-            fprintf(stdout, "|| [ARP] %s => %s ", str_ip_src, str_ip_dst);
+            fprintf(stdout, "|| [%s] ", type == ETHERTYPE_ARP ? "ARP" : "RARP");
+            switch (type) {
+                case ETHERTYPE_ARP:
+                    if (op_code == ARPOP_REQUEST)
+                        fprintf(stdout, "Who is %s ? Tell %s ", str_ip_dst, str_ip_src);
+                    else if (op_code == ARPOP_REPLY)
+                        fprintf(stdout, "%s is at %s ", str_ip_dst, ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                    break;
+
+                case ETHERTYPE_REVARP:
+                    if (op_code == ARPOP_RREQUEST)
+                        fprintf(stdout, "Who is %s ? Tell %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                    else if (op_code == ARPOP_RREPLY)
+                        fprintf(stdout, "%s is at %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), str_ip_dst);
+                    break;
+
+                default:
+                    break;
+            }
             put_arp_opcode(op_code);
             break;
 
         case V2:
-            fprintf(stdout, YELLOW"$> ARP: "COL_RESET);
-            fprintf(stdout, "From %s to %s ", str_ip_src, str_ip_dst);
+            fprintf(stdout, YELLOW"$> %s: "COL_RESET, type == ETHERTYPE_ARP ? "ARP" : "RARP");
+            switch (type) {
+                case ETHERTYPE_ARP:
+                    if (op_code == ARPOP_REQUEST)
+                        fprintf(stdout, "Who is %s ? Tell %s ", str_ip_dst, str_ip_src);
+                    else if (op_code == ARPOP_REPLY)
+                        fprintf(stdout, "%s is at %s ", str_ip_dst, ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                    break;
+
+                case ETHERTYPE_REVARP:
+                    if (op_code == ARPOP_RREQUEST)
+                        fprintf(stdout, "Who is %s ? Tell %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                    else if (op_code == ARPOP_RREPLY)
+                        fprintf(stdout, "%s is at %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), str_ip_dst);
+                    break;
+
+                default:
+                    break;
+            }
             put_arp_opcode(op_code);
             break;
 

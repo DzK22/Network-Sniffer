@@ -15,7 +15,8 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
             break;
 
         case ETHERTYPE_ARP:
-            treat_arp(packet, level);
+        case ETHERTYPE_REVARP:
+            treat_arp(packet, level, e_protocol);
             *to_add = sizeof(struct arphdr);
             break;
 
