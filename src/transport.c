@@ -43,8 +43,8 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
 
         case V3:
             fprintf(stdout, PINK"       └─ UDP Segment: from port %d to port %d\n"COL_RESET, *sport, *dport);
-            fprintf(stdout, PINK"        ├─"COL_RESET" Checksum = 0x%04x\n", checksum);
-            fprintf(stdout, PINK"        └─"COL_RESET" Length = %d\n", dataLength);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Checksum = 0x%04x\n", checksum);
+            fprintf(stdout, PINK"         └─"COL_RESET" Length = %d\n", dataLength);
             break;
     }
 }
