@@ -65,7 +65,7 @@ void treat_dns (const unsigned char *packet, int level, int type) {
                     char *type = get_type(ntohs(q_data->type));
                     fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", type);
                     if (nAnswers || nAuth || nAdd)
-                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n            ├ \n", class);
+                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n            "CYAN"├ \n"COL_RESET, class);
                     else
                         fprintf(stdout, CYAN"            └─"COL_RESET" \t\t- Class: %s\n", class);
                     datas += 4;
