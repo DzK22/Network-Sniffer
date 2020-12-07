@@ -112,7 +112,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             fprintf(stdout, PINK"         ├─"COL_RESET" Sequence Num = %02x\n", seq);
             fprintf(stdout, PINK"         ├─"COL_RESET" Acknowledgment Num = %02x\n", ack_seq);
             fprintf(stdout, PINK"         ├─"COL_RESET" Date Offset = %d\n", dataOff);
-            fprintf(stdout, PINK"         ├─"COL_RESET" Flags : \n");
+            fprintf(stdout, PINK"         ├─"COL_RESET" Flags : 0x%x\n", tcp->th_flags);
             fprintf(stdout, PINK"         ├"COL_RESET"\t\t- FIN : %d\n", fin);
             fprintf(stdout, PINK"         ├"COL_RESET"\t\t- SYN : %d\n", syn);
             fprintf(stdout, PINK"         ├"COL_RESET"\t\t- RST : %d\n", reset);
