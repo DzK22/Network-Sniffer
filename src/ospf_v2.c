@@ -1,4 +1,4 @@
-#include "../headers/ospf.h"
+#include "../headers/ospf_v2.h"
 
 //Traite OSPv2 (Seulement IPv4 et non la version 3 pour certains champs tels que les options de hello packet)
 void treat_ospf(const unsigned char *packet, int *to_add, int level) {
