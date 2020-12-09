@@ -1,6 +1,6 @@
 CC = gcc -g
 CFLAGS = -lpcap -Wall -Werror -Wextra
-EXEC = main
+EXEC = analyseur
 SRC_DIR = src/
 OBJ_DIR = obj/
 HD_DIR = headers/
@@ -72,12 +72,6 @@ $(OBJ_DIR)dhcp.o: $(SRC_DIR)dhcp.c $(HD_DIR)dhcp.h $(HD_DIR)bootp.h
 	$(CC) -c $< $(CFLAGS)
 	mkdir -p $(OBJ_DIR)
 	mv dhcp.o $(OBJ_DIR)
-
-$(OBJ_DIR)analyseur.o: $(SRC_DIR)analyseur.c $(HD_DIR)analyseur.h
-	$(CC) -c $< $(CFLAGS)
-	mkdir -p $(OBJ_DIR)
-	mv analyseur.o $(OBJ_DIR)
-
 
 clean:
 	rm -rf $(OBJ_DIR) nSniffer $(DOC_DIR)
