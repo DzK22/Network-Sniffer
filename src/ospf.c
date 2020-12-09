@@ -1,4 +1,4 @@
-#include "../headers/ospf_v2.h"
+#include "../headers/ospf.h"
 
 //Traite OSPv2 (Seulement IPv4 et non la version 3 pour certains champs tels que les options de hello packet)
 void treat_ospf(const unsigned char *packet, int *to_add, int level) {
@@ -17,15 +17,15 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
 
         case V3:
             fprintf(stdout, PINK"       └─ OSPFv2 Messsage\n"COL_RESET);
-            fprintf(stdout, "         ├─ Version: %d\n", ospf->version);
-            fprintf(stdout, "         ├─ Message Type: %s (%d)\n", get_ptype(ospf->type), ospf->type);
-            fprintf(stdout, "         ├─ Packet Length: %d\n", len);
-            fprintf(stdout, "         ├─ Source OSPF Router: %s\n", inet_ntoa(ospf->rid));
-            fprintf(stdout, "         ├─ Area ID: %s\n", inet_ntoa(ospf->aid));
+            fprintf(stdout, PINK"         ├─"COL_RESET" Version: %d\n", ospf->version);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Message Type: %s (%d)\n", get_ptype(ospf->type), ospf->type);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Packet Length: %d\n", len);
+            fprintf(stdout, PINK"         ├─"COL_RESET" Source OSPF Router: %s\n", inet_ntoa(ospf->rid));
+            fprintf(stdout, PINK"         ├─"COL_RESET" Area ID: %s\n", inet_ntoa(ospf->aid));
             if (!(ospf->type == HELLO && ospf->version == 2))
-                fprintf(stdout, "         └─ Checksum: 0x%4x\n", checksum);
+                fprintf(stdout, PINK"         └─"COL_RESET" Checksum: 0x%4x\n", checksum);
             if (ospf->type == HELLO && ospf->version == 2) {
-                fprintf(stdout, "         ├─ Checksum: 0x%4x\n", checksum);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Checksum: 0x%4x\n", checksum);
                 int opts[8];
                 u_int8_t opt = ospf->ospf_hello.options;
                 opts[0] = (opt & OPT_DN) ? 1 : 0;
@@ -38,15 +38,15 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
                 opts[7] = (opt & OPT_MT) ? 1 : 0;
                 u_int16_t h_int = ntohs(ospf->ospf_hello.interval);
                 u_int32_t deadint = ntohl(ospf->ospf_hello.dead_interval);
-                fprintf(stdout, "         ├─ Network Mask: %s\n", inet_ntoa(ospf->ospf_hello.nmask));
-                fprintf(stdout, "         ├─ Hello Interval [sec]: %d\n", h_int);
-                fprintf(stdout, "         ├─ Router Priority: %d\n", ospf->ospf_hello.priority);
-                fprintf(stdout, "         ├─ Router Dead Interval: %d\n", deadint);
-                fprintf(stdout, "         ├─ Options: 0x%2x\n", opt);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Network Mask: %s\n", inet_ntoa(ospf->ospf_hello.nmask));
+                fprintf(stdout, PINK"         ├─"COL_RESET" Hello Interval [sec]: %d\n", h_int);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Router Priority: %d\n", ospf->ospf_hello.priority);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Router Dead Interval: %d\n", deadint);
+                fprintf(stdout, PINK"         ├─"COL_RESET" Options: 0x%2x\n", opt);
                 print_hopt(opts, 8);
-                fprintf(stdout, "         ├─ Designated Router: %s\n", inet_ntoa(ospf->ospf_hello.dr));
-                fprintf(stdout, "         ├─ Backup Designated Router: %s\n", inet_ntoa(ospf->ospf_hello.bdr));
-                fprintf(stdout, "         └─ Active Neighbor: %s\n", inet_ntoa(*ospf->ospf_hello.neighbor));
+                fprintf(stdout, PINK"         ├─"COL_RESET" Designated Router: %s\n", inet_ntoa(ospf->ospf_hello.dr));
+                fprintf(stdout, PINK"         ├─"COL_RESET" Backup Designated Router: %s\n", inet_ntoa(ospf->ospf_hello.bdr));
+                fprintf(stdout, PINK"         └─"COL_RESET" Active Neighbor: %s\n", inet_ntoa(*ospf->ospf_hello.neighbor));
             }
             break;
     }
@@ -82,7 +82,7 @@ char *get_ptype (int type) {
 void print_hopt (int *list, int n) {
     int i;
     for (i = 0; i < n; i++) {
-        fprintf(stdout, "         ├\t\t");
+        fprintf(stdout, PINK"         ├"COL_RESET"\t\t");
         switch (i) {
             case 0:
                 fprintf(stdout, "DN: ");

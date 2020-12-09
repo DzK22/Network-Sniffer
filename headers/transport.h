@@ -1,7 +1,7 @@
 #ifndef TRANSPORT_H
 #define TRANSPORT_H
 #include "analyseur.h"
-#include "ospf_v2.h"
+#include "ospf.h"
 #define TCP 6
 #define UDP 17
 #define OSPF 89
