@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
 #include <arpa/nameser_compat.h>
+#include <arpa/nameser.h>
 #include <net/ethernet.h>
 #include <netinet/ether.h>
 #include <netinet/ip_icmp.h>

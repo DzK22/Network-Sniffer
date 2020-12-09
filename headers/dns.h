@@ -2,21 +2,6 @@
 #define DDNS_H
 #include "application.h"
 
-#define DNSQUERY 0
-#define DNSIQUERY 1
-#define DNSSSR 2
-#define DNSNOTIFY 4
-#define DNSUPDATE 5
-#define DNOERROR 0
-#define DFORMERR 1
-#define DSERVFAIL 2
-#define DNXDOMAIN 3
-#define DNOTIMP 4
-#define DREFUSED 5
-#define DYXDOMAIN 6
-#define DXRRSET 7
-#define DNOTAUTH 8
-#define DNOTZONE 9
 #define PTRMASK 0b11000000
 #define PTRVALUE 192
 #define PTRINDEXMASK 0b00111111
@@ -25,14 +10,6 @@
 #define CH 3
 #define HS 4
 #define SOA 6
-#define A 1
-#define AAAA 28
-#define NS 2
-#define PTR 12
-#define MX 15
-#define CNAME 5
-#define TXT 16
-#define HINFO 13
 
 void treat_dns (const unsigned char *, int, int);
 void put_opcode (unsigned);

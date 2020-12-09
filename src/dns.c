@@ -103,14 +103,14 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         if (num_class == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
-            if (num_type == A) {
+            if (num_type == T_A) {
                 if (inet_ntop(AF_INET, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
                 }
                 fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
             }
-            else if (num_type == AAAA) {
+            else if (num_type == T_AAAA) {
                 if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
                     fprintf(stderr, "inet_ntop error\n");
                     return;
@@ -156,19 +156,19 @@ unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
 void put_opcode(unsigned opcode) {
     fprintf(stdout, CYAN"            ├─"COL_RESET" Operation: ");
     switch (opcode) {
-        case DNSQUERY:
+        case QUERY:
             fprintf(stdout, "Query (%d)\n", opcode);
             break;
-        case DNSIQUERY:
+        case IQUERY:
             fprintf(stdout, "Inverse Query (%d)\n", opcode);
             break;
-        case DNSSSR:
+        case STATUS:
             fprintf(stdout, "Server Status Request (%d)\n", opcode);
             break;
-        case DNSNOTIFY:
+        case NS_NOTIFY_OP:
             fprintf(stdout, "Notify (%d)\n", opcode);
             break;
-        case DNSUPDATE:
+        case NS_UPDATE_OP:
             fprintf(stdout, "Update (%d)\n", opcode);
             break;
         default:
@@ -180,34 +180,34 @@ void put_opcode(unsigned opcode) {
 void put_rcode (unsigned rcode) {
     fprintf(stdout, CYAN"            ├─"COL_RESET" Reply Code: ");
     switch (rcode) {
-        case DNOERROR:
+        case NOERROR:
             fprintf(stdout, "DNS Query completed successfully (%d)\n", rcode);
             break;
-        case DFORMERR:
+        case FORMERR:
             fprintf(stdout, "DNS Query Format Error (%d)\n", rcode);
             break;
-        case DSERVFAIL:
+        case SERVFAIL:
             fprintf(stdout, "Server failed to complete the DNS request (%d)\n", rcode);
             break;
-        case DNXDOMAIN:
+        case NXDOMAIN:
             fprintf(stdout, "Domain name does not exist (%d)\n", rcode);
             break;
-        case DNOTIMP:
+        case NOTIMP:
             fprintf(stdout, "Function not implemented (%d)\n", rcode);
             break;
-        case DREFUSED:
+        case REFUSED:
             fprintf(stdout, "The server refused to answer for the query (%d)\n", rcode);
             break;
-        case DYXDOMAIN:
+        case YXDOMAIN:
             fprintf(stdout, "Name that should not exist, does exist (%d)\n", rcode);
             break;
-        case DXRRSET:
+        case YXRRSET:
             fprintf(stdout, "RRset that should not exist, does exist (%d)\n", rcode);
             break;
-        case DNOTAUTH:
+        case NOTAUTH:
             fprintf(stdout, "Server not authoritative for the zone (%d)\n", rcode);
             break;
-        case DNOTZONE:
+        case NOTZONE:
             fprintf(stdout, "Name not in zone (%d)\n", rcode);
             break;
         default:
@@ -233,23 +233,23 @@ char *get_class (u_int16_t class) {
 
 char *get_type (u_int16_t type) {
     switch (type) {
-        case SOA:
+        case T_SOA:
             return "SOA";
-        case A:
+        case T_A:
             return "A";
-        case AAAA:
+        case T_AAAA:
             return "AAAA";
-        case NS:
+        case T_NS:
             return "NS";
-        case PTR:
+        case T_PTR:
             return "PTR";
-        case MX:
+        case T_MX:
             return "MX";
-        case CNAME:
+        case T_CNAME:
             return "CNAME";
-        case TXT:
+        case T_TXT:
             return "TXT";
-        case HINFO:
+        case T_HINFO:
             return "HINFO";
         default:
             return "Unknown";
