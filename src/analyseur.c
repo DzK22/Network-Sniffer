@@ -207,7 +207,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
 }
 
 void usage (int argc) {
-    if ((argc - 1) % 2 != 0) {
+    if ((argc - 1) % 2) {
         fprintf(stderr, "Nombre d'arguments invalide %d\n", argc - 1);
         exit(EXIT_FAILURE);
     }
