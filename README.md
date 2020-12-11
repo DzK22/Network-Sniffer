@@ -2,11 +2,11 @@
 
 Projet Service Réseaux M1 SIRIS - Université de Strasbourg
 
-Protocoles Supporté :
+Protocoles Supportés :
 - Ethernet
 - IPv4, IPv6, (R)ARP, OSPFv2, ICMP
 - UDP, TCP
-- BOOTP/DHCP, (M)DNS, HTTP(S), FTP, SMPT(S), POP, IMAP, TELNET
+- BOOTP/DHCP, (M)DNS, HTTP(S), FTP, SMPT(S), POP3, IMAP, TELNET
 
 # Architecture
 - /src : Fichiers sources

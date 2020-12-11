@@ -1,4 +1,4 @@
-#include "../headers/liaison.h"
+#include "../headers/datalink.h"
 
 //Fonction qui gère la couche liaison dans sa globalité
 void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
