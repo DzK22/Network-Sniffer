@@ -2,7 +2,6 @@
 
 //Fonction qui gère le protocole ARP
 void treat_arp(const unsigned char *packet, int level, int type) {
-    (void)type;
     struct arphdr *arp = (struct arphdr *)packet;
     struct ether_arp *ea = (struct ether_arp *)packet;
     ushort hardware = ntohs(arp->ar_hrd);
