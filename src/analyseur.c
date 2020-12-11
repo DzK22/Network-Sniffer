@@ -104,7 +104,7 @@ int main (int argc, char **argv) {
         else {
             while (ptr != NULL) {
                 if (strcmp(ptr->name, interface) == 0)
-                exist = true;
+                    exist = true;
                 ptr = ptr->next;
             }
 
@@ -112,9 +112,7 @@ int main (int argc, char **argv) {
                 fprintf(stderr, "%s n\'existe pas\nVoici la liste des interfaces disponibles :\n", interface);
                 ptr = alldevs;
                 while (ptr != NULL) {
-                    printf("%s\n", ptr->name);
-                    if (interface != NULL && strcmp(ptr->name, interface) == 0)
-                    exist = true;
+                    fprintf(stdout, "%s\n", ptr->name);
                     ptr = ptr->next;
                 }
                 return EXIT_FAILURE;
