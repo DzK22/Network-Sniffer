@@ -22,7 +22,7 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
 
     switch (level) {
         case V1:
-            fprintf(stdout, "[Ethernet] %s => %s\t", mac_source, mac_dest);
+            fprintf(stdout, "[Ethernet] src: %s, dst: %s\t", mac_source, mac_dest);
             break;
 
         case V2:

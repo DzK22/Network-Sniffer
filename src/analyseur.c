@@ -167,7 +167,7 @@ void callback(unsigned char *args, const struct pcap_pkthdr *header, const unsig
             break;
 
         case V2:
-            fprintf(stdout, "** Packet ID = %ld **\n", packetID);
+            fprintf(stdout, "** Frame %ld: %d bytes on wire (%d bits), %d bytes captured (%d bits) **\n", packetID, len, len * 8, len, len * 8);
             break;
 
         case V3:

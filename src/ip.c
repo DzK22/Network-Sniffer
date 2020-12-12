@@ -20,7 +20,7 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
     }
     switch (level) {
         case V1:
-            fprintf(stdout, "|| [IPv4] %s => %s\t", ip_source, ip_dest);
+            fprintf(stdout, "|| [IPv4] src: %s, dst: %s\t", ip_source, ip_dest);
             break;
 
         case V2:
@@ -68,7 +68,7 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
     }
     switch (level) {
         case V1:
-            fprintf(stdout, "|| [IPv6] %s => %s\t", str_ip_src, str_ip_dst);
+            fprintf(stdout, "|| [IPv6] src: %s, dst: %s\t", str_ip_src, str_ip_dst);
             break;
 
         case V2:
