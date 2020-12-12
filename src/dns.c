@@ -11,7 +11,7 @@ void treat_dns (const unsigned char *packet, int level, int type) {
     nAdd = ntohs(dns->arcount);
     switch (level) {
         case V1:
-            fprintf(stdout, "|| %s\n", type == DNS ? "DNS" : "MDNS");
+            fprintf(stdout, "|| %s: Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", type == DNS ? "DNS" : "MDNS", nQuestions, nAnswers, nAuth, nAdd);
             break;
 
         case V2:
