@@ -3,7 +3,7 @@
 //Appelée que si Verbose = 2 ou 3
 void treat_dns (const unsigned char *packet, int level, int type) {
     HEADER *dns = (HEADER *)packet;
-    uint16_t tID, nQuestions, nAnswers, nAuth, nAdd;
+    u_int16_t tID, nQuestions, nAnswers, nAuth, nAdd;
     tID = ntohs(dns->id);
     nQuestions = ntohs(dns->qdcount);
     nAnswers = ntohs(dns->ancount);
@@ -50,60 +50,83 @@ void treat_dns (const unsigned char *packet, int level, int type) {
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Acceptable\n");
             else
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Unacceptable\n");
-
-            const unsigned char *datas = packet + sizeof(HEADER);
-            unsigned i;
-            //Questions treatment
-            if (nQuestions) {
-                fprintf(stdout, CYAN"            ├─"COL_RESET" Questions:\n");
-                for (i = 0; i < nQuestions; i++) {
-                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Name: ");
-                    datas += resolve(packet, datas);
-                    struct q_datas *q_data = (struct q_datas *)datas;
-                    fprintf(stdout, "\n");
-                    char *class = get_class(ntohs(q_data->clss));
-                    char *type = get_type(ntohs(q_data->type));
-                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", type);
-                    if (nAnswers || nAuth || nAdd)
-                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n            "CYAN"├ \n"COL_RESET, class);
-                    else
-                        fprintf(stdout, CYAN"            └─"COL_RESET" \t\t- Class: %s\n", class);
-                    datas += 4;
-                }
-            }
+            unsigned char *datas = (unsigned char *)packet + sizeof(HEADER);
+            if (nQuestions)
+                dns_print("Questions", packet, &datas, nQuestions, nAnswers || nAuth || nAdd ? true : false);
             //Answers treatment
             if (nAnswers)
-                dns_print("Answers", packet, datas, nAnswers, nAuth || nAdd ? true : false);
+                dns_print("Answers", packet, &datas, nAnswers, nAuth || nAdd ? true : false);
             //Authorities treatment
             if (nAuth)
-                dns_print("Authorities", packet, datas, nAuth, nAdd ? true : false);
+                dns_print("Authorities", packet, &datas, nAuth, nAdd ? true : false);
             //Additionnals treatment
             if (nAdd)
-                dns_print("Additionnals", packet, datas, nAdd, false);
+                dns_print("Additionnals", packet, &datas, nAdd, false);
             break;
     }
 }
 
-void dns_print(const char *type, const unsigned char *packet, const unsigned char *datas, u_int16_t n, bool is_following) {
+void dns_print(const char *type, const unsigned char *packet, unsigned char **datas, u_int16_t n, bool is_following) {
     unsigned i;
+    int test = strncmp(type, "Questions", 9);
     fprintf(stdout, CYAN"            ├─"COL_RESET" \t%s:\n", type);
     for (i = 0; i < n; i++) {
         fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Name: ");
-        datas += resolve(packet, datas);
-        struct r_datas *data = (struct r_datas *)datas;
-        u_int16_t len = ntohs(data->len), num_class = ntohs(data->clss), num_type = ntohs(data->type);
+        (*datas) += resolve(packet, *datas);
+        struct r_datas *rdata = NULL;
+        struct q_datas *qdata = NULL;
+        if (test)
+            rdata = (struct r_datas *)(*datas);
+        else
+            qdata = (struct q_datas *)(*datas);
+
+        u_int16_t num_class, num_type;
+        if (rdata != NULL) {
+            num_class = ntohs(rdata->clss);
+            num_type = ntohs(rdata->type);
+        }
+        else if (qdata != NULL) {
+            num_class = ntohs(qdata->clss);
+            num_type = ntohs(qdata->type);
+        }
         fprintf(stdout, "\n");
         char *class = get_class(num_class);
-        char *type = get_type(num_type);
-        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", type);
-        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
-        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Ttl: %d\n", ntohl(data->ttl));
-        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Length: %d\n", len);
-        datas += 10;
-        if (!len)
+        char *str_type = get_type(num_type);
+
+        //2 + 2 octets pour les champs class et type
+        (*datas) += 4;
+
+        if (test) {
+            fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
+            fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", str_type);
+            //fprintf(stdout, CYAN"            ├"COL_RESET"\n");
+        }
+        else {
+            if (is_following) {
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", str_type);
+                fprintf(stdout, CYAN"            ├"COL_RESET"\n");
+            }
+            else {
+                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
+                fprintf(stdout, CYAN"            └─"COL_RESET" \t\t- Type: %s\n", str_type);
+            }
             continue;
+        }
+        u_int16_t len = ntohs(rdata->len);
+        u_int32_t ttl = ntohl(rdata->ttl);
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Ttl: %d\n", ttl);
+        fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Length: %d\n", len);
+
+        //2 + 4 octets pour les champs len et ttl (resp.)
+        (*datas) += 6;
+        if (!len) {
+            if (i == (unsigned)n - 1)
+                fprintf(stdout, CYAN"            └─"COL_RESET" \n");
+            continue;
+        }
         if (num_class == IN) {
-            struct in_addr *ip = (struct in_addr *)datas;
+            struct in_addr *ip = (struct in_addr *)(*datas);
             char str[LEN];
             switch (num_type) {
                 case T_A:
@@ -125,14 +148,14 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
                 case T_PTR:
                 case T_CNAME:
                 case T_NS:
-                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", type);
-                    resolve(packet, datas);
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", str_type);
+                    resolve(packet, *datas);
                     fprintf(stdout, "\n");
                     break;
 
                 case T_MX:
-                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", type);
-                    resolve(packet, datas + 2);
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", str_type);
+                    resolve(packet, *datas + 2);
                     fprintf(stdout, "\n");
                     break;
             }
@@ -141,7 +164,7 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
             fprintf(stdout, CYAN"            ├"COL_RESET" \n");
         else
             fprintf(stdout, CYAN"            └─"COL_RESET" \n");
-        datas += len;
+        (*datas) += len;
     }
 }
 
