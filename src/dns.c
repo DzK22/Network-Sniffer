@@ -51,6 +51,7 @@ void treat_dns (const unsigned char *packet, int level, int type) {
             else
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Unacceptable\n");
             unsigned char *datas = (unsigned char *)packet + sizeof(HEADER);
+            //Questions treatment
             if (nQuestions)
                 dns_print("Questions", packet, &datas, nQuestions, nAnswers || nAuth || nAdd ? true : false);
             //Answers treatment
