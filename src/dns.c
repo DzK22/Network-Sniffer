@@ -9,13 +9,17 @@ void treat_dns (const unsigned char *packet, int level, int type) {
     nAnswers = ntohs(dns->ancount);
     nAuth = ntohs(dns->nscount);
     nAdd = ntohs(dns->arcount);
+    unsigned char *datas = (unsigned char *)packet + sizeof(HEADER);
     switch (level) {
         case V1:
             fprintf(stdout, "|| %s: Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", type == DNS ? "DNS" : "MDNS", nQuestions, nAnswers, nAuth, nAdd);
             break;
 
         case V2:
-            fprintf(stdout, CYAN"$> %s:"COL_RESET" Questions: %d, Answers: %d, Auths: %d, Adds: %d\n", type == DNS ? "DNS" : "MDNS", nQuestions, nAnswers, nAuth, nAdd);
+            fprintf(stdout, CYAN"$> %s:"COL_RESET" Questions: %d, Answers: %d, Auths: %d, Adds: %d => ", type == DNS ? "DNS" : "MDNS", nQuestions, nAnswers, nAuth, nAdd);
+            fprintf(stdout, "Query: ");
+            resolve(packet, datas);
+            fprintf(stdout, "\n");
             break;
 
         case V3:
@@ -50,7 +54,6 @@ void treat_dns (const unsigned char *packet, int level, int type) {
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Acceptable\n");
             else
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Non-authenticated data: Unacceptable\n");
-            unsigned char *datas = (unsigned char *)packet + sizeof(HEADER);
             //Questions treatment
             if (nQuestions)
                 dns_print("Questions", packet, &datas, nQuestions, nAnswers || nAuth || nAdd ? true : false);
