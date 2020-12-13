@@ -100,22 +100,41 @@ void dns_print(const char *type, const unsigned char *packet, const unsigned cha
         fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Ttl: %d\n", ntohl(data->ttl));
         fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Length: %d\n", len);
         datas += 10;
+        if (!len)
+            continue;
         if (num_class == IN) {
             struct in_addr *ip = (struct in_addr *)datas;
             char str[LEN];
-            if (num_type == T_A) {
-                if (inet_ntop(AF_INET, ip, str, LEN) == NULL) {
-                    fprintf(stderr, "inet_ntop error\n");
-                    return;
-                }
-                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
-            }
-            else if (num_type == T_AAAA) {
-                if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
-                    fprintf(stderr, "inet_ntop error\n");
-                    return;
-                }
-                fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
+            switch (num_type) {
+                case T_A:
+                    if (inet_ntop(AF_INET, ip, str, LEN) == NULL) {
+                        fprintf(stderr, "inet_ntop error\n");
+                        return;
+                    }
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
+                    break;
+
+                case T_AAAA:
+                    if (inet_ntop(AF_INET6, ip, str, LEN) == NULL) {
+                        fprintf(stderr, "inet_ntop error\n");
+                        return;
+                    }
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Address: %s\n", str);
+                    break;
+
+                case T_PTR:
+                case T_CNAME:
+                case T_NS:
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", type);
+                    resolve(packet, datas);
+                    fprintf(stdout, "\n");
+                    break;
+
+                case T_MX:
+                    fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- %s: ", type);
+                    resolve(packet, datas + 2);
+                    fprintf(stdout, "\n");
+                    break;
             }
         }
         if (i != ((unsigned)n - 1) || is_following)

@@ -3,7 +3,6 @@
 #include "application.h"
 
 #define PTRMASK 0b11000000
-#define PTRVALUE 192
 #define PTRINDEXMASK 0b00111111
 #define IN 1
 #define CS 2
