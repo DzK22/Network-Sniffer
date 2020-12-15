@@ -126,7 +126,6 @@ void dns_print(const char *type, const unsigned char *packet, unsigned char **da
         if (test) {
             fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Class: %s\n", class);
             fprintf(stdout, CYAN"            ├"COL_RESET" \t\t- Type: %s\n", str_type);
-            //fprintf(stdout, CYAN"            ├"COL_RESET"\n");
         }
         else {
             if (is_following) {

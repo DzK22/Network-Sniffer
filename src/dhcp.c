@@ -110,8 +110,8 @@ void treat_bootp (const unsigned char *packet, int level) {
 void print_dhcp (const unsigned char *packet, int level) {
     switch (level) {
         case V1:
-            fprintf(stdout, "|| DHCP\n");
-            return;
+            fprintf(stdout, "|| ");
+            break;
 
         case V2:
             fprintf(stdout, CYAN"$> DHCP: "COL_RESET);
@@ -160,8 +160,21 @@ void print_dhcp (const unsigned char *packet, int level) {
 
                 case TAG_DHCP_MESSAGE:
                     msg = *pvendor;
-                    fprintf(stdout, "DHCP Message type: ");
+                    switch (level) {
+                        case V1:
+                            fprintf(stdout, "DHCP ");
+                            break;
+
+                        case V2:
+                            break;
+
+                        case V3:
+                            fprintf(stdout, "DHCP Message type: ");
+                            break;
+                    }
                     fprintf(stdout, "%s", get_dhcp_type(msg));
+                    if (level == V1)
+                        return;
                     break;
 
                 case TAG_RENEWAL_TIME:
