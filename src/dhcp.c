@@ -139,9 +139,9 @@ void print_dhcp (const unsigned char *packet, int level) {
 
                 case V3:
                     if (option == TAG_END)
-                        fprintf(stdout, CYAN"            └─"COL_RESET"\t\tOption (len %d): ", len);
+                        fprintf(stdout, CYAN"            └─"COL_RESET"\t\tOption (length %d): ", len);
                     else
-                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\tOption (len %d): ", len);
+                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\tOption (length %d): ", len);
                     break;
             }
             switch (option) {

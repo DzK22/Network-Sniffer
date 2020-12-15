@@ -1,6 +1,5 @@
 #include "../headers/analyseur.h"
 unsigned long packetID = 0;
-extern unsigned long packetID;
 pcap_t *packet;
 
 volatile sig_atomic_t interrupt = 0;
