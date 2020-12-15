@@ -336,7 +336,7 @@ char *get_class (u_int16_t class) {
 }
 
 /*
- * Function: get_class
+ * Function: get_type
  * ----------------------------
  *   converti le numéro d'un type d'enregistrement DNS en string (pour l'affichage)
  *
