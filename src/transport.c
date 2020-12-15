@@ -1,6 +1,19 @@
 #include "../headers/transport.h"
 
-//Fonction qui gère la couche transport en appelant la fonction associée au protocole de transport.
+/*
+ * Function: treat_transport
+ * ----------------------------
+ *   Traite la couche transport
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête du protocole de transport à traîter
+ *   t_protocol: port correspondant au protocole de transport à traîter
+ *   sport: port source
+ *   dport: port de destination
+ *   to_add: taille de l'en-tête traîtée (utile pour pouvoir la rajouter au paquet traîté pour trouver le prochain protocole à traîter)
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_transport(const unsigned char *packet, int t_protocol, int *sport, int *dport, int *to_add, int level) {
     switch (t_protocol) {
         case UDP:
@@ -14,7 +27,8 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
 
         // OSPF n'est pas un protocole de transport mais je l'ai mis ici pour me faciliter l'implémentation par rapport au reste du code
         case OSPF:
-            treat_ospf(packet, to_add, level);
+            treat_ospf(packet, level);
+            *to_add = sizeof(struct ospfhdr);
             break;
         // ICMP n'est pas un protocole de transport mais je l'ai mis ici pour me faciliter l'implémentation par rapport au reste du code
         case ICMP:
@@ -26,7 +40,18 @@ void treat_transport(const unsigned char *packet, int t_protocol, int *sport, in
     }
 }
 
-//Fonction qui gère l'en-tête udp
+/*
+ * Function: treat_udp
+ * ----------------------------
+ *   Traite l'en-tête UDP
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête UDP
+ *   sport: port source
+ *   dport: port de destination
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     struct udphdr *udp = (struct udphdr *)packet;
     int checksum, dataLength;
@@ -51,7 +76,19 @@ void treat_udp(const unsigned char *packet, int *sport, int *dport, int level) {
     }
 }
 
-//Fonction qui traite l'en-tête TCP
+/*
+ * Function: treat_tcp
+ * ----------------------------
+ *   Traite l'en-tête TCP
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête TCP
+ *   packet: taille de l'en-tête TCP (variable)
+ *   sport: port source
+ *   dport: port de destination
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport, int level) {
     struct tcphdr *tcp = (struct tcphdr *)packet;
     int fin, syn, reset, push, ack, urg, window, checksum, seq, ack_seq, dataOff, urgPointer;
@@ -188,7 +225,16 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
     }
 }
 
-//Récupère la valeur du timestamp
+/*
+ * Function: get_timestamp
+ * ----------------------------
+ *   recupère la valeur d'un timestamp dans les options TCP
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête TCP
+ *   i: indice où l'on se trouve dans le paquet (au niveau des options)
+ *
+ *   returns: la valeur du timestamp
+ */
 u_int32_t get_timestamp (const unsigned char *packet, int i) {
     return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
 }

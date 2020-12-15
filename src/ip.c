@@ -1,6 +1,17 @@
 #include "../headers/ip.h"
 
-//Fonction qui gère une en-tête ipv4
+/*
+ * Function: treat_ipv4
+ * ----------------------------
+ *   Fonction qui traîte l'en-tête IPv4
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête IPv4
+ *   level: niveau de verbosité
+ *   to_add: taille de l'en-tête traîtée (utile pour pouvoir la rajouter au paquet traîté pour trouver le prochain protocole à traîter)
+ *   dataLen: taille totale de l'en-tête IPv4 (variable)
+ *
+ *   returns: le port correspondant au protocole de transport utilisé
+ */
 uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dataLen) {
     char ip_source[LEN], ip_dest[LEN];
     const struct ip *ip = (struct ip *)packet;
@@ -51,7 +62,16 @@ uint8_t treat_ipv4(const unsigned char *packet, int level, int *to_add, int *dat
     return protocol;
 }
 
-//Fonction qui gère une en-tête ipv6
+/*
+ * Function: treat_ipv6
+ * ----------------------------
+ *   Fonction qui traîte l'en-tête IPv6
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête IPv6
+ *   level: niveau de verbosité
+ *
+ *   returns: le port correspondant au protocole de transport utilisé
+ */
 uint8_t treat_ipv6(const unsigned char *packet, int level) {
     struct ip6_hdr *ip6 = (struct ip6_hdr *) packet;
     char str_ip_src[LEN], str_ip_dst[LEN];
@@ -85,7 +105,15 @@ uint8_t treat_ipv6(const unsigned char *packet, int level) {
     return next_header;
 }
 
-//Fonction qui convertion le numéro de port en string pour l'affichage du nom du protocol correspondant à ce protocole
+/*
+ * Function: get_protocol
+ * ----------------------------
+ *   Fonction qui convertion le numéro de port en string pour l'affichage du nom du protocol correspondant à ce protocole
+ *
+ *   id: port
+ *
+ *   returns: le nom du protocole de transport associé au port
+ */
 char* get_protocol(int id) {
   char* protocol_name;
   switch (id) {

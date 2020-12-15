@@ -1,6 +1,18 @@
 #include "../headers/application.h"
 
-//Fonction qui invoque la fonction nécessaire selon le protocole applicatif
+/*
+ * Function: get_app
+ * ----------------------------
+ *   Fonction qui invoque la fonction nécessaire selon le protocole applicatif
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête du protocole applicatif à traîter
+ *   port: port applicatif à traîter
+ *   resp: booléen pour savoir si c'est une requête du client ou une réponse du serveur (utile pour les protocoles de "transfert")
+ *   level: niveau de verbosité
+ *   len: taille des données (pour l'affichage des données)
+ *
+ *   returns: Vrai si le port correspond à une application supportée par l'analyseur, Faux sinon.
+ */
 bool get_app (const unsigned char *packet, int port, bool resp, int level, int len) {
     switch (port) {
         case HTTPS:
@@ -35,7 +47,19 @@ bool get_app (const unsigned char *packet, int port, bool resp, int level, int l
     return true;
 }
 
-//Fonction qui vérifie si un des ports source ou destination match avec un port applicatif (traité)
+/*
+ * Function: treat_app
+ * ----------------------------
+ *   Fonction qui traîte la couche applicative en vérifiant si un des ports source ou destination match avec un port applicatif (supporté)
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête du protocole applicatif à traîter
+ *   sport: port source
+ *   sport: port destination
+ *   level: niveau de verbosité
+ *   len: taille des données (pour l'affichage des données)
+ *
+ *   returns: void
+ */
 void treat_app (const unsigned char *packet, int sport, int dport, int level, int len) {
     if (!get_app(packet, sport, true, level, len) && !get_app(packet, dport, false, level, len)) {
         switch (level) {
@@ -54,6 +78,15 @@ void treat_app (const unsigned char *packet, int sport, int dport, int level, in
     }
 }
 
+/*
+ * Function: c_print
+ * ----------------------------
+ *   Fonction qui écrit un caractère
+ *
+ *   c: caractère à traîter
+ *
+ *   returns: le caractère qui a été écrit
+ */
 int c_print(char c) {
     if (c == '\r')
         fprintf(stdout, "\\r");
@@ -71,6 +104,16 @@ int c_print(char c) {
     return c;
 }
 
+/*
+ * Function: print
+ * ----------------------------
+ *   Fonction qui écrit des données (pour les protocoles applicatifs)
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête du protocole applicatif traîté
+ *   len: taille des données
+ *
+ *   returns: void
+ */
 void print(const unsigned char *packet, int len) {
     int i;
     if (len > 0)

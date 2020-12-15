@@ -93,7 +93,7 @@ struct ospfhdr {
 #define	ospf_lsu	ospf_union.lsu_packet
 #define	ospf_lsa	ospf_union.lsa_packet
 
-void treat_ospf(const unsigned char *, int *, int);
+void treat_ospf(const unsigned char *, int);
 void print_hopt (int *, int);
 char *get_ptype (int);
 

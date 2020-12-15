@@ -1,6 +1,16 @@
 #include "../headers/arp.h"
 
-//Fonction qui gère le protocole ARP
+/*
+ * Function: treat_arp
+ * ----------------------------
+ *   Fonction qui traîte le procole (R)ARP
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête (R)ARP
+ *   level: niveau de verbosité
+ *   type: ARP ou RARP
+ *
+ *   returns: void
+ */
 void treat_arp(const unsigned char *packet, int level, int type) {
     struct arphdr *arp = (struct arphdr *)packet;
     struct ether_arp *ea = (struct ether_arp *)packet;
@@ -118,7 +128,15 @@ void treat_arp(const unsigned char *packet, int level, int type) {
     }
 }
 
-//Converti l'opcode ARP en string pour l'affichage
+/*
+ * Function: put_arp_opcode
+ * ----------------------------
+ *   Fonction qui affiche le type de l'opération (R)ARP en fonction de son code
+ *
+ *   opcode: code de l'opération
+ *
+ *   returns: void
+ */
 void put_arp_opcode (int opcode) {
     switch (opcode) {
         case ARPOP_REQUEST:

@@ -1,6 +1,16 @@
 #include "../headers/dns.h"
 
-//Appelée que si Verbose = 2 ou 3
+/*
+ * Function: treat_dns
+ * ----------------------------
+ *   Traite l'en-tête (M)DNS
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête DNS
+ *   level: niveau de verbosité
+ *   type: DNS ou MDNS
+ *
+ *   returns: void
+ */
 void treat_dns (const unsigned char *packet, int level, int type) {
     HEADER *dns = (HEADER *)packet;
     u_int16_t tID, nQuestions, nAnswers, nAuth, nAdd;
@@ -70,6 +80,19 @@ void treat_dns (const unsigned char *packet, int level, int type) {
     }
 }
 
+/*
+ * Function: dns_print
+ * ----------------------------
+ *   Affiche les informations relatives aux questions/réponses DNS
+ *
+ *   type: Section question ou ressource record
+ *   packet: la partie du paquet correspondante à l'en-tête DNS
+ *   datas: une entrée de type "question" ou de type "ressource record"
+ *   n: nombre d'entrées
+ *   is_following: booléen pour savoir s'il y a des entrées d'autre type ensuite (utile pour l'affichage)
+ *
+ *   returns: void
+ */
 void dns_print(const char *type, const unsigned char *packet, unsigned char **datas, u_int16_t n, bool is_following) {
     unsigned i;
     int test = strncmp(type, "Questions", 9);
@@ -172,6 +195,16 @@ void dns_print(const char *type, const unsigned char *packet, unsigned char **da
     }
 }
 
+/*
+ * Function: resolve
+ * ----------------------------
+ *   écrit le nom de domaine correspondant à la requête DNS
+ *
+ *   packet: la partie du paquet correspondant à l'en-tête DNS
+ *   rest: une entrée de type "question" ou "ressource record"
+ *
+ *   returns: la taille du nom de domaine
+ */
 unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
     int total = 0, len, i = 0;
     //On lit le nom tant qu'il n'est pas terminé
@@ -195,10 +228,18 @@ unsigned resolve (const unsigned char *packet, const unsigned char *rest) {
             fprintf(stdout, ".");
         }
     }
-
     return ++total;
 }
 
+/*
+ * Function: put_opcode
+ * ----------------------------
+ *   converti le type de l'opération en string (pour l'affichage)
+ *
+ *   opcode: identifiant (entier) de l'opération
+ *
+ *   returns: void
+ */
 void put_opcode(unsigned opcode) {
     fprintf(stdout, CYAN"            ├─"COL_RESET" Operation: ");
     switch (opcode) {
@@ -223,6 +264,15 @@ void put_opcode(unsigned opcode) {
     }
 }
 
+/*
+ * Function: put_rcode
+ * ----------------------------
+ *   converti le type de réponse à une opération en string (pour l'affichage)
+ *
+ *   rcode: identifiant (entier) de la réponse à l'opération
+ *
+ *   returns: void
+ */
 void put_rcode (unsigned rcode) {
     fprintf(stdout, CYAN"            ├─"COL_RESET" Reply Code: ");
     switch (rcode) {
@@ -262,6 +312,15 @@ void put_rcode (unsigned rcode) {
     }
 }
 
+/*
+ * Function: get_class
+ * ----------------------------
+ *   converti le numéro d'une classe DNS en string (pour l'affichage)
+ *
+ *   class: identifiant (entier) de la classe
+ *
+ *   returns: le nom de la classe
+ */
 char *get_class (u_int16_t class) {
     switch (class) {
         case IN:
@@ -277,6 +336,15 @@ char *get_class (u_int16_t class) {
     }
 }
 
+/*
+ * Function: get_class
+ * ----------------------------
+ *   converti le numéro d'un type d'enregistrement DNS en string (pour l'affichage)
+ *
+ *   type: identifiant (entier) du type de l'enregistrement
+ *
+ *   returns: le nom du type
+ */
 char *get_type (u_int16_t type) {
     switch (type) {
         case T_SOA:

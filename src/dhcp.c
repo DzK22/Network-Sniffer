@@ -1,6 +1,15 @@
 #include "../headers/dhcp.h"
 
-//Fonction qui gère bootp
+/*
+ * Function: treat_bootp
+ * ----------------------------
+ *   Fonction qui gère l'en-tête bootp
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête bootp
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_bootp (const unsigned char *packet, int level) {
     struct bootp *bootp = (struct bootp *)packet;
     u_int8_t opcode, htype, hlen, hops;
@@ -88,6 +97,16 @@ void treat_bootp (const unsigned char *packet, int level) {
     }
 }
 
+/*
+ * Function: print_dhcp
+ * ----------------------------
+ *   Fonction qui gère la partie vendor specific de bootp (DHCP)
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête bootp
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void print_dhcp (const unsigned char *packet, int level) {
     switch (level) {
         case V1:
@@ -294,6 +313,16 @@ void print_dhcp (const unsigned char *packet, int level) {
     } while (i < 60);
 }
 
+/*
+ * Function: get_time
+ * ----------------------------
+ *   recupère la valeur d'un timestamp
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête bootp
+ *   i: indice où l'on se trouve dans le paquet
+ *
+ *   returns: la valeur du timestamp
+ */
 u_int32_t get_time (const unsigned char *packet, int i) {
     return packet[i] << 24 | packet[i + 1] << 16 | packet[i + 2] << 8 | packet[i + 3];
 }

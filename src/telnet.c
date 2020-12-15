@@ -1,5 +1,16 @@
 #include "../headers/telnet.h"
 
+/*
+ * Function: treat_telnet
+ * ----------------------------
+ *   Traite telnet
+ *
+ *   packet: la partie du paquet correspondante à telnet
+ *   len: taille des données
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_telnet (const unsigned char *packet, int len, int level) {
     switch (level) {
         case V1:
@@ -19,6 +30,16 @@ void treat_telnet (const unsigned char *packet, int len, int level) {
     }
 }
 
+/*
+ * Function: treat_negoc
+ * ----------------------------
+ *   Traite une subnegoc telnet
+ *
+ *   packet: la partie du paquet correspondante à telnet
+ *   len: taille des données
+ *
+ *   returns: void
+ */
 void negoc(const unsigned char *packet, int len) {
     unsigned char *byte = (unsigned char *)packet;
     unsigned char *last;
@@ -116,6 +137,15 @@ void negoc(const unsigned char *packet, int len) {
     }
 }
 
+/*
+ * Function: put_opt
+ * ----------------------------
+ *   Fonction qui affiche le type de l'option telnet en fonction de son code
+ *
+ *   opt: code de l'option
+ *
+ *   returns: void
+ */
 void put_opt (int opt) {
     switch (opt) {
         case ECHO:

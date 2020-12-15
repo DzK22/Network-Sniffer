@@ -1,6 +1,18 @@
 #include "../headers/transfer.h"
 
-//Fonction qui invoque la fonction correpondant au protocole (de "transfert") applicatif du port passé en paramètre
+/*
+ * Function: treat_tranfer
+ * ----------------------------
+ *   Traite les données relatives aux protocoles de "transfert"
+ *
+ *   packet: la partie du paquet correspondante au protocole de transfert
+ *   resp: booléan pour savoir si c'est une requête ou une réponse
+ *   len: taille des données
+ *   level: niveau de verbosité
+ *   port: port applicatif correspondant au protocole traîté
+ *
+ *   returns: void
+ */
 void treat_transfer (const unsigned char *packet, bool resp, int len, int level, int port) {
     switch (port) {
         case HTTP:

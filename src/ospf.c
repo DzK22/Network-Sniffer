@@ -1,9 +1,17 @@
 #include "../headers/ospf.h"
 
-//Traite OSPv2 (Seulement IPv4 et non la version 3 pour certains champs tels que les options de hello packet)
-void treat_ospf(const unsigned char *packet, int *to_add, int level) {
+/*
+ * Function: treat_ospf
+ * ----------------------------
+ *   Fonction qui traîte l'en-tête OSPFv2
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête OSPFv2
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
+void treat_ospf(const unsigned char *packet, int level) {
     struct ospfhdr *ospf = (struct ospfhdr *)packet;
-    *to_add = sizeof(struct ospfhdr);
     u_int16_t len = ntohs(ospf->len);
     u_int16_t checksum = ntohs(ospf->checksum);
     switch (level) {
@@ -52,7 +60,15 @@ void treat_ospf(const unsigned char *packet, int *to_add, int level) {
     }
 }
 
-//Transforme le type d'un message OSPF en string pour l'affichage
+/*
+ * Function: get_ptype
+ * ----------------------------
+ *   Fonction qui transforme le type d'un message OSPF en string pour l'affichage
+ *
+ *   type: type du message (entier)
+ *
+ *   returns: le type du message sous forme de string
+ */
 char *get_ptype (int type) {
     char *str_type = NULL;
     switch (type) {
@@ -78,7 +94,16 @@ char *get_ptype (int type) {
     return str_type;
 }
 
-//Affiche les options OSPFv2
+/*
+ * Function: print_hopt
+ * ----------------------------
+ *   Fonction qui affiche les options OSPFv2
+ *
+ *   list: tableau où chaque case du tableau est un booléen valant 1 si l'option est présente, faux sinon.
+ *   n: nombre d'options
+ *
+ *   returns: le type du message sous forme de string
+ */
 void print_hopt (int *list, int n) {
     int i;
     for (i = 0; i < n; i++) {

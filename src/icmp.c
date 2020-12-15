@@ -1,5 +1,15 @@
 #include "../headers/icmp.h"
 
+/*
+ * Function: treat_icmp
+ * ----------------------------
+ *   Fonction qui traîte l'en-tête ICMP
+ *
+ *   packet: la partie du paquet correspondante à l'en-tête ICMP
+ *   level: niveau de verbosité
+ *
+ *   returns: void
+ */
 void treat_icmp (const unsigned char *packet, int level) {
     struct icmphdr *icmp = (struct icmphdr *)packet;
     switch (level) {
@@ -25,6 +35,15 @@ void treat_icmp (const unsigned char *packet, int level) {
     }
 }
 
+/*
+ * Function: put_type
+ * ----------------------------
+ *   Fonction qui affiche le type de l'opération ICMP en fonction de son code
+ *
+ *   type: code de l'opération
+ *
+ *   returns: void
+ */
 void put_type(u_int8_t type) {
     switch (type) {
         case ICMP_ECHO:
