@@ -121,196 +121,136 @@ void print_dhcp (const unsigned char *packet, int level) {
             fprintf(stdout, CYAN"            ├─"COL_RESET" DHCP:\n");
             break;
     }
-
-    unsigned i = 0;
-    int cpt, len;
+    u_int8_t cpt, len, option, msg;
     u_int32_t time;
     char str_ip[LEN];
     struct in_addr *ip;
-    //Le magic cookie a déjà été traité on prend donc les 60 octets suivant de Vendor spec
-    do {
-        if (level == V3) {
-            if ((int)packet[i] == TAG_END || (int)packet[i] == TAG_PARM_REQUEST)
-                fprintf(stdout, CYAN"            └─"COL_RESET"\t\tOption: ");
-            else
-                fprintf(stdout, CYAN"            ├"COL_RESET" \t\tOption: ");
-        }
-        switch ((int)packet[i]) {
-            case TAG_DHCP_MESSAGE:
-                fprintf(stdout, "DHCP Message type: ");
-                len = (int)packet[i + 1];
-                i += 2;
-                fprintf(stdout, "%s", get_dhcp_type((int)packet[i]));
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+    u_int8_t *pvendor = (u_int8_t *)packet;
+    while (1) {
+        option = *pvendor++;
+        len = *pvendor++;
+        if (option != 0) {
+            switch (level) {
+                case V1:
+                    break;
 
-            case TAG_RENEWAL_TIME:
-                fprintf(stdout, "Renewal time value: ");
-                len = (int)packet[i + 1];
-                i += 2;
-                time = ntohl(*((u_int32_t *)(packet + i)));
-                fprintf(stdout, "%d secs", time);
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+                case V2:
+                    break;
 
-            case TAG_REBIND_TIME:
-                fprintf(stdout, "Rebind time value: ");
-                len = (int)packet[i + 1];
-                i += 2;
-                time = ntohl(*((u_int32_t *)(packet + i)));
-                fprintf(stdout, "%d secs", time);
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+                case V3:
+                    if (option == TAG_END)
+                        fprintf(stdout, CYAN"            └─"COL_RESET"\t\tOption (len %d): ", len);
+                    else
+                        fprintf(stdout, CYAN"            ├"COL_RESET" \t\tOption (len %d): ", len);
+                    break;
+            }
+            switch (option) {
+                case TAG_PAD:
+                    break;
 
-            case TAG_IP_LEASE:
-                fprintf(stdout, "IP Address Lease Time: ");
-                len = (int)packet[i + 1];
-                i += 2;
-                time = ntohl(*((u_int32_t *)(packet + i)));
-                fprintf(stdout, "%d secs", time);
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+                case TAG_REBIND_TIME:
+                    time = ntohl((*(u_int32_t *)pvendor));
+                    fprintf(stdout, "Rebind time value: ");
+                    fprintf(stdout, "%d secs", time);
+                    break;
 
-            case TAG_SUBNET_MASK:
-                fprintf(stdout, "Subnet Mask: ");
-                len = (int)packet[i + 1];
-                i += 2;
-
-                ip = (struct in_addr *) (packet + i);
-                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
-                    fprintf(stderr, "inet_ntop\n");
+                case TAG_END:
+                    fprintf(stdout, "End\n");
                     return;
-                }
-                fprintf(stdout, "%s", str_ip);
 
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+                case TAG_DHCP_MESSAGE:
+                    msg = *pvendor;
+                    fprintf(stdout, "DHCP Message type: ");
+                    fprintf(stdout, "%s", get_dhcp_type(msg));
+                    break;
 
-            case TAG_SERVER_ID:
-                fprintf(stdout, "DHCP Server ID: ");
-                len = (int)packet[i + 1];
-                i += 2;
+                case TAG_RENEWAL_TIME:
+                    time = ntohl((*(u_int32_t *)pvendor));
+                    fprintf(stdout, "Renewal time value: ");
+                    fprintf(stdout, "%d secs", time);
+                    break;
 
-                ip = (struct in_addr *) (packet + i);
-                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
-                    fprintf(stderr, "inet_ntop\n");
-                    return;
-                }
-                fprintf(stdout, "%s", str_ip);
+                case TAG_IP_LEASE:
+                    time = ntohl((*(u_int32_t *)pvendor));
+                    fprintf(stdout, "IP Address Lease Time: ");
+                    fprintf(stdout, "%d secs", time);
+                    break;
 
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
-
-            case TAG_REQUESTED_IP:
-                fprintf(stdout, "Requested IP Address: ");
-                len = (int)packet[i + 1];
-                i += 2;
-
-                ip = (struct in_addr *) (packet + i);
-                if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
-                    fprintf(stderr, "inet_ntop\n");
-                    return;
-                }
-                fprintf(stdout, "%s", str_ip);
-
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
-
-            case TAG_PARM_REQUEST:
-                if (level == V3)
-                    fprintf(stdout, "Parameter Request List [");
-                if (level == V2)
-                    fprintf(stdout, "Parameter Request List Item: { ");
-                len = (int)packet[i + 1];
-                for (cpt = 0; cpt < len; cpt++) {
-                    int param = packet[i + cpt + 2];
-                    switch (param) {
-                        case TAG_SUBNET_MASK:
-                            fprintf(stdout, "(%d) Subnet Mask", param);
-                            break;
-                        case TAG_GATEWAY:
-                            fprintf(stdout, "(%d) Router", param);
-                            break;
-                        case TAG_DOMAIN_SERVER:
-                            fprintf(stdout, "(%d) Domain Name Server", param);
-                            break;
-                        case TAG_NTP_SERVERS:
-                            fprintf(stdout, "(%d) Network Time Protocol Servers", param);
-
-                            break;
-                        default:
-                            if (level == V3)
-                                fprintf(stdout, "(%d) Unknown", param);
-                            break;
+                case TAG_CLIENT_ID:
+                    fprintf(stdout, "Client identifier ");
+                    //Si le type est ethernet alors c'est une @MAC
+                    if (*pvendor == 0x01) {
+                        struct ether_addr *mac = (struct ether_addr *)(pvendor + 1);
+                        fprintf(stdout, "%s", ether_ntoa(mac));
                     }
-                    if (cpt != len - 1)
-                        fprintf(stdout, ", ");
-                }
-                if (level == V2)
-                    fprintf(stdout, " }\n");
-                i += (int)packet[i];
-                if (level == V3)
-                    fprintf(stdout, "]\n");
-                else if (i < 60)
-                    fprintf(stdout, ", ");
-                break;
+                    else
+                        fprintf(stdout, "Unknown\n");
+                    break;
 
-            case TAG_END:
-                if (level == V3)
-                    fprintf(stdout, "End");
-                fprintf(stdout, "\n");
-                return;
+                case TAG_REQUESTED_IP:
+                    ip = (struct in_addr *)pvendor;
+                    if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                        fprintf(stderr, "inet_ntop\n");
+                        return;
+                    }
+                    fprintf(stdout, "Requested IP Address: %s", str_ip);
+                    break;
 
-            case TAG_CLIENT_ID:
-                fprintf(stdout, "Client identifier ");
-                len = (int)packet[i + 1];
-                i += 2;
-                //Si le type est ethernet alors c'est une @MAC
-                if ((int)packet[i] == 0x01) {
-                    struct ether_addr *mac = (struct ether_addr *)(packet + 6);
-                    fprintf(stdout, "%s", ether_ntoa(mac));
-                }
-                else
-                    fprintf(stdout, "Unknown\n");
-                i += len;
-                if (level == V3)
-                    fprintf(stdout, "\n");
-                else if ((int)packet[i] != TAG_END)
-                    fprintf(stdout, ", ");
-                break;
+                case TAG_SERVER_ID:
+                    ip = (struct in_addr *)pvendor;
+                    if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                        fprintf(stderr, "inet_ntop\n");
+                        return;
+                    }
+                    fprintf(stdout, "DHCP Server ID: %s", str_ip);
+                    break;
 
-            default:
-                return;
+                case TAG_SUBNET_MASK:
+                    ip = (struct in_addr *)pvendor;
+                    if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                        fprintf(stderr, "inet_ntop\n");
+                        return;
+                    }
+                    fprintf(stdout, "Subnet Mask: %s", str_ip);
+                    break;
+
+                case TAG_PARM_REQUEST:
+                    fprintf(stdout, "Parameter Request List Item: { ");
+                    for (cpt = 0; cpt < len; cpt++) {
+                        int param = pvendor[cpt + 2];
+                        switch (param) {
+                            case TAG_SUBNET_MASK:
+                                fprintf(stdout, "(%d) Subnet Mask", param);
+                                break;
+                            case TAG_GATEWAY:
+                                fprintf(stdout, "(%d) Router", param);
+                                break;
+                            case TAG_DOMAIN_SERVER:
+                                fprintf(stdout, "(%d) Domain Name Server", param);
+                                break;
+                            case TAG_NTP_SERVERS:
+                                fprintf(stdout, "(%d) Network Time Protocol Servers", param);
+                                break;
+                            default:
+                                fprintf(stdout, "(%d) Unknown", param);
+                                break;
+                        }
+                        if (cpt != len - 1)
+                            fprintf(stdout, ", ");
+                    }
+                    fprintf(stdout, " }");
+                    break;
+                default:
+                    fprintf(stdout, "Unknown (%d)", option);
+                    break;
+            }
         }
-    } while (i < 60);
+        if (level == V3)
+            fprintf(stdout, "\n");
+        else //Ici on a pas de verbose 1
+            fprintf(stdout, ", ");
+        pvendor += len;
+    }
 }
 
 char *get_dhcp_type (int type) {
