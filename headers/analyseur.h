@@ -29,7 +29,6 @@
 #include <signal.h>
 #include <net/if_arp.h>
 
-#define NO_INTERFACE "NULL"
 #define V3 3
 #define V2 2
 #define V1 1
@@ -39,7 +38,7 @@
 #define YELLOW "\e[38;2;255;250;0m"
 #define CYAN "\e[0;36m"
 #define SUPPR "\e[D\e[D\e[K"
-#define LEN 512
+#define LEN 1024
 
 void sigint_handler (int);
 void callback(unsigned char *, const struct pcap_pkthdr *, const unsigned char *);
