@@ -152,7 +152,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "Renewal time value: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                time = get_time(packet, i);
+                time = ntohl(*((u_int32_t *)(packet + i)));
                 fprintf(stdout, "%d secs", time);
                 i += len;
                 if (level == V3)
@@ -165,7 +165,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "Rebind time value: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                time = get_time(packet, i);
+                time = ntohl(*((u_int32_t *)(packet + i)));
                 fprintf(stdout, "%d secs", time);
                 i += len;
                 if (level == V3)
@@ -178,7 +178,7 @@ void print_dhcp (const unsigned char *packet, int level) {
                 fprintf(stdout, "IP Address Lease Time: ");
                 len = (int)packet[i + 1];
                 i += 2;
-                time = get_time(packet, i);
+                time = ntohl(*((u_int32_t *)(packet + i)));
                 fprintf(stdout, "%d secs", time);
                 i += len;
                 if (level == V3)
@@ -311,20 +311,6 @@ void print_dhcp (const unsigned char *packet, int level) {
                 return;
         }
     } while (i < 60);
-}
-
-/*
- * Function: get_time
- * ----------------------------
- *   recupère la valeur d'un timestamp
- *
- *   packet: la partie du paquet correspondante à l'en-tête bootp
- *   i: indice où l'on se trouve dans le paquet
- *
- *   returns: la valeur du timestamp
- */
-u_int32_t get_time (const unsigned char *packet, int i) {
-    return packet[i] << 24 | packet[i + 1] << 16 | packet[i + 2] << 8 | packet[i + 3];
 }
 
 char *get_dhcp_type (int type) {

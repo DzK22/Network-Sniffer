@@ -164,6 +164,7 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             if (*to_add > 20) {
                 fprintf(stdout, PINK"         ├─"COL_RESET" Urgent Pointer = %d\n", urgPointer);
                 int i = sizeof(struct tcphdr), value, len;
+                u_int32_t timestamp;
                 fprintf(stdout, PINK"         ├─"COL_RESET" Options:\n");
                 do {
                     if (i + (int)packet[i + 1] >= *to_add || i + 1 >= *to_add)
@@ -206,10 +207,10 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                             len = (int)packet[i + 1];
                             fprintf(stdout, "\tTimestamp (%d): ", packet[i]);
                             fprintf(stdout, "[Length: %d, ", len);
-                            value = get_timestamp(packet, i);
-                            fprintf(stdout, "Timestamp value: %d secs, ", value);
-                            value = get_timestamp(packet, i + 4);
-                            fprintf(stdout, "Timestamp echo reply: %d secs]\n", value);
+                            timestamp = ntohl(*((u_int32_t *)(packet + i + 2)));
+                            fprintf(stdout, "Timestamp value: %u secs, ", timestamp);
+                            timestamp = ntohl(*((u_int32_t *)(packet + i + 6)));
+                            fprintf(stdout, "Timestamp echo reply: %u secs]\n", timestamp);
                             i += len;
                             break;
 
@@ -223,18 +224,4 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
             }
             break;
     }
-}
-
-/*
- * Function: get_timestamp
- * ----------------------------
- *   recupère la valeur d'un timestamp dans les options TCP
- *
- *   packet: la partie du paquet correspondante à l'en-tête TCP
- *   i: indice où l'on se trouve dans le paquet (au niveau des options)
- *
- *   returns: la valeur du timestamp
- */
-u_int32_t get_timestamp (const unsigned char *packet, int i) {
-    return packet[i + 2] << 24 | packet[i + 3] << 16 | packet[i + 4] << 8 | packet[i + 5];
 }
