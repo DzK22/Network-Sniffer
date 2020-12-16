@@ -47,39 +47,39 @@ void treat_icmp (const unsigned char *packet, int level) {
 void put_type(u_int8_t type) {
     switch (type) {
         case ICMP_ECHO:
-        fprintf(stdout, "Echo Request ");
+            fprintf(stdout, "Echo Request ");
             break;
 
         case ICMP_ECHOREPLY:
-        fprintf(stdout, "Echo Reply ");
+            fprintf(stdout, "Echo Reply ");
             break;
 
         case ICMP_DEST_UNREACH:
-        fprintf(stdout, "Destination Unreachable");
+            fprintf(stdout, "Destination Unreachable");
             break;
 
         case ICMP_SOURCE_QUENCH:
-        fprintf(stdout, "Source Quench");
+            fprintf(stdout, "Source Quench");
             break;
 
         case ICMP_INFO_REPLY:
-        fprintf(stdout, "Info Reply");
+            fprintf(stdout, "Info Reply");
             break;
 
         case ICMP_INFO_REQUEST:
-        fprintf(stdout, "Info Request");
+            fprintf(stdout, "Info Request");
             break;
 
         case ICMP_TIME_EXCEEDED:
-        fprintf(stdout, "Time Exceeded");
+            fprintf(stdout, "Time Exceeded");
             break;
 
         case ICMP_ADDRESS:
-        fprintf(stdout, "Adress Mask Request");
+            fprintf(stdout, "Adress Mask Request");
             break;
 
         case ICMP_ADDRESSREPLY:
-        fprintf(stdout, "Adress Mask Reply");
+            fprintf(stdout, "Adress Mask Reply");
             break;
 
         default:
