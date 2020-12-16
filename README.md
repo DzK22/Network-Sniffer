@@ -10,7 +10,7 @@ Protocoles Supportés :
 
 # Architecture
 - /src : Fichiers sources
-- /headers : fichiers include
+- /headers : Fichiers includes
 
 ## Auteur
 

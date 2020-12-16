@@ -75,11 +75,6 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    if (f && o) {
-        fprintf(stderr, "Vous ne pouvez pas utiliser -f et -o pendant la mm execution\n");
-        return EXIT_FAILURE;
-    }
-
     if (o) {
         if ((packet = pcap_open_offline(fichier, errbuff)) == NULL) {
             fprintf(stderr, "pcap_open_offline error\n");
@@ -123,19 +118,20 @@ int main (int argc, char **argv) {
             return EXIT_FAILURE;
         }
         pcap_freealldevs(alldevs);
-        if (f) {
-            struct bpf_program bfp_f;
-            bpf_u_int32 maskp = 0;
-            if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
-                fprintf(stderr, "Error filter compiling\n");
-                return EXIT_FAILURE;
-            }
-            if (pcap_setfilter(packet, &bfp_f) == PCAP_ERROR) {
-                fprintf(stderr, "Error filter setting\n");
-                return EXIT_FAILURE;
-            }
-            fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
+    }
+
+    if (f) {
+        struct bpf_program bfp_f;
+        bpf_u_int32 maskp = 0;
+        if (pcap_compile(packet, &bfp_f, filtre, 0, maskp) == -1) {
+            fprintf(stderr, "Error filter compiling\n");
+            return EXIT_FAILURE;
         }
+        if (pcap_setfilter(packet, &bfp_f) == PCAP_ERROR) {
+            fprintf(stderr, "Error filter setting\n");
+            return EXIT_FAILURE;
+        }
+        fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
     }
 
     args[0] = (unsigned char) level;
