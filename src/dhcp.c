@@ -33,8 +33,6 @@ void treat_bootp (const unsigned char *packet, int level) {
     res_snp = snprintf(chaddr, LEN, "%s", ether_ntoa((struct ether_addr *)bootp->bp_chaddr));
     if (test_snprintf(res_snp, LEN) == EXIT_FAILURE)
         return;
-    char *sname = *bootp->bp_sname ? ether_ntoa((struct ether_addr *)bootp->bp_sname) : "None";
-    char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
     int is_dhcp = memcmp(bootp->bp_vend, magic_cookie, 4);
     switch (level) {
         case V3:
@@ -66,15 +64,34 @@ void treat_bootp (const unsigned char *packet, int level) {
             fprintf(stdout, CYAN"            ├─"COL_RESET" Next server IP address: %s\n", inet_ntoa(sip));
             fprintf(stdout, CYAN"            ├─"COL_RESET" Relay agent IP address: %s\n", inet_ntoa(gip));
             fprintf(stdout, CYAN"            ├─"COL_RESET" Client MAC address: %s\n", chaddr);
-            if (strcmp(sname, "None") == 0)
+            if (*bootp->bp_sname == 0)
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Server host name not given\n");
-            else
-                fprintf(stdout, CYAN"            ├─"COL_RESET" Server host name: %s\n", sname);
-            if (strcmp(file, "None") == 0)
+            else {
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Server host name: ");
+                u_int8_t *ptr = &bootp->bp_sname[0];
+                while (*ptr) {
+                    if (isprint(*ptr))
+                        fprintf(stdout, "%c", *ptr);
+                    else
+                        fprintf(stdout, ".");
+                    ptr++;
+                }
+                fprintf(stdout, "\n");
+            }
+            if (*bootp->bp_file == 0)
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Boot file name not given\n");
-            else
-                fprintf(stdout, CYAN"            ├─"COL_RESET" Boot file name: %s\n", file);
-
+            else {
+                fprintf(stdout, CYAN"            ├─"COL_RESET" Boot file name: ");
+                u_int8_t *ptr = &bootp->bp_file[0];
+                while (*ptr) {
+                    if (isprint(*ptr))
+                        fprintf(stdout, "%c", *ptr);
+                    else
+                        fprintf(stdout, ".");
+                    ptr++;
+                }
+                fprintf(stdout, "\n");
+            }
             if (is_dhcp == 0)
                 fprintf(stdout, CYAN"            ├─"COL_RESET" Vendor Spec: ");
             else
