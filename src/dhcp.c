@@ -15,7 +15,6 @@ void treat_bootp (const unsigned char *packet, int level) {
     u_int8_t opcode, htype, hlen, hops;
     u_int32_t xID;
     u_int16_t secs, flags;
-    int res_snp;
     opcode = bootp->bp_op;
     htype = bootp->bp_htype;
     hlen = bootp->bp_hlen;
@@ -30,9 +29,7 @@ void treat_bootp (const unsigned char *packet, int level) {
     gip = bootp->bp_giaddr;
     u_int8_t magic_cookie[4] = VM_RFC1048;
     char chaddr[LEN];
-    res_snp = snprintf(chaddr, LEN, "%s", ether_ntoa((struct ether_addr *)bootp->bp_chaddr));
-    if (test_snprintf(res_snp, LEN) == EXIT_FAILURE)
-        return;
+    ether_ntoa_r((struct ether_addr *)bootp->bp_chaddr, chaddr);
     int is_dhcp = memcmp(bootp->bp_vend, magic_cookie, 4);
     switch (level) {
         case V3:
