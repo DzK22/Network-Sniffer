@@ -125,7 +125,7 @@ void print_dhcp (const unsigned char *packet, int level) {
             fprintf(stdout, CYAN"            ├─"COL_RESET" DHCP:\n");
             break;
     }
-    u_int8_t cpt, len, option, msg, start;
+    u_int8_t cpt, len, option, msg;
     u_int32_t time;
     char str_ip[LEN];
     struct in_addr *ip;
@@ -233,8 +233,6 @@ void print_dhcp (const unsigned char *packet, int level) {
 
                 case TAG_DOMAIN_SERVER:
                     fprintf(stdout, "Domain Name Server: ");
-                    //start = *pvendor;
-                    (void)start;
                     for (u_int8_t i = 0; i < len; i += 4) {
                         ip = (struct in_addr *)(pvendor + i);
                         if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
