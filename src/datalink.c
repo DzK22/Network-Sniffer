@@ -16,31 +16,21 @@ void treat_ethernet(const unsigned char *packet, int *protocol, int level) {
     const struct ether_addr *mac_src = (struct ether_addr *) header->ether_shost;
     const struct ether_addr *mac_dst = (struct ether_addr *) header->ether_dhost;
     *protocol = ntohs(header->ether_type);
-    int res;
-    char mac_source[LEN];
-    char mac_dest[LEN];
-    res = snprintf(mac_source, LEN, "%s", ether_ntoa(mac_src));
-    if (test_snprintf(res, LEN) == EXIT_FAILURE) {
-        fprintf(stderr, "error\n");
-        exit(EXIT_FAILURE);
-    }
-    res = snprintf(mac_dest, LEN, "%s", ether_ntoa(mac_dst));
-    if (test_snprintf(res, LEN) == EXIT_FAILURE) {
-        fprintf(stderr, "error\n");
-        exit(EXIT_FAILURE);
-    }
-
+    char str_mac_src[LEN];
+    char str_mac_dst[LEN];
+    ether_ntoa_r(mac_src, str_mac_src);
+    ether_ntoa_r(mac_dst, str_mac_dst);
     switch (level) {
         case V1:
-            fprintf(stdout, "[Ethernet] src: %s, dst: %s\t", mac_source, mac_dest);
+            fprintf(stdout, "[Ethernet] src: %s, dst: %s\t", str_mac_src, str_mac_dst);
             break;
 
         case V2:
-            fprintf(stdout, GREEN"$> Ethernet:"COL_RESET" @mac src: %s, @mac dst: %s\n", mac_source, mac_dest);
+            fprintf(stdout, GREEN"$> Ethernet:"COL_RESET" @mac src: %s, @mac dst: %s\n", str_mac_src, str_mac_dst);
             break;
 
         case V3:
-            fprintf(stdout, GREEN" └─ Ethernet Frame: from %s to %s\n"COL_RESET, mac_source, mac_dest);
+            fprintf(stdout, GREEN" └─ Ethernet Frame: from %s to %s\n"COL_RESET, str_mac_src, str_mac_dst);
             break;
     }
 }
