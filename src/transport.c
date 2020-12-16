@@ -168,18 +168,18 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
                 fprintf(stdout, PINK"         ├─"COL_RESET" Options:\n");
                 do {
                     if (i + (int)packet[i + 1] >= *to_add || i + 1 >= *to_add)
-                        fprintf(stdout, PINK"         └─"COL_RESET"\t\tTCP Option - ");
+                        fprintf(stdout, PINK"         └─"COL_RESET);
                     else
-                        fprintf(stdout, PINK"         ├"COL_RESET"\t\tTCP Option - ");
+                        fprintf(stdout, PINK"         ├"COL_RESET);
                     switch (packet[i]) {
                         case NOP:
-                            fprintf(stdout, "\tNo Operation (NOP)\n");
+                            fprintf(stdout, "\t- No Operation (NOP)\n");
                             i++;
                             break;
 
                         case MSS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tMaximum Segment Size (%d): [Length: %d, ", packet[i], len);
+                            fprintf(stdout, "\t- Maximum Segment Size (%d): [Length: %d, ", packet[i], len);
                             value = packet[i + 2] << 8 | packet[i + 3];
                             fprintf(stdout, "MSS Value: %d bytes]\n", value);
                             i += len;
@@ -187,36 +187,36 @@ void treat_tcp(const unsigned char *packet, int *to_add, int *sport, int *dport,
 
                         case WS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tWindow Scale (%d): [Length: %d, Shift count: %d]\n", packet[i], len, packet[i + 2]);
+                            fprintf(stdout, "\t- Window Scale (%d): [Length: %d, Shift count: %d]\n", packet[i], len, packet[i + 2]);
                             i += len;
                             break;
 
                         case SACKP:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tSack Permitted (%d): [Length: %d]\n", packet[i], len);
+                            fprintf(stdout, "\t- Sack Permitted (%d): [Length: %d]\n", packet[i], len);
                             i += len;
                             break;
 
                         case SACK:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tSack\n");
+                            fprintf(stdout, "\t- Sack\n");
                             i += len;
                             break;
 
                         case TS:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tTimestamp (%d): ", packet[i]);
+                            fprintf(stdout, "\t- TS (%d): ", packet[i]);
                             fprintf(stdout, "[Length: %d, ", len);
                             timestamp = ntohl(*((u_int32_t *)(packet + i + 2)));
-                            fprintf(stdout, "Timestamp value: %u secs, ", timestamp);
+                            fprintf(stdout, "TSval: %u secs, ", timestamp);
                             timestamp = ntohl(*((u_int32_t *)(packet + i + 6)));
-                            fprintf(stdout, "Timestamp echo reply: %u secs]\n", timestamp);
+                            fprintf(stdout, "TSecr: %u]\n", timestamp);
                             i += len;
                             break;
 
                         default:
                             len = (int)packet[i + 1];
-                            fprintf(stdout, "\tUnknown (%d): [Length: %d]\n", packet[i], len);
+                            fprintf(stdout, "\t- Unknown (%d): [Length: %d]\n", packet[i], len);
                             i += len;
                             break;
                     }

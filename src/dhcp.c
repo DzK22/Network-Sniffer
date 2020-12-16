@@ -15,6 +15,7 @@ void treat_bootp (const unsigned char *packet, int level) {
     u_int8_t opcode, htype, hlen, hops;
     u_int32_t xID;
     u_int16_t secs, flags;
+    int res_snp;
     opcode = bootp->bp_op;
     htype = bootp->bp_htype;
     hlen = bootp->bp_hlen;
@@ -28,7 +29,10 @@ void treat_bootp (const unsigned char *packet, int level) {
     sip = bootp->bp_siaddr;
     gip = bootp->bp_giaddr;
     u_int8_t magic_cookie[4] = VM_RFC1048;
-    char *chaddr = ether_ntoa((struct ether_addr *)bootp->bp_chaddr);
+    char chaddr[LEN];
+    res_snp = snprintf(chaddr, LEN, "%s", ether_ntoa((struct ether_addr *)bootp->bp_chaddr));
+    if (test_snprintf(res_snp, LEN) == EXIT_FAILURE)
+        return;
     char *sname = *bootp->bp_sname ? ether_ntoa((struct ether_addr *)bootp->bp_sname) : "None";
     char *file = *bootp->bp_file ? ether_ntoa((struct ether_addr *)bootp->bp_file) : "None";
     int is_dhcp = memcmp(bootp->bp_vend, magic_cookie, 4);
@@ -121,7 +125,7 @@ void print_dhcp (const unsigned char *packet, int level) {
             fprintf(stdout, CYAN"            ├─"COL_RESET" DHCP:\n");
             break;
     }
-    u_int8_t cpt, len, option, msg;
+    u_int8_t cpt, len, option, msg, start;
     u_int32_t time;
     char str_ip[LEN];
     struct in_addr *ip;
@@ -225,6 +229,26 @@ void print_dhcp (const unsigned char *packet, int level) {
                         return;
                     }
                     fprintf(stdout, "Subnet Mask: %s", str_ip);
+                    break;
+
+                case TAG_DOMAIN_SERVER:
+                    fprintf(stdout, "Domain Name Server: ");
+                    //start = *pvendor;
+                    (void)start;
+                    for (u_int8_t i = 0; i < len; i += 4) {
+                        ip = (struct in_addr *)(pvendor + i);
+                        if (inet_ntop(AF_INET, ip, str_ip, LEN) == NULL) {
+                            fprintf(stderr, "inet_ntop\n");
+                            return;
+                        }
+                        fprintf(stdout, "%s%s", str_ip, (i + 4 == len ? "" : ", "));
+                    }
+                    break;
+
+                case TAG_DOMAINNAME:
+                    fprintf(stdout, "Domain Name: ");
+                    for (u_int8_t i = 0; i < len; i++)
+                        fprintf(stdout, "%c", pvendor[i]);
                     break;
 
                 case TAG_PARM_REQUEST:
