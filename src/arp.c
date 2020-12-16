@@ -21,6 +21,8 @@ void treat_arp(const unsigned char *packet, int level, int type) {
     ushort op_code = ntohs(arp->ar_op);
     char str_ip_src[LEN];
     char str_ip_dst[LEN];
+    char str_mac_src[LEN];
+    char str_mac_dst[LEN];
     if (inet_ntop(AF_INET, (struct in_addr *)ea->arp_spa, str_ip_src, LEN) == NULL) {
         fprintf(stderr, "inet_ntop error\n");
         return;
@@ -29,6 +31,8 @@ void treat_arp(const unsigned char *packet, int level, int type) {
         fprintf(stderr, "inet_ntop error\n");
         return;
     }
+    ether_ntoa_r((struct ether_addr *)&ea->arp_sha, str_mac_src);
+    ether_ntoa_r((struct ether_addr *)&ea->arp_tha, str_mac_dst);
     switch (level) {
         case V1:
             fprintf(stdout, "|| [%s] ", type == ETHERTYPE_ARP ? "ARP" : "RARP");
@@ -37,14 +41,14 @@ void treat_arp(const unsigned char *packet, int level, int type) {
                     if (op_code == ARPOP_REQUEST)
                         fprintf(stdout, "Who is %s ? Tell %s ", str_ip_dst, str_ip_src);
                     else if (op_code == ARPOP_REPLY)
-                        fprintf(stdout, "%s is at %s ", str_ip_dst, ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                        fprintf(stdout, "%s is at %s ", str_ip_dst, str_mac_src);
                     break;
 
                 case ETHERTYPE_REVARP:
                     if (op_code == ARPOP_RREQUEST)
-                        fprintf(stdout, "Who is %s ? Tell %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                        fprintf(stdout, "Who is %s ? Tell %s ", str_mac_dst, str_mac_src);
                     else if (op_code == ARPOP_RREPLY)
-                        fprintf(stdout, "%s is at %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), str_ip_dst);
+                        fprintf(stdout, "%s is at %s ", str_mac_dst, str_ip_dst);
                     break;
 
                 default:
@@ -60,14 +64,14 @@ void treat_arp(const unsigned char *packet, int level, int type) {
                     if (op_code == ARPOP_REQUEST)
                         fprintf(stdout, "Who is %s ? Tell %s ", str_ip_dst, str_ip_src);
                     else if (op_code == ARPOP_REPLY)
-                        fprintf(stdout, "%s is at %s ", str_ip_dst, ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                        fprintf(stdout, "%s is at %s ", str_ip_dst, str_mac_src);
                     break;
 
                 case ETHERTYPE_REVARP:
                     if (op_code == ARPOP_RREQUEST)
-                        fprintf(stdout, "Who is %s ? Tell %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                        fprintf(stdout, "Who is %s ? Tell %s ", str_mac_dst, str_mac_src);
                     else if (op_code == ARPOP_RREPLY)
-                        fprintf(stdout, "%s is at %s ", ether_ntoa((struct ether_addr *)&ea->arp_tha), str_ip_dst);
+                        fprintf(stdout, "%s is at %s ", str_mac_dst, str_ip_dst);
                     break;
 
                 default:
@@ -119,9 +123,9 @@ void treat_arp(const unsigned char *packet, int level, int type) {
             fprintf(stdout, YELLOW"     ├─"COL_RESET" Protocol size: %d\n", protocol);
 
             if (hardware == ARPHRD_ETHER && p_type == ETHERTYPE_IP) {
-                fprintf(stdout, YELLOW"     ├─"COL_RESET" Src Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_sha));
+                fprintf(stdout, YELLOW"     ├─"COL_RESET" Src Mac Address => %s\n", str_mac_src);
                 fprintf(stdout, YELLOW"     ├─"COL_RESET" Src IP Address => %s\n", str_ip_src);
-                fprintf(stdout, YELLOW"     ├─"COL_RESET" Dst Mac Address => %s\n", ether_ntoa((struct ether_addr *)&ea->arp_tha));
+                fprintf(stdout, YELLOW"     ├─"COL_RESET" Dst Mac Address => %s\n", str_mac_dst);
                 fprintf(stdout, YELLOW"     └─"COL_RESET" Dst IP Address => %s\n", str_ip_dst);
             }
             break;
