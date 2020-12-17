@@ -131,7 +131,11 @@ int main (int argc, char **argv) {
             fprintf(stderr, "Error filter setting\n");
             return EXIT_FAILURE;
         }
-        fprintf(stdout, "le filtre %s a été appliqué sur l'interface %s\n", filtre, interface);
+        if (!o)
+            fprintf(stdout, "le filtre <%s> a été appliqué sur l'interface %s\n\n", filtre, interface);
+        //Il ne peut pas y avoir i et o pendant la mm exec
+        else
+            fprintf(stdout, "le filtre <%s> a été appliqué sur le fichier %s\n\n", filtre, fichier);
     }
 
     args[0] = (unsigned char) level;
