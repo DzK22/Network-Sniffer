@@ -18,7 +18,6 @@ void treat_network(const unsigned char *packet, int e_protocol, int *t_protocol,
     int port = -1;
     switch(e_protocol) {
         case ETHERTYPE_IP:
-            //appelez fonction IP
             port = treat_ipv4(packet, level, to_add, dataLen);
             break;
 

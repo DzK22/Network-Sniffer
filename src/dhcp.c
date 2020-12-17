@@ -302,6 +302,15 @@ void print_dhcp (const unsigned char *packet, int level) {
     }
 }
 
+/*
+ * Function: get_type
+ * ----------------------------
+ *   converti le numéro d'un type de message DHCP en string (pour l'affichage)
+ *
+ *   type: identifiant (entier) du type du message DHCP
+ *
+ *   returns: le nom du type
+ */
 char *get_dhcp_type (int type) {
     switch (type) {
         case DHCPDISCOVER:
